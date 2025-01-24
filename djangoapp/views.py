@@ -11,6 +11,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 # Obtenir tous les utilisateurs
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def getData(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
@@ -18,6 +19,7 @@ def getData(request):
 
 # Obtenir un utilisateur spécifique
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def getUser(request, pk):
     try:
         user = User.objects.get(id=pk)
