@@ -1,19 +1,19 @@
 <script setup>
-import { ref } from 'vue';
-import i18next from 'i18next';
+import { ref } from 'vue'
+import i18next from 'i18next'
 
-const email = ref('');
-const password = ref('');
-const showSignIn = ref(false);
-const showRegister = ref(false);
+const email = ref('')
+const password = ref('')
+const showSignIn = ref(false)
+const showRegister = ref(false)
 
 const handleSignIn = () => {
-  console.log('Sign In clicked with:', email.value, password.value);
-};
+  console.log('Sign In clicked with:', email.value, password.value)
+}
 
 const forgotPassword = () => {
-  console.log('Forgot password clicked');
-};
+  console.log('Forgot password clicked')
+}
 </script>
 
 <template>
@@ -51,7 +51,9 @@ const forgotPassword = () => {
       </div>
 
       <div class="button-group">
-        <button class="submit-button" @click="$router.push('/profil')">Go to Profil</button>
+        <button class="submit-button" @click="$router.push('/profil')">
+          Go to Profil
+        </button>
       </div>
     </div>
   </div>
@@ -60,7 +62,9 @@ const forgotPassword = () => {
 <style scoped>
 .container {
   width: 100vw;
-  height: calc(100vh - 100px); /* Ajuster en fonction de la hauteur de la navbar */
+  height: calc(
+    100vh - 100px
+  ); /* Ajuster en fonction de la hauteur de la navbar */
   margin: 0;
   padding: 0;
   display: flex;
@@ -135,7 +139,9 @@ const forgotPassword = () => {
   font-weight: 400;
   line-height: 16px;
   cursor: pointer;
-  transition: background 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
 }
 
 .submit-button:hover {

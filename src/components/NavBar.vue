@@ -1,22 +1,26 @@
 <script setup>
-import IconEcosystem from './icons/IconEcosystem.vue';
-import ThemeSelector from './ThemeSelector.vue';
+import IconGolem from './icons/IconGolem.vue'
+import ThemeSelector from './ThemeSelector.vue'
 
-defineEmits(['showSignIn', 'showRegister']);
+defineEmits(['showSignIn', 'showRegister'])
 </script>
 
 <template>
   <div class="header">
     <div class="logo-container">
       <div class="logo-border">
-        <IconEcosystem style="color: #FFF000"></IconEcosystem>
+        <IconGolem style="color: #000000"></IconGolem>
       </div>
     </div>
     <div class="spacer"></div>
     <ThemeSelector />
     <div class="auth-buttons">
-      <button class="sign-in-button" @click="$emit('showSignIn')">Sign in</button>
-      <button class="register-button" @click="$emit('showRegister')">Register</button>
+      <button class="sign-in-button" @click="$emit('showSignIn')">
+        Sign in
+      </button>
+      <button class="register-button" @click="$emit('showRegister')">
+        Register
+      </button>
     </div>
   </div>
 </template>
@@ -44,9 +48,8 @@ defineEmits(['showSignIn', 'showRegister']);
 }
 
 .logo-border {
-  width: 23.33px;
-  height: 35px;
-  border: 3.5px solid var(--text-color);
+  width: 50px;
+  height: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -75,7 +78,10 @@ defineEmits(['showSignIn', 'showRegister']);
   font-weight: 400;
   line-height: 16px;
   cursor: pointer;
-  transition: background 0.3s, border-color 0.3s, color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    color 0.3s;
 }
 
 .sign-in-button {
