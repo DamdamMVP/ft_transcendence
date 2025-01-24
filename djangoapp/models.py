@@ -10,7 +10,7 @@ class BaseModel(models.Model):
 class User(BaseModel):  # Hérite de BaseModel
     name = models.CharField(max_length=50)
     email = models.CharField(max_length=50, unique=True)
-    password = models.CharField(max_length=50)
+    password = models.CharField(max_length=8192)  # Augmenté pour stocker le hash
 
     def __str__(self):
         return self.name
@@ -24,4 +24,3 @@ class History(BaseModel):  # Hérite également de BaseModel
 
     def __str__(self):
         return f"History of {self.user.name} at {self.created_at}"
-

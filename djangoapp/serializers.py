@@ -4,7 +4,7 @@ from .models import User, History
 class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = History
-        fields = ['id', 'guest_name', 'user_score', 'guest_score', 'played_at']
+        fields = ['id', 'user', 'guest_name', 'user_score', 'guest_score', 'played_at']
 
 class UserSerializer(serializers.ModelSerializer):
     histories = HistorySerializer(many=True, read_only=True)  # Relation avec History
@@ -15,6 +15,3 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True},  # Cache le mot de passe lors de la lecture
         }
-
-
-

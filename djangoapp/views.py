@@ -2,8 +2,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from django.contrib.auth.hashers import check_password, make_password
-from .models import User
-from .serializers import UserSerializer
+from .models import User, History
+from .serializers import UserSerializer, HistorySerializer
 
 # Obtenir tous les utilisateurs
 @api_view(['GET'])
