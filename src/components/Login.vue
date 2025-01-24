@@ -1,11 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import i18next from 'i18next'
 
 const email = ref('')
 const password = ref('')
-const showSignIn = ref(false)
-const showRegister = ref(false)
 
 const handleSignIn = () => {
   console.log('Sign In clicked with:', email.value, password.value)
@@ -21,38 +18,42 @@ const forgotPassword = () => {
     <!-- Form Section -->
     <div class="form-container">
       <div class="form-group">
-        <label for="email">{{ i18next.t('key') }}</label>
+        <label for="email">{{ $t('login.email') }}</label>
         <input
           id="email"
           type="email"
           v-model="email"
-          placeholder="Enter your email"
+          :placeholder="$t('login.placeholders.email')"
           class="input-field"
         />
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">{{ $t('login.password') }}</label>
         <input
           id="password"
           type="password"
           v-model="password"
-          placeholder="Enter your password"
+          :placeholder="$t('login.placeholders.password')"
           class="input-field"
         />
       </div>
 
       <div class="button-group">
-        <button class="submit-button" @click="handleSignIn">Sign In</button>
+        <button class="submit-button" @click="handleSignIn">
+          {{ $t('login.signIn') }}
+        </button>
       </div>
 
       <div class="forgot-password">
-        <a href="#" @click.prevent="forgotPassword">Forgot password?</a>
+        <a href="#" @click.prevent="forgotPassword">{{
+          $t('login.forgotPassword')
+        }}</a>
       </div>
 
       <div class="button-group">
         <button class="submit-button" @click="$router.push('/profil')">
-          Go to Profil
+          {{ $t('login.goToProfil') }}
         </button>
       </div>
     </div>
@@ -61,16 +62,12 @@ const forgotPassword = () => {
 
 <style scoped>
 .container {
-  width: 100vw;
-  height: calc(
-    100vh - 100px
-  ); /* Ajuster en fonction de la hauteur de la navbar */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 85vh;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Centrer verticalement */
-  align-items: center;
   overflow-x: hidden;
 }
 
@@ -82,8 +79,8 @@ const forgotPassword = () => {
   border: 1px solid #d9d9d9;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
   gap: 24px;
 }
 

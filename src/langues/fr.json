@@ -1,0 +1,21 @@
+{
+  "welcome": "Bienvenue sur votre site",
+  "navbar": {
+    "create": "Créer",
+    "connect": "Connecter",
+    "settings": "Paramètres",
+    "pong": "Pong",
+    "tic-tac-toe": "Tic-Tac-Toe"
+  },
+  "login": {
+    "email": "Email",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "forgotPassword": "Mot de passe oublié?",
+    "goToProfil": "Aller au profil",
+    "placeholders": {
+      "email": "Entrez votre email",
+      "password": "Entrez votre mot de passe"
+    }
+  }
+}

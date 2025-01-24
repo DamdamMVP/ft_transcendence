@@ -1,8 +1,10 @@
 <script setup>
 import IconGolem from './icons/IconGolem.vue'
 import ThemeSelector from './ThemeSelector.vue'
+import Langage from './Langage.vue'
+import { defineEmits } from 'vue'
 
-defineEmits(['showSignIn', 'showRegister'])
+const emit = defineEmits(['showSignIn', 'showRegister'])
 </script>
 
 <template>
@@ -14,12 +16,13 @@ defineEmits(['showSignIn', 'showRegister'])
     </div>
     <div class="spacer"></div>
     <ThemeSelector />
+    <Langage />
     <div class="auth-buttons">
-      <button class="sign-in-button" @click="$emit('showSignIn')">
-        Sign in
+      <button class="sign-in-button" @click="emit('showSignIn')">
+        {{ $t('navbar.create') }}
       </button>
-      <button class="register-button" @click="$emit('showRegister')">
-        Register
+      <button class="register-button" @click="emit('showRegister')">
+        {{ $t('navbar.connect') }}
       </button>
     </div>
   </div>
@@ -30,7 +33,6 @@ defineEmits(['showSignIn', 'showRegister'])
   align-self: stretch;
   padding: 32px 0;
   margin: 0;
-  width: 100vw;
   background: var(--background-color);
   border-bottom: 1px solid var(--secondary-color);
   display: flex;
