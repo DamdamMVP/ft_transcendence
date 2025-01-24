@@ -1,12 +1,10 @@
 from django.urls import path
 from . import views
-from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,  # Génère access et refresh tokens
     TokenRefreshView,     # Renouvelle un access token
     TokenVerifyView,      # Vérifie si un token est valide
 )
-
 
 urlpatterns = [
     path('', views.getData),

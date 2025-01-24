@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserSerializer, HistorySerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import render
 
 
 # Obtenir tous les utilisateurs
