@@ -1,4 +1,10 @@
 #!/bin/bash
+
+
+echo "Waiting for PostgreSQL to be ready..."
+/wait-for-it.sh $PG_HOST:$PG_PORT --timeout=30 --strict -- echo "PostgreSQL is ready!"
+
+
 echo "Creating Migrations..."
 python3 manage.py makemigrations djangoapp
 echo ====================================

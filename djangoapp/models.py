@@ -1,5 +1,7 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+# BaseModel reste inchangé
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Remplit la date à la création
     updated_at = models.DateTimeField(auto_now=True)  # Met à jour la date à chaque modification
@@ -7,14 +9,18 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True  # Cette classe ne sera pas directement utilisée pour créer une table
 
-class User(BaseModel):  # Hérite de BaseModel
-    name = models.CharField(max_length=50)
-    email = models.CharField(max_length=50, unique=True)
-    password = models.CharField(max_length=8192)  # Augmenté pour stocker le hash
+# User hérite maintenant de AbstractUser
+class User(AbstractUser):  # Remplace le modèle utilisateur par défaut de Django
+    # Ajout de champs supplémentaires
+    email = models.EmailField(unique=True)  # Email unique obligatoire (déjà présent dans AbstractUser mais non unique par défaut)
+    # D'autres champs peuvent être ajoutés si nécessaire
+    pass
 
     def __str__(self):
-        return self.name
+        return self.username
 
+
+# History reste inchangé
 class History(BaseModel):  # Hérite également de BaseModel
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="histories")
     guest_name = models.CharField(max_length=50)  # Nom de l'adversaire (non utilisateur)
@@ -23,4 +29,4 @@ class History(BaseModel):  # Hérite également de BaseModel
     played_at = models.DateTimeField(auto_now_add=True)  # Date et heure du match
 
     def __str__(self):
-        return f"History of {self.user.name} at {self.created_at}"
+        return f"History of {self.user.username} at {self.created_at}"

@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from django.contrib.auth.hashers import check_password, make_password
 from .models import User, History
+from django.contrib.auth import authenticate
 from .serializers import UserSerializer, HistorySerializer
 
 # Obtenir tous les utilisateurs
@@ -15,9 +16,12 @@ def getData(request):
 # Obtenir un utilisateur spécifique
 @api_view(['GET'])
 def getUser(request, pk):
-    user = User.objects.get(id=pk)
-    serializer = UserSerializer(user, many=False)
-    return Response(serializer.data)
+    try:
+        user = User.objects.get(id=pk)
+        serializer = UserSerializer(user, many=False)
+        return Response(serializer.data)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
 
 # Ajouter un nouvel utilisateur (avec hachage du mot de passe)
 @api_view(['POST'])
@@ -33,21 +37,24 @@ def addUser(request):
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
-# Mettre à jour un utilisateur
 @api_view(['PUT'])
 def updateUser(request, pk):
-    user = User.objects.get(id=pk)
-    data = request.data
+    try:
+        user = User.objects.get(id=pk)
+        data = request.data
 
-    # Si un mot de passe est fourni, le hacher
-    if 'password' in data:
-        data['password'] = make_password(data['password'])
+        # Si un mot de passe est fourni, le hacher
+        if 'password' in data:
+            data['password'] = make_password(data['password'])
 
-    serializer = UserSerializer(instance=user, data=data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=400)
+        serializer = UserSerializer(instance=user, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+
 
 # Supprimer un utilisateur
 @api_view(['DELETE'])
@@ -64,21 +71,17 @@ def connect(request):
     email = data.get('email')
     password = data.get('password')
 
-    try:
-        # Récupérer l'utilisateur par email
-        user = User.objects.get(email=email)
+    # Utiliser authenticate pour vérifier l'utilisateur
+    user = authenticate(request, username=email, password=password)
 
-        # Vérifier le mot de passe
-        if check_password(password, user.password):
-            serializer = UserSerializer(user)
-            return Response({
-                'message': 'User authenticated',
-                'user': serializer.data
-            }, status=200)
-        else:
-            return Response({'error': 'Invalid password'}, status=400)
-    except User.DoesNotExist:
-        return Response({'error': 'User not found'}, status=404)
+    if user:
+        serializer = UserSerializer(user)
+        return Response({
+            'message': 'User authenticated',
+            'user': serializer.data
+        }, status=200)
+    return Response({'error': 'Invalid email or password'}, status=400)
+
 
 @api_view(['GET'])
 def getHistories(request):

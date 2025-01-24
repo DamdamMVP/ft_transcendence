@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'password', 'histories']  # Ajout de histories
+        fields = ['id', 'username', 'email', 'password', 'histories']  # Ajout de histories
         extra_kwargs = {
             'password': {'write_only': True},  # Cache le mot de passe lors de la lecture
         }
