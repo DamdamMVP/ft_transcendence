@@ -43,5 +43,19 @@
       "new": "Nouveau mot de passe",
       "confirm": "Confirmer le nouveau mot de passe"
     }
+  },
+  "friendList": {
+    "title": "Mes amis",
+    "online": "en ligne",
+    "search": "Rechercher un ami",
+    "addFriend": "Ajouter un ami",
+    "block": "Bloquer",
+    "unblock": "Débloquer",
+    "chat": "Discuter",
+    "icons": {
+      "chat": "chat",
+      "block": "block",
+      "addFriend": "person_add"
+    }
   }
 }

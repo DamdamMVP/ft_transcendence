@@ -43,5 +43,19 @@
       "new": "Ger-tremen nevez",
       "confirm": "Kadarnaat ar ger-tremen nevez"
     }
+  },
+  "friendList": {
+    "title": "Ma mignoned",
+    "online": "enlinenn",
+    "search": "Klask ur mignon",
+    "addFriend": "Ouzhpennañ ur mignon",
+    "block": "Stankañ",
+    "unblock": "Distankañ",
+    "chat": "Flapañ",
+    "icons": {
+      "chat": "flap",
+      "block": "stankañ",
+      "addFriend": "mignon ouzhpennañ"
+    }
   }
 }

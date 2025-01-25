@@ -1,12 +1,14 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import NavBar from './components/NavBar.vue'
+import FriendList from './components/FriendList.vue'
 </script>
 
 <template>
   <div class="app">
     <NavBar />
     <RouterView />
+    <FriendList />
   </div>
 </template>
 

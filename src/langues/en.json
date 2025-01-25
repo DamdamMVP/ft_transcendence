@@ -43,5 +43,19 @@
       "new": "New password",
       "confirm": "Confirm new password"
     }
+  },
+  "friendList": {
+    "title": "My Friends",
+    "online": "online",
+    "search": "Search friend",
+    "addFriend": "Add friend",
+    "block": "Block",
+    "unblock": "Unblock",
+    "chat": "Chat",
+    "icons": {
+      "chat": "chat",
+      "block": "block",
+      "addFriend": "person_add"
+    }
   }
 }
