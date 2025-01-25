@@ -10,7 +10,7 @@ import { useI18n } from 'vue-i18n'
 const authStore = useAuthStore()
 const router = useRouter()
 const { setTheme } = useTheme()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 // Variables temporaires pour le thème et la langue
 const tempTheme = ref(null)
@@ -80,74 +80,74 @@ const onLanguageUpdate = (lang) => {
   <div class="settings-container">
     <!-- Photo de profil -->
     <div class="profile-section">
-      <h3>Photo de profil</h3>
+      <h3>{{ t('settings.profilePhoto') }}</h3>
       <img
         src="https://via.placeholder.com/150"
-        alt="Photo de profil"
+        :alt="t('settings.profilePhoto')"
         class="profile-photo"
       />
       <button class="save-button" @click="saveProfilePhoto">
-        <i class="icon-save"></i> Save
+        <i class="icon-save"></i> {{ t('settings.save') }}
       </button>
     </div>
 
     <!-- Pseudo -->
     <div class="setting-item">
-      <h3>Pseudo</h3>
+      <h3>{{ t('settings.username') }}</h3>
       <div class="input-group">
         <input v-model="username" type="text" class="input-field" />
         <button class="save-button" @click="saveUsername">
-          <i class="icon-save"></i> Save
+          <i class="icon-save"></i> {{ t('settings.save') }}
         </button>
       </div>
     </div>
 
     <!-- Mot de passe -->
     <div class="setting-item">
-      <h3>Mot de passe</h3>
+      <h3>{{ t('settings.password') }}</h3>
       <div class="input-group">
         <input
           v-model="currentPassword"
           type="password"
-          placeholder="Ancien mot de passe"
+          :placeholder="t('settings.passwordPlaceholders.current')"
           class="input-field"
         />
         <input
           v-model="newPassword"
           type="password"
-          placeholder="Nouveau mot de passe"
+          :placeholder="t('settings.passwordPlaceholders.new')"
           class="input-field"
         />
         <input
           v-model="confirmPassword"
           type="password"
-          placeholder="Confirmer le nouveau mot de passe"
+          :placeholder="t('settings.passwordPlaceholders.confirm')"
           class="input-field"
         />
         <button class="save-button" @click="savePassword">
-          <i class="icon-save"></i> Save
+          <i class="icon-save"></i> {{ t('settings.save') }}
         </button>
       </div>
     </div>
 
     <!-- Langue -->
     <div class="setting-item">
-      <h3>Langue</h3>
+      <h3>{{ t('settings.language') }}</h3>
       <div class="input-group">
         <Langage @update:language="onLanguageUpdate" />
         <button class="save-button" @click="saveLanguage">
-          <i class="icon-save"></i> Save
+          <i class="icon-save"></i> {{ t('settings.save') }}
         </button>
       </div>
     </div>
 
     <!-- Thème -->
     <div class="setting-item">
-      <h3>Thème</h3>
+      <h3>{{ t('settings.theme') }}</h3>
       <div class="input-group">
         <ThemeSelector @update:theme="onThemeUpdate" />
         <button class="save-button" @click="saveTheme">
-          <i class="icon-save"></i> Save
+          <i class="icon-save"></i> {{ t('settings.save') }}
         </button>
       </div>
     </div>
@@ -155,12 +155,12 @@ const onLanguageUpdate = (lang) => {
     <!-- Suppression du compte -->
     <div class="delete-account-section">
       <button class="delete-button" @click="deleteAccount">
-        Supprimer le compte <i class="icon-delete"></i>
+        {{ t('settings.deleteAccount') }} <i class="icon-delete"></i>
       </button>
     </div>
 
     <button class="logout-button" @click="handleLogout">
-      {{ $t('navbar.disconnect') }}
+      {{ t('navbar.disconnect') }}
     </button>
   </div>
 </template>

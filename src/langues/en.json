@@ -29,5 +29,19 @@
     "Pong": "Pong",
     "Tic-Tac-Toe": "Tic-Tac-Toe",
     "Settings": "Settings"
+  },
+  "settings": {
+    "profilePhoto": "Profile Photo",
+    "username": "Username",
+    "password": "Password",
+    "language": "Language",
+    "theme": "Theme",
+    "deleteAccount": "Delete Account",
+    "save": "Save",
+    "passwordPlaceholders": {
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password"
+    }
   }
 }
