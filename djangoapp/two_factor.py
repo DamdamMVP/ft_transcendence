@@ -113,20 +113,3 @@ def disable_2fa(request):
     
     return Response({'error': '2FA is not enabled'}, status=400)
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def verify_token(request):
-    user = request.user
-    token = request.data.get('token')
-    
-    if not token:
-        return Response({'error': 'Token is required'}, status=400)
-    
-    device = get_user_totp_device(user)
-    if not device or not device.confirmed:
-        return Response({'error': '2FA is not set up'}, status=400)
-    
-    if device.verify_token(token):
-        return Response({'success': True, 'message': 'Token is valid'})
-    
-    return Response({'error': 'Invalid token'}, status=400)
