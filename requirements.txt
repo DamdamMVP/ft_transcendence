@@ -10,3 +10,4 @@ djangorestframework-simplejwt==4.8.0
 channels-redis
 channels
 daphne==4.1.2
+Pillow==9.4.0

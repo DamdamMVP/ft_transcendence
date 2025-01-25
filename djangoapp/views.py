@@ -102,6 +102,23 @@ def login(request):
         }, status=200)
     return Response({'error': 'Invalid email or password'}, status=400)
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateProfilePicture(request, pk):
+    try:
+        user = User.objects.get(id=pk)
+
+        if 'profile_picture' not in request.FILES:
+            return Response({'error': 'No profile picture provided'}, status=400)
+
+        # Mettre à jour la photo de profil
+        user.profile_picture = request.FILES['profile_picture']
+        user.save()
+
+        return Response({'message': 'Profile picture updated successfully'}, status=200)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

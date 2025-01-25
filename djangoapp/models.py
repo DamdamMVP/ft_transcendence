@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 # BaseModel reste inchangé
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)  # Remplit la date à la création
@@ -13,7 +14,11 @@ class BaseModel(models.Model):
 class User(AbstractUser):  # Remplace le modèle utilisateur par défaut de Django
     # Ajout de champs supplémentaires
     email = models.EmailField(unique=True)  # Email unique obligatoire (déjà présent dans AbstractUser mais non unique par défaut)
-    # D'autres champs peuvent être ajoutés si nécessaire
+    profile_picture = models.ImageField(
+        upload_to="profile_pictures/",  # Dossier de stockage des photos
+        default="profile_pictures/default.jpg",  # Image par défaut si aucune photo n'est fournie
+        blank=True  # Permet de laisser ce champ vide
+    )
     pass
 
     def __str__(self):
