@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps } from 'vue'
+import { defineProps, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
@@ -9,14 +9,26 @@ const props = defineProps({
   },
 })
 
-const { t } = useI18n() // Utilisation directe de la fonction `t`
+const selectedItem = ref('Pong')
+const { t } = useI18n()
+
+const selectItem = (item) => {
+  selectedItem.value = item
+}
 </script>
 
 <template>
   <nav class="navbar-profil">
     <ul class="navbar-list">
       <li v-for="(item, index) in items" :key="index" class="navbar-item">
-        <a href="#" class="navbar-link">{{ t(`navbarProfil.${item}`) }}</a>
+        <a
+          href="#"
+          class="navbar-link"
+          :class="{ 'navbar-link-selected': selectedItem === item }"
+          @click.prevent="selectItem(item)"
+        >
+          {{ t(`navbarProfil.${item}`) }}
+        </a>
       </li>
     </ul>
   </nav>
@@ -58,7 +70,17 @@ const { t } = useI18n() // Utilisation directe de la fonction `t`
 }
 
 .navbar-link:hover {
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.navbar-link-selected {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.navbar-link:hover:not(.navbar-link-selected) {
+  background-color: var(--primary-color);
+  color: white;
 }
 </style>
