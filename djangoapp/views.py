@@ -11,6 +11,91 @@ from django.shortcuts import render
 from rest_framework import status
 
 
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login(request):
+    data = request.data
+
+    email = data.get('email')
+    password = data.get('password')
+
+    user = authenticate(request, username=email, password=password)
+
+    if user:
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
+        response = Response({
+            'message': 'User authenticated',
+            'user': UserSerializer(user).data,
+        }, status=200)
+
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            httponly=True,  # Rend le cookie inaccessible en JavaScript
+            secure=True,  # En production, active cette option pour HTTPS uniquement
+            samesite='Strict',  # Restreint le cookie aux mêmes origines (protection CSRF)
+            max_age=60 * 5  # Temps de vie du token (en secondes)
+        )
+        response.set_cookie(
+            key='refresh_token',
+            value=str(refresh),
+            httponly=True,
+            secure=True,
+            samesite='Strict',
+            max_age=60 * 60 * 24
+        )
+
+        return response
+    else:
+        return Response({'error': 'Invalid email or password'}, status=400)
+
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def refresh_token(request):
+    refresh_token = request.COOKIES.get('refresh_token')
+
+    if not refresh_token:
+        return Response({'error': 'No refresh token provided'}, status=400)
+
+    try:
+        refresh = RefreshToken(refresh_token)
+        access_token = str(refresh.access_token)
+
+        response = Response({
+            'message': 'Access token refreshed successfully'
+        }, status=200)
+
+        # Met à jour le cookie d'accès
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            httponly=True,
+            secure=True,
+            samesite='Strict',
+            max_age=60 * 5  # Temps de vie du token d'accès
+        )
+        return response
+    except Exception as e:
+        return Response({'error': 'Invalid refresh token'}, status=400)
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    response = Response({'message': 'Logged out successfully'}, status=200)
+
+    # Supprimer les cookies
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+
+    return response
+
+
 # Obtenir tous les utilisateurs
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -80,27 +165,6 @@ def deleteUser(request, pk):
 def connect(request):
     return render(request, 'login.html')
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def login(request):
-    data = request.data
-
-    email = data.get('email')
-    password = data.get('password')
-
-    # Utiliser authenticate pour vérifier l'utilisateur
-    user = authenticate(request, username=email, password=password)
-
-    if user:
-        serializer = UserSerializer(user)
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'message': 'User authenticated',
-            'user': serializer.data,
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }, status=200)
-    return Response({'error': 'Invalid email or password'}, status=400)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -123,21 +187,22 @@ def updateProfilePicture(request, pk):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updatePassword(request, pk):
-	try:
-		user = User.objects.get(id=pk)
-		data = request.data
+    try:
+        user = User.objects.get(id=pk)
+        data = request.data
 
-		if not check_password(data['old_password'], user.password):
-			return Response({'error': 'Invalid old password'}, status=400)
+        if not check_password(data['old_password'], user.password):
+            return Response({'error': 'Invalid old password'}, status=400)
 
-		data['password'] = make_password(data['password'])
-		serializer = UserSerializer(instance=user, data=data)
-		if serializer.is_valid():
-			serializer.save()
-			return Response({'message': 'Password updated successfully'}, status=200)
-		return Response(serializer.errors, status=400)
-	except User.DoesNotExist:
-		return Response({'error': 'User not found'}, status=404)
+        data['password'] = make_password(data['password'])
+        serializer = UserSerializer(instance=user, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Password updated successfully'}, status=200)
+        return Response(serializer.errors, status=400)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

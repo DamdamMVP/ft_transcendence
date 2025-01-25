@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'djangoapp.Midleware.CookieJWTAuthentication',  # Utilise notre classe d'authentification
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -50,7 +50,7 @@ SIMPLE_JWT = {
 # Application definition
 
 INSTALLED_APPS = [
-	'daphne',
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-	'channels',
+    'channels',
     'djangoapp',
     'django.contrib.sites',
     'allauth',
@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     'django_otp',
     'django_otp.plugins.otp_totp',
     'django_otp.plugins.otp_static',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 SITE_ID = 1
@@ -209,3 +210,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+CSRF_COOKIE_SECURE = False  # Mettre à True en production si HTTPS est utilisé
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SECURE = False  # Mettre à True en production si HTTPS est utilisé
+SESSION_COOKIE_HTTPONLY = True

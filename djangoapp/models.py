@@ -35,3 +35,5 @@ class History(BaseModel):  # Hérite également de BaseModel
 
     def __str__(self):
         return f"History of {self.user.username} at {self.created_at}"
+
+

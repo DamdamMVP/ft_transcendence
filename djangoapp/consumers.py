@@ -69,7 +69,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not message or not message.strip():
             return
 
-        timestamp = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         await self.channel_layer.group_send(
             self.room_group_name,
             {
