@@ -6,7 +6,8 @@ const store = useGamesHistoryStore()
 
 setTimeout(() => {
   store.addMatch({
-    id: 1,
+    id: 4,
+    game: 'Pong',
     win: true,
     score: '3-2',
     opponent: 'Roger',
@@ -20,7 +21,7 @@ setTimeout(() => {
     <h2>{{ $t('history.title') }}</h2>
     <div class="match-list">
       <div
-        v-for="match in store.matches"
+        v-for="match in store.matches.filter((m) => m.game === 'Pong')"
         :key="match.id"
         class="match-card"
         :class="{
