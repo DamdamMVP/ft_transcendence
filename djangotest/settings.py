@@ -33,12 +33,15 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+	'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+	'channels',
     'djangoapp',
     'django.contrib.sites',
     'allauth',
@@ -48,6 +51,18 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+
+
+ASGI_APPLICATION = 'djangotest.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('redis', 6379)],  # Assure-toi que Redis est installé et tourne
+        },
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

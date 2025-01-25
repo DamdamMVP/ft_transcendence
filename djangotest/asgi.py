@@ -1,16 +1,22 @@
-"""
-ASGI config for djangotest project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
-"""
-
 import os
-
 from django.core.asgi import get_asgi_application
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
+
+# Importer les URLs WebSocket de manière sûre
+from djangoapp.routing import websocket_urlpatterns
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangotest.settings')
 
-application = get_asgi_application()
+# Initialisation de Django
+django_asgi_app = get_asgi_application()
+
+# Configuration de l'application ASGI avec Channels
+application = ProtocolTypeRouter({
+    "http": django_asgi_app,  # Traite les requêtes HTTP
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            websocket_urlpatterns
+        )
+    ),
+})
