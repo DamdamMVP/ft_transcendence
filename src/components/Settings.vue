@@ -157,11 +157,10 @@ const onLanguageUpdate = (lang) => {
       <button class="delete-button" @click="deleteAccount">
         {{ t('settings.deleteAccount') }} <i class="icon-delete"></i>
       </button>
+      <button class="logout-button" @click="handleLogout">
+        {{ t('navbar.disconnect') }}
+      </button>
     </div>
-
-    <button class="logout-button" @click="handleLogout">
-      {{ t('navbar.disconnect') }}
-    </button>
   </div>
 </template>
 
@@ -286,16 +285,17 @@ h3 {
 }
 
 .delete-account-section {
-  margin-top: 32px;
   text-align: center;
   padding: 16px;
   background: var(--background-color);
   border-radius: 8px;
-  border: 1px solid var(--secondary-color);
+  display: flex;
+  gap: 24px;
+  justify-content: center;
 }
 
 .delete-button {
-  padding: 12px 16px;
+  padding: 8px 16px;
   background: var(--error-color);
   color: white;
   border: none;
@@ -310,7 +310,6 @@ h3 {
 }
 
 .logout-button {
-  margin-top: 24px;
   padding: 8px 16px;
   background: var(--error-color);
   color: white;
@@ -319,7 +318,6 @@ h3 {
   cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;
-  align-self: center;
 }
 
 .logout-button:hover {
