@@ -1,18 +1,43 @@
 <script setup>
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { useGamesHistoryStore } from '../stores/gamesHistory'
 
 const store = useGamesHistoryStore()
+const route = useRoute() // Récupérer les paramètres de la route
 
-setTimeout(() => {
-  store.addMatch({
-    id: 4,
-    game: 'Pong',
-    win: true,
-    score: '3-2',
-    opponent: 'Roger',
-    date: 1737766734,
-  })
-}, 1000)
+// Filtrer les matchs en fonction du jeu sélectionné
+const filteredMatches = computed(() =>
+  store.matches
+    .filter(
+      (match) => match.game.toLowerCase() === route.params.game?.toLowerCase()
+    )
+    .sort((a, b) => b.date - a.date)
+)
+
+// // Ajouter un match pour tester
+// setTimeout(() => {
+//   store.addMatch({
+//     id: 4,
+//     game: 'Pong',
+//     win: true,
+//     score: '3-0',
+//     opponent: 'Roger',
+//     date: Date.now(),
+//   })
+// }, 1000)
+
+// setTimeout(() => {
+//   store.addMatch({
+//     id: 5,
+//     game: 'Tic-Tac-Toe',
+//     win: true,
+//     score: '3-0',
+//     opponent: 'Albert',
+//     date: Date.now(),
+//   })
+// }, 1000)
+//
 </script>
 
 <template>
@@ -20,14 +45,12 @@ setTimeout(() => {
     <h2>{{ $t('history.title') }}</h2>
     <div class="match-list">
       <div
-        v-for="match in store.matches
-          .filter((m) => m.game === 'Pong')
-          .sort((a, b) => b.date - a.date)"
+        v-for="match in filteredMatches"
         :key="match.id"
         class="match-card"
         :class="{
-          'win-card': match.win === true,
-          'loose-card': match.win === false,
+          'win-card': match.win,
+          'loose-card': !match.win,
         }"
       >
         <p class="match-result">
@@ -35,7 +58,9 @@ setTimeout(() => {
           {{ match.score }}
         </p>
         <p class="match-opponent">{{ match.opponent }}</p>
-        <p class="match-date">{{ match.date }}</p>
+        <p class="match-date">
+          {{ new Date(match.date).toLocaleDateString() }}
+        </p>
       </div>
     </div>
   </div>

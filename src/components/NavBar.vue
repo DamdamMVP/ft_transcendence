@@ -11,7 +11,7 @@ const emit = defineEmits(['showSignIn', 'showRegister'])
   <div class="header">
     <div class="logo-container">
       <div class="logo-border">
-        <IconGolem style="color: #000000"></IconGolem>
+        <IconGolem style="color: var(--primary-color)"></IconGolem>
       </div>
     </div>
     <div class="spacer"></div>

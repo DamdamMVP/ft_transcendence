@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, ref } from 'vue'
+import { defineProps } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
@@ -9,26 +9,20 @@ const props = defineProps({
   },
 })
 
-const selectedItem = ref('Pong')
 const { t } = useI18n()
-
-const selectItem = (item) => {
-  selectedItem.value = item
-}
 </script>
 
 <template>
   <nav class="navbar-profil">
     <ul class="navbar-list">
       <li v-for="(item, index) in items" :key="index" class="navbar-item">
-        <a
-          href="#"
+        <router-link
+          :to="`/profil/${item.toLowerCase().replace(/ /g, '-')}`"
           class="navbar-link"
-          :class="{ 'navbar-link-selected': selectedItem === item }"
-          @click.prevent="selectItem(item)"
+          active-class="navbar-link-selected"
         >
           {{ t(`navbarProfil.${item}`) }}
-        </a>
+        </router-link>
       </li>
     </ul>
   </nav>

@@ -1,7 +1,6 @@
 <script setup>
 import ProfilLeft from '../components/ProfilLeft.vue'
 import NavBarProfil from '../components/NavBarProfil.vue'
-import PongHistorique from '../components/PongHistorique.vue'
 </script>
 
 <template>
@@ -9,7 +8,7 @@ import PongHistorique from '../components/PongHistorique.vue'
     <NavBarProfil />
     <div class="profil-content">
       <ProfilLeft />
-      <PongHistorique />
+      <router-view />
     </div>
   </main>
 </template>
