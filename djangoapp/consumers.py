@@ -1,34 +1,17 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
-from rest_framework_simplejwt.tokens import UntypedToken
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth import get_user_model
-from urllib.parse import parse_qs
 from . import models
+from django.contrib.auth.models import AnonymousUser
 from datetime import datetime
 
 User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # extract the token from the query parameters
-        query_params = parse_qs(self.scope["query_string"].decode())
-        token = query_params.get("token", [None])[0]
-
-        if not token:
-            await self.close()
-            return
-
-        try:
-            # Validate token JWT
-            decoded_token = UntypedToken(token)
-            # extraxt user_id from the token
-            user_id = decoded_token["user_id"]
-            # get user from the database
-            self.scope["user"] = await database_sync_to_async(User.objects.get)(id=user_id)
-        except (InvalidToken, TokenError, User.DoesNotExist):
-            await self.close()
+        if isinstance(self.scope["user"], AnonymousUser):
+            await self.close(code=4001)  # Code WebSocket pour utilisateur non autorisé
             return
 
         # get chan name from the url
