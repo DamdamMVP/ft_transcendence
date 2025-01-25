@@ -1,0 +1,47 @@
+{
+  "welcome": "Degemer mat war ho lec'hienn",
+  "navbar": {
+    "create": "Krouiñ",
+    "connect": "Kevreañ",
+    "settings": "Arventennoù",
+    "pong": "Pong",
+    "tic-tac-toe": "Tris",
+    "profil": "Profil",
+    "disconnect": "Digevreañ"
+  },
+  "login": {
+    "email": "Postel",
+    "password": "Ger-tremen",
+    "signIn": "Kevreañ",
+    "forgotPassword": "Ger-tremen ankouaet?",
+    "goToProfil": "Mont d'ar profil",
+    "placeholders": {
+      "email": "Lakait ho postel",
+      "password": "Lakait ho ker-tremen"
+    }
+  },
+  "history": {
+    "title": "Istor",
+    "win": "Trec'h",
+    "loose": "Koll"
+  },
+  "navbarProfil": {
+    "Pong": "Pong",
+    "Tic-Tac-Toe": "Tris",
+    "Settings": "Arventennoù"
+  },
+  "settings": {
+    "profilePhoto": "Skeudenn profil",
+    "username": "Anv implijer",
+    "password": "Ger-tremen",
+    "language": "Yezh",
+    "theme": "Tem",
+    "deleteAccount": "Dilemel ar gont",
+    "save": "Enrollañ",
+    "passwordPlaceholders": {
+      "current": "Ger-tremen bremañ",
+      "new": "Ger-tremen nevez",
+      "confirm": "Kadarnaat ar ger-tremen nevez"
+    }
+  }
+}

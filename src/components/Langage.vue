@@ -19,8 +19,10 @@ const onLanguageChange = (lang) => {
       @change="onLanguageChange(selectedLanguage)"
       class="select-field"
     >
-      <option value="en">English</option>
       <option value="fr">Français</option>
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+      <option value="br">Brezhoneg</option>
     </select>
   </div>
 </template>
