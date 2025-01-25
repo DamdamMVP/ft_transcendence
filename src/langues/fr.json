@@ -22,5 +22,10 @@
     "title": "Historique",
     "win": "Victoire",
     "loose": "Défaite"
+  },
+  "navbarProfil": {
+    "Pong": "Pong",
+    "Tic-Tac-Toe": "Tic-Tac-Toe",
+    "Settings": "Paramètres"
   }
 }

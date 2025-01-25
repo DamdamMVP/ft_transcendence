@@ -22,5 +22,10 @@
     "title": "History",
     "win": "Win",
     "loose": "Loose"
+  },
+  "navbarProfil": {
+    "Pong": "Pong",
+    "Tic-Tac-Toe": "Tic-Tac-Toe",
+    "Settings": "Settings"
   }
 }

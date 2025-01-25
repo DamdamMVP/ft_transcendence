@@ -1,20 +1,22 @@
 <script setup>
-// Props pour passer les informations de navigation
 import { defineProps } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-defineProps({
+const props = defineProps({
   items: {
     type: Array,
     default: () => ['Pong', 'Tic-Tac-Toe', 'Settings'],
   },
 })
+
+const { t } = useI18n() // Utilisation directe de la fonction `t`
 </script>
 
 <template>
   <nav class="navbar-profil">
     <ul class="navbar-list">
       <li v-for="(item, index) in items" :key="index" class="navbar-item">
-        <a href="#" class="navbar-link">{{ item }}</a>
+        <a href="#" class="navbar-link">{{ t(`navbarProfil.${item}`) }}</a>
       </li>
     </ul>
   </nav>
