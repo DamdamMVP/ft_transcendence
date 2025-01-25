@@ -5,6 +5,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,     # Renouvelle un access token
     TokenVerifyView,      # Vérifie si un token est valide
 )
+from . import two_factor
 
 urlpatterns = [
     path('', views.getData),
@@ -23,4 +24,10 @@ urlpatterns = [
     path('token', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify', TokenVerifyView.as_view(), name='token_verify'),
+    path('users/<str:pk>/update_password/', views.updatePassword, name='update-password'),
+    # 2FA URLs
+    path('2fa/setup', two_factor.setup_2fa, name='setup-2fa'),
+    path('2fa/verify', two_factor.verify_2fa, name='verify-2fa'),
+    path('2fa/disable', two_factor.disable_2fa, name='disable-2fa'),
+    path('2fa/verify-token', two_factor.verify_token, name='verify-token'),
 ]
