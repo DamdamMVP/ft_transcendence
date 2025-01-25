@@ -30,24 +30,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-}
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,  # Renouvelle le refresh token à chaque utilisation
-    'BLACKLIST_AFTER_ROTATION': True,  # Invalide les anciens refresh tokens après rotation
-    'ALGORITHM': 'HS256',  # Algorithme de cryptage
-    'SIGNING_KEY': 'your-secret-key',  # Remplace par une clé secrète sécurisée
-}
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,8 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djangoapp',
-    'rest_framework',
-    'rest_framework_simplejwt',  # Ajout de Simple JWT
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -140,11 +120,26 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+# Configuration de django-allauth
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_USERNAME_REQUIRED = False
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+# URLs de redirection
+LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+# Configuration du provider Google
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
+        'APP': {
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID'),
+            'secret': os.environ.get('GOOGLE_SECRET_KEY'),
+            'key': ''
+        },
         'SCOPE': [
             'profile',
             'email',

@@ -12,12 +12,15 @@ services:
       - PG_HOST=db
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_SECRET_KEY=${GOOGLE_SECRET_KEY}
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
     depends_on:
       - db
 
   db:
     container_name: db
-    image: postgres:12
+    image: postgres:13
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres

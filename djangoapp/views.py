@@ -8,6 +8,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserSerializer, HistorySerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import render
+from rest_framework import status
 
 
 # Obtenir tous les utilisateurs
@@ -74,8 +75,14 @@ def deleteUser(request, pk):
     return Response({'message': 'User successfully deleted!'}, status=200)
 
 # Connexion utilisateur
-@api_view(['POST'])
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def connect(request):
+    return render(request, 'login.html')
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def login(request):
     data = request.data
 
     email = data.get('email')

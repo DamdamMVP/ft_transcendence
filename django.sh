@@ -13,5 +13,12 @@ echo "Starting Migrations..."
 python3 manage.py migrate
 echo ====================================
 
+echo "Creating Superuser if needed..."
+DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME:-admin} \
+DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-admin@example.com} \
+DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD:-golemian123} \
+python3 manage.py createsuperuser --noinput || true
+echo ====================================
+
 echo "Starting Server..."
 python3 manage.py runserver 0.0.0.0:8000
