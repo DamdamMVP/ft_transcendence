@@ -94,17 +94,18 @@ const emit = defineEmits(['showSignIn', 'showRegister'])
 
 .sign-in-button:hover {
   background: var(--secondary-color);
-  color: var(--background-color);
+  color: var(--text-color);
 }
 
 .register-button {
   background: var(--primary-color);
   border-color: var(--primary-color);
-  color: var(--background-color);
+  color: var(--text-color);
 }
 
 .register-button:hover {
   background: var(--info-color);
   border-color: var(--info-color);
+  color: var(--text-color);
 }
 </style>

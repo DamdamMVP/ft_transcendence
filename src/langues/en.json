@@ -17,5 +17,10 @@
       "email": "Enter your email",
       "password": "Enter your password"
     }
+  },
+  "history": {
+    "title": "History",
+    "win": "Win",
+    "loose": "Loose"
   }
 }

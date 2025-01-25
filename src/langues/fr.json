@@ -17,5 +17,10 @@
       "email": "Entrez votre email",
       "password": "Entrez votre mot de passe"
     }
+  },
+  "history": {
+    "title": "Historique",
+    "win": "Victoire",
+    "loose": "Défaite"
   }
 }
