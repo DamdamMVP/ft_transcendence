@@ -1,5 +1,4 @@
 <script setup>
-// Props pour passer l'historique des parties comme un tableau
 import { useGamesHistoryStore } from '../stores/gamesHistory'
 
 const store = useGamesHistoryStore()
@@ -11,9 +10,9 @@ setTimeout(() => {
     win: true,
     score: '3-2',
     opponent: 'Roger',
-    date: '2024-10-20',
+    date: '2024-11-20',
   })
-}, 5000)
+}, 1000)
 </script>
 
 <template>
@@ -21,7 +20,10 @@ setTimeout(() => {
     <h2>{{ $t('history.title') }}</h2>
     <div class="match-list">
       <div
-        v-for="match in store.matches.filter((m) => m.game === 'Pong')"
+        v-for="match in store.matches
+          .filter((m) => m.game === 'Pong')
+          .slice(-6)
+          .reverse()"
         :key="match.id"
         class="match-card"
         :class="{

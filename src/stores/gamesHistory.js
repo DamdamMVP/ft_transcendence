@@ -31,6 +31,12 @@ export const useGamesHistoryStore = defineStore('gamesHistory', () => {
 
   const addMatch = (match) => {
     matches.value.push(match)
+    // Garder seulement les 6 derniers matchs de Pong
+    const pongMatches = matches.value.filter(m => m.game === 'Pong')
+    if (pongMatches.length > 6) {
+      const oldestPongMatch = pongMatches[0]
+      matches.value = matches.value.filter(m => m !== oldestPongMatch)
+    }
   }
 
   return { matches, addMatch }
