@@ -9,7 +9,7 @@ export const useGamesHistoryStore = defineStore('gamesHistory', () => {
       win: false,
       score: '3-2',
       opponent: 'Roger',
-      date: '2024-10-20',
+      date: 1737766730,
     },
     {
       id: 2,
@@ -17,7 +17,7 @@ export const useGamesHistoryStore = defineStore('gamesHistory', () => {
       win: false,
       score: '3-1',
       opponent: 'Albert',
-      date: '2024-10-20',
+      date: 1737766731,
     },
     {
       id: 3,
@@ -25,18 +25,12 @@ export const useGamesHistoryStore = defineStore('gamesHistory', () => {
       win: false,
       score: '3-2',
       opponent: 'Roger',
-      date: '2024-10-20',
+      date: 1737766732,
     },
   ])
 
   const addMatch = (match) => {
     matches.value.push(match)
-    // Garder seulement les 6 derniers matchs de Pong
-    const pongMatches = matches.value.filter(m => m.game === 'Pong')
-    if (pongMatches.length > 6) {
-      const oldestPongMatch = pongMatches[0]
-      matches.value = matches.value.filter(m => m !== oldestPongMatch)
-    }
   }
 
   return { matches, addMatch }

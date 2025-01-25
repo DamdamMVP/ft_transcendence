@@ -10,7 +10,7 @@ setTimeout(() => {
     win: true,
     score: '3-2',
     opponent: 'Roger',
-    date: '2024-11-20',
+    date: 1737766734,
   })
 }, 1000)
 </script>
@@ -22,8 +22,7 @@ setTimeout(() => {
       <div
         v-for="match in store.matches
           .filter((m) => m.game === 'Pong')
-          .slice(-6)
-          .reverse()"
+          .sort((a, b) => b.date - a.date)"
         :key="match.id"
         class="match-card"
         :class="{
@@ -63,6 +62,8 @@ h2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
+  overflow-y: scroll;
+  max-height: 60vh;
 }
 
 .match-card {
