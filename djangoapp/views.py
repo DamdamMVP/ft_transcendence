@@ -120,6 +120,25 @@ def updateProfilePicture(request, pk):
         return Response({'error': 'User not found'}, status=404)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updatePassword(request, pk):
+	try:
+		user = User.objects.get(id=pk)
+		data = request.data
+
+		if not check_password(data['old_password'], user.password):
+			return Response({'error': 'Invalid old password'}, status=400)
+
+		data['password'] = make_password(data['password'])
+		serializer = UserSerializer(instance=user, data=data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response({'message': 'Password updated successfully'}, status=200)
+		return Response(serializer.errors, status=400)
+	except User.DoesNotExist:
+		return Response({'error': 'User not found'}, status=404)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getHistories(request):
