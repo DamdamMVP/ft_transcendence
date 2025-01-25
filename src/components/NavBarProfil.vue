@@ -5,7 +5,7 @@ import { useI18n } from 'vue-i18n'
 const props = defineProps({
   items: {
     type: Array,
-    default: () => ['Pong', 'Tic-Tac-Toe', 'Settings'],
+    default: () => ['Pong', 'Tic-Tac-Toe'],
   },
 })
 

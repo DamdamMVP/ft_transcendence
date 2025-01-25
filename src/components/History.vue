@@ -15,29 +15,28 @@ const filteredMatches = computed(() =>
     .sort((a, b) => b.date - a.date)
 )
 
-// // Ajouter un match pour tester
-// setTimeout(() => {
-//   store.addMatch({
-//     id: 4,
-//     game: 'Pong',
-//     win: true,
-//     score: '3-0',
-//     opponent: 'Roger',
-//     date: Date.now(),
-//   })
-// }, 1000)
+// Ajouter un match pour tester
+setTimeout(() => {
+  store.addMatch({
+    id: 4,
+    game: 'Pong',
+    win: true,
+    score: '3-1',
+    opponent: 'Roger',
+    date: Date.now(),
+  })
+}, 1000)
 
-// setTimeout(() => {
-//   store.addMatch({
-//     id: 5,
-//     game: 'Tic-Tac-Toe',
-//     win: true,
-//     score: '3-0',
-//     opponent: 'Albert',
-//     date: Date.now(),
-//   })
-// }, 1000)
-//
+setTimeout(() => {
+  store.addMatch({
+    id: 5,
+    game: 'Tic-Tac-Toe',
+    win: true,
+    score: '3-0',
+    opponent: 'Albert',
+    date: Date.now(),
+  })
+}, 1000)
 </script>
 
 <template>

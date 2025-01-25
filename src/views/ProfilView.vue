@@ -19,7 +19,7 @@ import NavBarProfil from '../components/NavBarProfil.vue'
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 85vh;
+  height: 80vh;
   margin: 0;
   padding: 0;
 }

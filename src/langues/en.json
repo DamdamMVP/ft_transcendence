@@ -5,7 +5,9 @@
     "connect": "Connect",
     "settings": "Settings",
     "pong": "Pong",
-    "tic-tac-toe": "Tic-Tac-Toe"
+    "tic-tac-toe": "Tic-Tac-Toe",
+    "profil": "Profil",
+    "disconnect": "Disconnect"
   },
   "login": {
     "email": "Email",

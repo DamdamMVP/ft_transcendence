@@ -10,7 +10,9 @@ const themes = {
     '--error-color': '#e74c3c',
     '--success-color': '#2ecc71',
     '--warning-color': '#f39c12',
-    '--info-color': '#3498db'
+    '--info-color': '#3498db',
+    '--primary-hover-color': '#0056b3',
+    '--error-hover-color': '#c0392b'
   },
   dark: {
     '--background-color': '#1a1a1a',
@@ -21,7 +23,9 @@ const themes = {
     '--error-color': '#e74c3c',
     '--success-color': '#2ecc71',
     '--warning-color': '#f39c12',
-    '--info-color': '#3498db'
+    '--info-color': '#3498db',
+    '--primary-hover-color': '#2980b9',
+    '--error-hover-color': '#c0392b'
   },
   forest: {
     '--background-color': '#2c3e50',
@@ -32,7 +36,9 @@ const themes = {
     '--error-color': '#c0392b',
     '--success-color': '#27ae60',
     '--warning-color': '#f39c12',
-    '--info-color': '#2980b9'
+    '--info-color': '#2980b9',
+    '--primary-hover-color': '#219a52',
+    '--error-hover-color': '#962c22'
   }
 }
 

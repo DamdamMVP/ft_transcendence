@@ -50,12 +50,6 @@ const forgotPassword = () => {
           $t('login.forgotPassword')
         }}</a>
       </div>
-
-      <div class="button-group">
-        <button class="submit-button" @click="$router.push('/profil')">
-          {{ $t('login.goToProfil') }}
-        </button>
-      </div>
     </div>
   </div>
 </template>
@@ -65,7 +59,7 @@ const forgotPassword = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 85vh;
+  height: 80vh;
   margin: 0;
   padding: 0;
   overflow-x: hidden;

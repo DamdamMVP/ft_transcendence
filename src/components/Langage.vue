@@ -1,18 +1,24 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
 
+const emit = defineEmits(['update:language'])
 const { locale } = useI18n() // Utilisation de vue-i18n pour gérer la langue
-const currentLanguage = ref(locale.value) // Langue actuelle
+const selectedLanguage = ref(locale.value) // Langue actuelle
 
-function changeLanguage(lng) {
-  locale.value = lng // Met à jour la langue dans vue-i18n
+const onLanguageChange = (lang) => {
+  selectedLanguage.value = lang
+  emit('update:language', lang)
 }
 </script>
 
 <template>
   <div class="language-selector">
-    <select v-model="currentLanguage" @change="changeLanguage(currentLanguage)">
+    <select
+      v-model="selectedLanguage"
+      @change="onLanguageChange(selectedLanguage)"
+      class="select-field"
+    >
       <option value="en">English</option>
       <option value="fr">Français</option>
     </select>
@@ -21,31 +27,33 @@ function changeLanguage(lng) {
 
 <style scoped>
 .language-selector {
-  margin: 0 12px;
+  width: 100%;
 }
 
-.language-selector select {
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid var(--secondary-color);
+.select-field {
+  padding: 8px 12px;
   background: var(--background-color);
+  border: 2px solid var(--secondary-color);
+  border-radius: 4px;
   color: var(--text-color);
-  cursor: pointer;
-  font-family: Inter, sans-serif;
+  font-size: 14px;
   transition: all 0.3s ease;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.language-selector select:hover {
+.select-field:hover {
   border-color: var(--primary-color);
 }
 
-.language-selector select:focus {
+.select-field:focus {
+  border-color: var(--info-color);
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-color-alpha);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
-.language-selector option {
+option {
   background: var(--background-color);
   color: var(--text-color);
   padding: 8px;
