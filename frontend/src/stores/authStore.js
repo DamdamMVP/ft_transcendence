@@ -24,6 +24,18 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.setItem('user', JSON.stringify(userData))
   }
 
+  const updateUser = (updatedData) => {
+    if (user.value) {
+      // Mettre à jour uniquement les champs fournis
+      user.value = {
+        ...user.value,
+        ...updatedData
+      }
+      // Sauvegarder les données mises à jour
+      localStorage.setItem('user', JSON.stringify(user.value))
+    }
+  }
+
   const logout = () => {
     // Nettoyer l'état
     user.value = null
@@ -43,6 +55,7 @@ export const useAuthStore = defineStore('auth', () => {
     
     // Actions
     login,
-    logout
+    logout,
+    updateUser
   }
 })

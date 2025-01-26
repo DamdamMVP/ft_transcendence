@@ -1,21 +1,24 @@
 <script setup>
-import { useProfilDatasStore } from '../stores/profilDatas'
+import { useAuthStore } from '../stores/authStore'
 
-const profilDatas = useProfilDatasStore()
+const authStore = useAuthStore()
+
+// URL de l'image par défaut avec le bon chemin backend
+const defaultProfilePicture = 'http://localhost:8000/media/profile_pictures/default.jpg'
 </script>
 
 <template>
   <div class="profile-container">
     <div class="profile-card">
-      <h2 class="profile-name">{{ profilDatas.matches[0].name }}</h2>
+      <h2 class="profile-name">{{ authStore.user?.username || 'Utilisateur' }}</h2>
       <img
-        :src="profilDatas.matches[0].profilePicture"
-        alt="Profile Picture"
+        :src="authStore.user?.profilePicture || defaultProfilePicture"
+        :alt="authStore.user?.username || 'Profile Picture'"
         class="profile-picture"
       />
-      <p class="profile-stats">
-        W: {{ profilDatas.matches[0].wins }} | L:
-        {{ profilDatas.matches[0].losses }}
+      <p class="profile-stats" v-if="authStore.user?.stats">
+        W: {{ authStore.user.stats.wins || 0 }} | L:
+        {{ authStore.user.stats.losses || 0 }}
       </p>
     </div>
   </div>
