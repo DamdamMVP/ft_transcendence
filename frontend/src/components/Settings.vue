@@ -3,7 +3,7 @@ import ThemeSelector from './ThemeSelector.vue'
 import Langage from './Langage.vue'
 import { useAuthStore } from '../stores/authStore'
 import { useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
@@ -23,6 +23,14 @@ const selectedFile = ref(null)
 
 // Champs pour la mise à jour des paramètres
 const username = ref(authStore.user?.username || '')
+
+// Surveiller les changements dans authStore.user
+watch(() => authStore.user, (newUser) => {
+  if (newUser) {
+    username.value = newUser.username
+  }
+}, { deep: true })
+
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -103,15 +111,9 @@ const saveUsername = async () => {
       { withCredentials: true }
     )
 
-    if (response.data.message === 'Username updated successfully') {
-      // Mettre à jour le store avec les nouvelles données
-      const userResponse = await axios.get(
-        `http://localhost:8000/users/read/${authStore.user.id}`,
-        { withCredentials: true }
-      )
-      if (userResponse.data) {
-        authStore.updateUser(userResponse.data)
-      }
+    if (response.data && response.data.username === username.value) {
+      console.log('✅ Username mis à jour:', response.data.username)
+      authStore.updateUser(response.data)
     }
   } catch (error) {
     console.error(

@@ -145,7 +145,7 @@ def addUser(request):
 def updateUser(request, pk):
     try:
         # Check that the user making the request corresponds to the user to be updated
-        if request.user.id != pk:
+        if int(request.user.id) != int(pk):  # Ensure both are integers
             return Response({'error': 'You can only update your own account.'}, status=403)
         
         user = User.objects.get(id=pk)
