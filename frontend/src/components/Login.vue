@@ -1,11 +1,26 @@
 <script setup>
 import { ref } from 'vue'
 
+const isLogin = ref(true)
 const email = ref('')
 const password = ref('')
+const username = ref('')
+const confirmPassword = ref('')
 
 const handleSignIn = () => {
   console.log('Sign In clicked with:', email.value, password.value)
+}
+
+const handleSignUp = () => {
+  console.log('Sign Up clicked with:', username.value, email.value, password.value)
+}
+
+const toggleMode = () => {
+  isLogin.value = !isLogin.value
+  email.value = ''
+  password.value = ''
+  username.value = ''
+  confirmPassword.value = ''
 }
 
 const forgotPassword = () => {
@@ -15,37 +30,77 @@ const forgotPassword = () => {
 
 <template>
   <div class="container">
-    <!-- Form Section -->
     <div class="form-container">
+      <div class="mode-toggle">
+        <button 
+          :class="{ active: isLogin }" 
+          @click="toggleMode"
+        >
+          {{ $t('auth.login') }}
+        </button>
+        <button 
+          :class="{ active: !isLogin }" 
+          @click="toggleMode"
+        >
+          {{ $t('auth.signup') }}
+        </button>
+      </div>
+
+      <template v-if="!isLogin">
+        <div class="form-group">
+          <label for="username">{{ $t('signup.username') }}</label>
+          <input
+            id="username"
+            type="text"
+            v-model="username"
+            :placeholder="$t('signup.placeholders.username')"
+            class="input-field"
+          />
+        </div>
+      </template>
+
       <div class="form-group">
-        <label for="email">{{ $t('login.email') }}</label>
+        <label for="email">{{ isLogin ? $t('login.email') : $t('signup.email') }}</label>
         <input
           id="email"
           type="email"
           v-model="email"
-          :placeholder="$t('login.placeholders.email')"
+          :placeholder="isLogin ? $t('login.placeholders.email') : $t('signup.placeholders.email')"
           class="input-field"
         />
       </div>
 
       <div class="form-group">
-        <label for="password">{{ $t('login.password') }}</label>
+        <label for="password">{{ isLogin ? $t('login.password') : $t('signup.password') }}</label>
         <input
           id="password"
           type="password"
           v-model="password"
-          :placeholder="$t('login.placeholders.password')"
+          :placeholder="isLogin ? $t('login.placeholders.password') : $t('signup.placeholders.password')"
           class="input-field"
         />
       </div>
 
+      <template v-if="!isLogin">
+        <div class="form-group">
+          <label for="confirmPassword">{{ $t('signup.confirmPassword') }}</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            v-model="confirmPassword"
+            :placeholder="$t('signup.placeholders.confirmPassword')"
+            class="input-field"
+          />
+        </div>
+      </template>
+
       <div class="button-group">
-        <button class="submit-button" @click="handleSignIn">
-          {{ $t('login.signIn') }}
+        <button class="submit-button" @click="isLogin ? handleSignIn : handleSignUp">
+          {{ isLogin ? $t('login.signIn') : $t('signup.signUp') }}
         </button>
       </div>
 
-      <div class="forgot-password">
+      <div v-if="isLogin" class="forgot-password">
         <a href="#" @click.prevent="forgotPassword">{{
           $t('login.forgotPassword')
         }}</a>
@@ -78,6 +133,33 @@ const forgotPassword = () => {
   gap: 24px;
 }
 
+.mode-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.mode-toggle button {
+  padding: 8px 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.mode-toggle button.active {
+  border-bottom: 2px solid #1e1e1e;
+  font-weight: bold;
+}
+
+.mode-toggle button:hover {
+  opacity: 0.8;
+}
+
 .form-group {
   width: 100%;
   display: flex;
@@ -99,63 +181,42 @@ const forgotPassword = () => {
   border-radius: 8px;
   border: 1px solid #d9d9d9;
   font-size: 16px;
-  font-family: Inter, sans-serif;
-  color: #b3b3b3;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.input-field:focus {
-  outline: none;
-  border-color: #1e90ff;
+  width: calc(100% - 32px);
 }
 
 .button-group {
   width: 100%;
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
 }
 
 .submit-button {
-  flex: 1;
-  height: 40px;
-  padding: 12px;
-  background: #2c2c2c;
-  border: 1px solid #2c2c2c;
+  padding: 12px 24px;
+  background: #1e1e1e;
+  color: white;
+  border: none;
   border-radius: 8px;
-  color: #f5f5f5;
-  font-size: 16px;
-  font-family: Inter, sans-serif;
-  font-weight: 400;
-  line-height: 16px;
   cursor: pointer;
-  transition:
-    background 0.3s,
-    border-color 0.3s;
+  font-size: 16px;
+  transition: background-color 0.2s;
 }
 
 .submit-button:hover {
-  background: #3a3a3a;
+  background: #333;
 }
 
 .forgot-password {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
+  text-align: center;
 }
 
 .forgot-password a {
   color: #1e1e1e;
-  font-size: 16px;
-  font-family: Inter, sans-serif;
-  font-weight: 400;
-  line-height: 22.4px;
-  text-decoration: underline;
-  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
 }
 
 .forgot-password a:hover {
-  color: #1e90ff;
+  text-decoration: underline;
 }
 </style>

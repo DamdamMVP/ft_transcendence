@@ -6,24 +6,41 @@
     "settings": "Settings",
     "pong": "Pong",
     "tic-tac-toe": "Tic-Tac-Toe",
-    "profil": "Profil",
+    "profil": "Profile",
     "disconnect": "Disconnect"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up"
   },
   "login": {
     "email": "Email",
     "password": "Password",
     "signIn": "Sign In",
-    "forgotPassword": "Forgot password?",
+    "forgotPassword": "Forgot Password?",
     "goToProfil": "Go to Profile",
     "placeholders": {
       "email": "Enter your email",
       "password": "Enter your password"
     }
   },
+  "signup": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signUp": "Sign Up",
+    "placeholders": {
+      "username": "Enter your username",
+      "email": "Enter your email",
+      "password": "Enter your password",
+      "confirmPassword": "Confirm your password"
+    }
+  },
   "history": {
     "title": "History",
-    "win": "Win",
-    "loose": "Loose"
+    "win": "Victory",
+    "loose": "Defeat"
   },
   "navbarProfil": {
     "Pong": "Pong",
@@ -47,7 +64,7 @@
   "friendList": {
     "title": "My Friends",
     "online": "online",
-    "search": "Search friend",
+    "search": "Search a friend",
     "addFriend": "Add friend",
     "block": "Block",
     "unblock": "Unblock",

@@ -9,6 +9,10 @@
     "profil": "Profil",
     "disconnect": "Digevreañ"
   },
+  "auth": {
+    "login": "Kevreañ",
+    "signup": "Enrollañ"
+  },
   "login": {
     "email": "Postel",
     "password": "Ger-tremen",
@@ -17,7 +21,20 @@
     "goToProfil": "Mont d'ar profil",
     "placeholders": {
       "email": "Lakait ho postel",
-      "password": "Lakait ho ker-tremen"
+      "password": "Lakait ho ger-tremen"
+    }
+  },
+  "signup": {
+    "username": "Anv implijer",
+    "email": "Postel",
+    "password": "Ger-tremen",
+    "confirmPassword": "Kadarnaat ar ger-tremen",
+    "signUp": "Enrollañ",
+    "placeholders": {
+      "username": "Lakait hoc'h anv implijer",
+      "email": "Lakait ho postel",
+      "password": "Lakait ho ker-tremen",
+      "confirmPassword": "Kadarnaat ho ker-tremen"
     }
   },
   "history": {

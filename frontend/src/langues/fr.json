@@ -9,6 +9,10 @@
     "profil": "Profil",
     "disconnect": "Déconnexion"
   },
+  "auth": {
+    "login": "Connexion",
+    "signup": "Inscription"
+  },
   "login": {
     "email": "Email",
     "password": "Mot de passe",
@@ -18,6 +22,19 @@
     "placeholders": {
       "email": "Entrez votre email",
       "password": "Entrez votre mot de passe"
+    }
+  },
+  "signup": {
+    "username": "Pseudo",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "signUp": "S'inscrire",
+    "placeholders": {
+      "username": "Entrez votre pseudo",
+      "email": "Entrez votre email",
+      "password": "Entrez votre mot de passe",
+      "confirmPassword": "Confirmez votre mot de passe"
     }
   },
   "history": {
