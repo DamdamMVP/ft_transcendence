@@ -123,12 +123,50 @@ const saveUsername = async () => {
   }
 }
 
-const savePassword = () => {
-  if (newPassword.value !== confirmPassword.value) {
-    console.error('Les mots de passe ne correspondent pas')
-    return
+const savePassword = async () => {
+  try {
+    if (!currentPassword.value) {
+      console.error('❌ Le mot de passe actuel est requis')
+      return
+    }
+    
+    if (!newPassword.value || !confirmPassword.value) {
+      console.error('❌ Le nouveau mot de passe et sa confirmation sont requis')
+      return
+    }
+
+    if (newPassword.value !== confirmPassword.value) {
+      console.error('❌ Les mots de passe ne correspondent pas')
+      return
+    }
+
+    const response = await axios.put(
+      `http://localhost:8000/users/update_password/${authStore.user.id}`,
+      {
+        old_password: currentPassword.value,
+        password: newPassword.value,
+        username: authStore.user.username,
+        email: authStore.user.email
+      },
+      { withCredentials: true }
+    )
+
+    if (response.data && response.data.message === 'Password updated successfully') {
+      console.log('✅ Mot de passe mis à jour')
+      // Réinitialiser les champs
+      currentPassword.value = ''
+      newPassword.value = ''
+      confirmPassword.value = ''
+    }
+  } catch (error) {
+    if (error.response?.data?.error === 'Invalid old password') {
+      console.error('❌ Le mot de passe actuel est incorrect')
+    } else if (error.response?.data?.error === 'User not found') {
+      console.error('❌ Utilisateur non trouvé')
+    } else {
+      console.error('❌ Erreur lors de la mise à jour du mot de passe')
+    }
   }
-  console.log(`Mot de passe mis à jour : ${newPassword.value}`)
 }
 
 const saveLanguage = () => {
