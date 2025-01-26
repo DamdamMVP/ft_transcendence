@@ -113,51 +113,52 @@ User = get_user_model()
 
 class TokenAuthMiddlewareHTTP(MiddlewareMixin):
     """
-    Middleware pour gérer l'authentification par JWT dans les cookies HTTP.
-    Si le token d'accès est expiré, utilise le token de rafraîchissement pour en générer un nouveau.
+    Middleware to handle JWT authentication in HTTP cookies.
+    If the access token is expired, uses the refresh token to generate a new one.
     """
 
     def process_request(self, request):
-        access_token = request.COOKIES.get("access_token")
-        refresh_token = request.COOKIES.get("refresh_token")
+        # Get access token from cookies
+        access_token = request.COOKIES.get('access_token')
+        refresh_token = request.COOKIES.get('refresh_token')
 
         if not access_token:
             request.user = AnonymousUser()
             return
 
         try:
-            # 1) Tenter de décoder le token d'accès
+            # Try to decode the current access token
             decoded_data = jwt_decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
             user_id = decoded_data.get("user_id")
             if not user_id:
                 request.user = AnonymousUser()
                 return
             
-            # Récupérer l'utilisateur associé
+            # Get user from database
             request.user = User.objects.get(id=user_id)
 
         except ExpiredSignatureError:
-            # 2) Si le token d'accès est expiré, tenter de rafraîchir
+            # If access token is expired, try to use refresh token
             if not refresh_token:
                 request.user = AnonymousUser()
                 return
 
             try:
-                # Rafraîchir le token
+                # Refresh the token
                 refresh = RefreshToken(refresh_token)
                 new_access_token = str(refresh.access_token)
 
-                # Ajouter le nouveau token d'accès dans la réponse (cookies)
+                # Add the new access token to the response (cookies)
                 request.new_access_token = new_access_token
 
-                # Décoder le nouveau token
+                # Decode the new access token
                 new_decoded_data = jwt_decode(new_access_token, settings.SECRET_KEY, algorithms=["HS256"])
                 user_id = new_decoded_data.get("user_id")
                 if not user_id:
                     request.user = AnonymousUser()
                     return
 
-                # Récupérer l'utilisateur
+                # Get user from database
                 request.user = User.objects.get(id=user_id)
 
             except InvalidToken:
@@ -168,13 +169,13 @@ class TokenAuthMiddlewareHTTP(MiddlewareMixin):
             request.user = AnonymousUser()
 
     def process_response(self, request, response):
-        # Si un nouveau token d'accès a été généré, le placer dans les cookies
+        # If we generated a new access token, set it in the response cookies
         if hasattr(request, "new_access_token"):
             response.set_cookie(
                 key="access_token",
                 value=request.new_access_token,
                 httponly=True,
-                secure=settings.DEBUG is False,  # Utilisez HTTPS en production
+                secure=settings.DEBUG is False,  # Use HTTPS in production
                 samesite="Lax",
             )
         return response

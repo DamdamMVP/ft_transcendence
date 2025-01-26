@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'djangoapp.Midleware.CookieJWTAuthentication',  # Utilise notre classe d'authentification
+        'djangoapp.Midleware.CookieJWTAuthentication',  # Use our authentication class
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -43,7 +43,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,  # Renew refresh token on each use
     'BLACKLIST_AFTER_ROTATION': True,  # Invalidate old refresh tokens after rotation
-    'ALGORITHM': 'HS256',  # Algorithme de cryptage
+    'ALGORITHM': 'HS256',  # Encryption algorithm
     'SIGNING_KEY': SECRET_KEY,  # Replace with a secure secret key
 }
 
@@ -95,7 +95,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Utilise notre middleware
+    'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Use our middleware
 ]
 
 ROOT_URLCONF = 'djangotest.urls'
@@ -158,19 +158,19 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# Configuration de django-allauth
+# Configuration of django-allauth
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USERNAME_REQUIRED = False
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
-# URLs de redirection
+# Redirect URLs
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Configuration du provider Google
+# Configuration of the Google provider
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [

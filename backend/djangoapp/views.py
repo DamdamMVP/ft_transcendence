@@ -33,9 +33,9 @@ def login(request):
         response.set_cookie(
             key='access_token',
             value=access_token,
-            httponly=True,  # Make the cookie inaccessible to JavaScript
-            secure=True,  # In production, enable this option for HTTPS only
-            samesite='Strict',  # Restrict the cookie to the same origin (CSRF protection)
+            httponly=True,  # Makes cookie inaccessible via JavaScript
+            secure=True,    # In production, enable this option for HTTPS only
+            samesite='Strict',  # Restricts cookie to same origin (CSRF protection)
             max_age=60 * 5  # Token lifetime (in seconds)
         )
         response.set_cookie(
@@ -135,22 +135,22 @@ def addUser(request):
 @permission_classes([IsAuthenticated])
 def updateUser(request, pk):
     try:
-        # Vérifier que l'utilisateur qui fait la requête correspond à l'utilisateur à mettre à jour
+        # Check that the user making the request corresponds to the user to be updated
         if request.user.id != pk:
             return Response({'error': 'You can only update your own account.'}, status=403)
         
         user = User.objects.get(id=pk)
         data = request.data
 
-        # Autoriser uniquement les champs `username` et `email` à être mis à jour
+        # Only allow `username` and `email` fields to be updated
         allowed_fields = ['username', 'email']
         update_data = {field: data[field] for field in allowed_fields if field in data}
 
-        # Vérifier que les champs autorisés sont présents et valides
+        # Check that allowed fields are present and valid
         if not update_data:
             return Response({'error': 'Only username and email can be updated.'}, status=400)
 
-        serializer = UserSerializer(instance=user, data=update_data, partial=True)  # Utiliser `partial=True` pour n'exiger que les champs fournis
+        serializer = UserSerializer(instance=user, data=update_data, partial=True)  # Use `partial=True` to only require provided fields
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)
