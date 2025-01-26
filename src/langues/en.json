@@ -1,0 +1,60 @@
+{
+  "welcome": "Welcome to your site",
+  "navbar": {
+    "create": "Create",
+    "connect": "Connect",
+    "settings": "Settings",
+    "pong": "Pong",
+    "tic-tac-toe": "Tic-Tac-Toe",
+    "profil": "Profil",
+    "disconnect": "Disconnect"
+  },
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "forgotPassword": "Forgot password?",
+    "goToProfil": "Go to Profile",
+    "placeholders": {
+      "email": "Enter your email",
+      "password": "Enter your password"
+    }
+  },
+  "history": {
+    "title": "History",
+    "win": "Win",
+    "loose": "Loose"
+  },
+  "navbarProfil": {
+    "Pong": "Pong",
+    "Tic-Tac-Toe": "Tic-Tac-Toe",
+    "Settings": "Settings"
+  },
+  "settings": {
+    "profilePhoto": "Profile Photo",
+    "username": "Username",
+    "password": "Password",
+    "language": "Language",
+    "theme": "Theme",
+    "deleteAccount": "Delete Account",
+    "save": "Save",
+    "passwordPlaceholders": {
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password"
+    }
+  },
+  "friendList": {
+    "title": "My Friends",
+    "online": "online",
+    "search": "Search friend",
+    "addFriend": "Add friend",
+    "block": "Block",
+    "unblock": "Unblock",
+    "chat": "Chat",
+    "icons": {
+      "chat": "chat",
+      "block": "block"
+    }
+  }
+}

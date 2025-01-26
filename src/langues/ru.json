@@ -1,0 +1,60 @@
+{
+  "welcome": "Добро пожаловать на ваш сайт",
+  "navbar": {
+    "create": "Создать",
+    "connect": "Подключиться",
+    "settings": "Настройки",
+    "pong": "Понг",
+    "tic-tac-toe": "Крестики-нолики",
+    "profil": "Профиль",
+    "disconnect": "Выйти"
+  },
+  "login": {
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "signIn": "Войти",
+    "forgotPassword": "Забыли пароль?",
+    "goToProfil": "Перейти в профиль",
+    "placeholders": {
+      "email": "Введите вашу почту",
+      "password": "Введите ваш пароль"
+    }
+  },
+  "history": {
+    "title": "История",
+    "win": "Победа",
+    "loose": "Поражение"
+  },
+  "navbarProfil": {
+    "Pong": "Понг",
+    "Tic-Tac-Toe": "Крестики-нолики",
+    "Settings": "Настройки"
+  },
+  "settings": {
+    "profilePhoto": "Фото профиля",
+    "username": "Имя пользователя",
+    "password": "Пароль",
+    "language": "Язык",
+    "theme": "Тема",
+    "deleteAccount": "Удалить аккаунт",
+    "save": "Сохранить",
+    "passwordPlaceholders": {
+      "current": "Текущий пароль",
+      "new": "Новый пароль",
+      "confirm": "Подтвердите новый пароль"
+    }
+  },
+  "friendList": {
+    "title": "Мои друзья",
+    "online": "в сети",
+    "search": "Поиск друга",
+    "addFriend": "Добавить друга",
+    "block": "Заблокировать",
+    "unblock": "Разблокировать",
+    "chat": "Чат",
+    "icons": {
+      "chat": "чат",
+      "block": "блокировка"
+    }
+  }
+}

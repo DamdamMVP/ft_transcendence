@@ -1,0 +1,60 @@
+{
+  "welcome": "Bienvenue sur votre site",
+  "navbar": {
+    "create": "Créer",
+    "connect": "Connecter",
+    "settings": "Paramètres",
+    "pong": "Pong",
+    "tic-tac-toe": "Tic-Tac-Toe",
+    "profil": "Profil",
+    "disconnect": "Déconnexion"
+  },
+  "login": {
+    "email": "Email",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "forgotPassword": "Mot de passe oublié?",
+    "goToProfil": "Aller au profil",
+    "placeholders": {
+      "email": "Entrez votre email",
+      "password": "Entrez votre mot de passe"
+    }
+  },
+  "history": {
+    "title": "Historique",
+    "win": "Victoire",
+    "loose": "Défaite"
+  },
+  "navbarProfil": {
+    "Pong": "Pong",
+    "Tic-Tac-Toe": "Tic-Tac-Toe",
+    "Settings": "Paramètres"
+  },
+  "settings": {
+    "profilePhoto": "Photo de profil",
+    "username": "Pseudo",
+    "password": "Mot de passe",
+    "language": "Langue",
+    "theme": "Thème",
+    "deleteAccount": "Supprimer le compte",
+    "save": "Sauvegarder",
+    "passwordPlaceholders": {
+      "current": "Ancien mot de passe",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le nouveau mot de passe"
+    }
+  },
+  "friendList": {
+    "title": "Mes amis",
+    "online": "en ligne",
+    "search": "Rechercher un ami",
+    "addFriend": "Ajouter un ami",
+    "block": "Bloquer",
+    "unblock": "Débloquer",
+    "chat": "Discuter",
+    "icons": {
+      "chat": "chat",
+      "block": "block"
+    }
+  }
+}

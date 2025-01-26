@@ -2,7 +2,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from django.http import JsonResponse
 from django.contrib.auth.hashers import check_password, make_password
+<<<<<<< HEAD
 from .models import User, History, Block
+=======
+from .models import User, History
+>>>>>>> c35a75964efecd843b638411b877eb5299c3f688
 from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserSerializer, HistorySerializer
@@ -243,6 +247,7 @@ def deleteHistory(request, pk):
     history = History.objects.get(id=pk)
     history.delete()
     return Response({'message': 'History successfully deleted!'}, status=200)
+<<<<<<< HEAD
 
 
 @api_view(['POST'])
@@ -280,3 +285,5 @@ def unblock_user(request):
 def list_blocks(request):
     blocked_users = Block.objects.filter(blocker=request.user).values_list('blocked__username', flat=True)
     return Response({"blocked_users": list(blocked_users)}, status=200)
+=======
+>>>>>>> c35a75964efecd843b638411b877eb5299c3f688

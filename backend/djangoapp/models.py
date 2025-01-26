@@ -10,7 +10,6 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True  # Cette classe ne sera pas directement utilisée pour créer une table
 
-
 # User hérite maintenant de AbstractUser
 class User(AbstractUser):  # Remplace le modèle utilisateur par défaut de Django
     # Ajout de champs supplémentaires
