@@ -31,7 +31,9 @@ const profilePhotoUrl = computed(() => {
   if (selectedFile.value) {
     return URL.createObjectURL(selectedFile.value)
   }
-  return authStore.user?.profilePicture || 'https://via.placeholder.com/150'
+  return authStore.user?.profile_picture
+    ? `http://localhost:8000${authStore.user.profile_picture}`
+    : null
 })
 
 const handleLogout = () => {
@@ -66,15 +68,30 @@ const saveProfilePhoto = async () => {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        withCredentials: true
+        withCredentials: true,
       }
     )
-    if (response.data.success) {
-      authStore.updateUser({ profilePicture: response.data.profile_picture_url })
+    console.log('Réponse du serveur update:', response.data)
+
+    // Si la requête réussit (pas d'erreur), on considère que c'est un succès
+    if (response.data.message === 'Profile picture updated successfully') {
+      // On recharge les données de l'utilisateur pour obtenir la nouvelle URL de la photo
+      const userResponse = await axios.get(
+        `http://localhost:8000/users/read/${authStore.user.id}`,
+        { withCredentials: true }
+      )
+      console.log('Réponse user data:', userResponse.data)
+      if (userResponse.data) {
+        // On garde l'URL relative
+        authStore.updateUser(userResponse.data)
+      }
       selectedFile.value = null
     }
   } catch (error) {
-    console.error('Erreur lors de la mise à jour de la photo de profil:', error)
+    console.error(
+      'Erreur lors de la mise à jour de la photo de profil:',
+      error.response?.data || error
+    )
   }
 }
 
