@@ -32,7 +32,10 @@ const handleLogin = () => {
     </div>
 
     <div class="user-options" v-else>
-      <router-link to="/profil/pong" class="profil-link">
+      <router-link to="/pong" class="nav-link">
+        {{ $t('navbar.pong') }}
+      </router-link>
+      <router-link to="/profil/pong" class="nav-link">
         {{ $t('navbar.profil') }}
       </router-link>
       <router-link to="/settings" class="settings-link">
@@ -80,6 +83,7 @@ const handleLogin = () => {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding-right: 32px;
 }
 
 .sign-in-button,
@@ -101,52 +105,50 @@ const handleLogin = () => {
     color 0.3s;
 }
 
-.sign-in-button {
-  background: var(--background-color);
-  border-color: var(--secondary-color);
+.nav-link {
   color: var(--text-color);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+  background-color: var(--secondary-color);
+}
+
+.settings-link {
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s;
+}
+
+.settings-link:hover {
+  background-color: var(--secondary-color);
+}
+
+.sign-in-button {
+  background: transparent;
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .sign-in-button:hover {
-  background: var(--secondary-color);
-  color: var(--text-color);
+  background: var(--primary-color);
+  color: var(--background-color);
 }
 
 .register-button {
   background: var(--primary-color);
   border-color: var(--primary-color);
-  color: var(--text-color);
+  color: var(--background-color);
 }
 
 .register-button:hover {
-  background: var(--info-color);
-  border-color: var(--info-color);
-  color: var(--text-color);
-}
-
-.logout-button {
-  background: var(--secondary-color);
-  border-color: var(--secondary-color);
-  color: white;
-}
-
-.logout-button:hover {
-  background: var(--danger-color);
-  border-color: var(--danger-color);
-}
-
-.profil-link,
-.settings-link {
-  text-decoration: none;
-  color: var(--primary-color);
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-right: 16px;
-}
-
-.profil-link:hover,
-.settings-link:hover {
-  text-decoration: underline;
+  opacity: 0.9;
 }
 </style>

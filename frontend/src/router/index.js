@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue'
 import ProfilView from '../views/ProfilView.vue'
 import History from '../components/History.vue'
 import SettingsView from '../views/SettingsView.vue'
+import PongView from '../views/PongView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,12 @@ const router = createRouter({
       name: 'settings',
       component: SettingsView,
     },
+    {
+      path: '/pong',
+      name: 'pong',
+      component: PongView,
+      meta: { requiresAuth: true }
+    }
   ],
 })
 
