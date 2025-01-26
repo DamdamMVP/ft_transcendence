@@ -1,8 +1,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useRouter } from 'vue-router'
 
 const emit = defineEmits(['success', 'switch-mode'])
+const router = useRouter()
 
 const email = ref('')
 const password = ref('')
@@ -31,6 +33,8 @@ const handleSignIn = async () => {
       password.value = ''
       error.value = ''
       emit('success', result.data)
+      // Redirection vers la page Pong
+      router.push('/pong')
     }
   } catch (err) {
     error.value = err.message
