@@ -95,8 +95,30 @@ const saveProfilePhoto = async () => {
   }
 }
 
-const saveUsername = () => {
-  console.log(`Pseudo sauvegardé : ${username.value}`)
+const saveUsername = async () => {
+  try {
+    const response = await axios.put(
+      `http://localhost:8000/users/update/${authStore.user.id}`,
+      { username: username.value },
+      { withCredentials: true }
+    )
+
+    if (response.data.message === 'Username updated successfully') {
+      // Mettre à jour le store avec les nouvelles données
+      const userResponse = await axios.get(
+        `http://localhost:8000/users/read/${authStore.user.id}`,
+        { withCredentials: true }
+      )
+      if (userResponse.data) {
+        authStore.updateUser(userResponse.data)
+      }
+    }
+  } catch (error) {
+    console.error(
+      "Erreur lors de la mise à jour du nom d'utilisateur:",
+      error.response?.data || error
+    )
+  }
 }
 
 const savePassword = () => {
