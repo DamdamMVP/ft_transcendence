@@ -5,7 +5,7 @@ from django.contrib.auth.hashers import check_password, make_password
 from .models import User, History, Block
 from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializers import UserSerializer, HistorySerializer
+from .serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import render
 from rest_framework import status
@@ -33,10 +33,10 @@ def login(request):
         response.set_cookie(
             key='access_token',
             value=access_token,
-            httponly=True,  # Rend le cookie inaccessible en JavaScript
-            secure=True,  # En production, active cette option pour HTTPS uniquement
-            samesite='Strict',  # Restreint le cookie aux mêmes origines (protection CSRF)
-            max_age=60 * 5  # Temps de vie du token (en secondes)
+            httponly=True,  # Makes cookie inaccessible via JavaScript
+            secure=True,  # In production, enable this option for HTTPS only
+            samesite='Strict',  # Restricts cookie to same origin (CSRF protection)
+            max_age=60 * 5  # Token lifetime (in seconds)
         )
         response.set_cookie(
             key='refresh_token',
@@ -69,14 +69,14 @@ def refresh_token(request):
             'message': 'Access token refreshed successfully'
         }, status=200)
 
-        # Met à jour le cookie d'accès
+        # Update access cookie
         response.set_cookie(
             key='access_token',
             value=access_token,
             httponly=True,
             secure=True,
             samesite='Strict',
-            max_age=60 * 5  # Temps de vie du token d'accès
+            max_age=60 * 5  # Access token lifetime
         )
         return response
     except Exception as e:
@@ -89,14 +89,14 @@ def refresh_token(request):
 def logout(request):
     response = Response({'message': 'Logged out successfully'}, status=200)
 
-    # Supprimer les cookies
+    # Delete cookies
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
 
     return response
 
 
-# Obtenir tous les utilisateurs
+# Get all users
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getData(request):
@@ -104,7 +104,7 @@ def getData(request):
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data)
 
-# Obtenir un utilisateur spécifique
+# Get a specific user
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def getUser(request, pk):
@@ -115,13 +115,13 @@ def getUser(request, pk):
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=404)
 
-# Ajouter un nouvel utilisateur (avec hachage du mot de passe)
+# Add a new user (with password hashing)
 @api_view(['POST'])
-@permission_classes([AllowAny])  # Autorise l'accès sans authentification
+@permission_classes([AllowAny])  # Allows access without authentication
 def addUser(request):
     data = request.data
 
-    # Hacher le mot de passe
+    # Hash password
     data['password'] = make_password(data['password'])
     serializer = UserSerializer(data=data)
 
@@ -138,7 +138,7 @@ def updateUser(request, pk):
         user = User.objects.get(id=pk)
         data = request.data
 
-        # Si un mot de passe est fourni, le hacher
+        # If password is provided, hash it
         if 'password' in data:
             data['password'] = make_password(data['password'])
 
@@ -151,7 +151,7 @@ def updateUser(request, pk):
         return Response({'error': 'User not found'}, status=404)
 
 
-# Supprimer un utilisateur
+# Delete a user
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def deleteUser(request, pk):
@@ -159,7 +159,7 @@ def deleteUser(request, pk):
     user.delete()
     return Response({'message': 'User successfully deleted!'}, status=200)
 
-# Connexion utilisateur
+# User login
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def connect(request):
@@ -175,7 +175,7 @@ def updateProfilePicture(request, pk):
         if 'profile_picture' not in request.FILES:
             return Response({'error': 'No profile picture provided'}, status=400)
 
-        # Mettre à jour la photo de profil
+        # Update profile picture
         user.profile_picture = request.FILES['profile_picture']
         user.save()
 
@@ -204,45 +204,89 @@ def updatePassword(request, pk):
         return Response({'error': 'User not found'}, status=404)
 
 
-@api_view(['GET'])
+@api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def getHistories(request):
-    histories = History.objects.all()
-    serializer = HistorySerializer(histories, many=True)
-    return Response(serializer.data)
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def getUserHistory(request, user_id):
-    histories = History.objects.filter(user_id=user_id)
-    serializer = HistorySerializer(histories, many=True)
-    return Response(serializer.data)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def addHistory(request):
-    serializer = HistorySerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=201)
-    return Response(serializer.errors, status=400)
+def updateLanguage(request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        language = request.data.get('language')
+        
+        if language not in ['french', 'english', 'russian', 'breizh']:
+            return Response({'error': 'Invalid language'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user.language = language
+        user.save()
+        
+        return Response({
+            'message': 'Language updated successfully',
+            'user': UserSerializer(user).data
+        })
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def updateHistory(request, pk):
-    history = History.objects.get(id=pk)
-    serializer = HistorySerializer(instance=history, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors, status=400)
+def updateTheme(request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        theme = request.data.get('theme')
+        
+        if theme not in ['dark', 'light', 'forest']:
+            return Response({'error': 'Invalid theme'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user.theme = theme
+        user.save()
+        
+        return Response({
+            'message': 'Theme updated successfully',
+            'user': UserSerializer(user).data
+        })
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['DELETE'])
+
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def deleteHistory(request, pk):
-    history = History.objects.get(id=pk)
-    history.delete()
-    return Response({'message': 'History successfully deleted!'}, status=200)
+def add_friend(request, friend_id):
+    try:
+        user = request.user
+        friend = User.objects.get(id=friend_id)
+        
+        if user == friend:
+            return Response({'error': 'You cannot add yourself as a friend'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if friend in user.friends.all():
+            return Response({'error': 'This user is already your friend'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.friends.add(friend)
+        return Response({'message': f'Successfully added {friend.username} as friend'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remove_friend(request, friend_id):
+    try:
+        user = request.user
+        friend = User.objects.get(id=friend_id)
+        
+        if friend not in user.friends.all():
+            return Response({'error': 'This user is not in your friend list'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.friends.remove(friend)
+        return Response({'message': f'Successfully removed {friend.username} from friends'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_friends(request):
+    user = request.user
+    friends = user.friends.all()
+    serializer = UserSerializer(friends, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -251,8 +295,23 @@ def block_user(request):
     blocker = request.user
     blocked_id = request.data.get("blocked_id")
 
+    # Check if blocked user ID is provided
+    if not blocked_id:
+        return Response({"error": "Blocked user ID is required."}, status=400)
+
     try:
+        # Check if user exists
         blocked = User.objects.get(id=blocked_id)
+
+        # Prevent user from blocking themselves
+        if blocker.id == blocked.id:
+            return Response({"error": "You cannot block yourself."}, status=400)
+
+        # Check if user is already blocked
+        if Block.objects.filter(blocker=blocker, blocked=blocked).exists():
+            return Response({"message": f"{blocked.username} is already blocked."}, status=200)
+
+        # Create block
         Block.objects.create(blocker=blocker, blocked=blocked)
         return Response({"message": f"{blocked.username} has been blocked."}, status=201)
     except User.DoesNotExist:
@@ -266,17 +325,70 @@ def unblock_user(request):
     blocker = request.user
     blocked_id = request.data.get("blocked_id")
 
+    # Check if unblock user ID is provided
+    if not blocked_id:
+        return Response({"error": "Blocked user ID is required."}, status=400)
+
     try:
+        # Check if user exists
         blocked = User.objects.get(id=blocked_id)
-        Block.objects.filter(blocker=blocker, blocked=blocked).delete()
+
+        # Check if user is actually blocked
+        block = Block.objects.filter(blocker=blocker, blocked=blocked).first()
+        if not block:
+            return Response({"error": f"{blocked.username} is not blocked."}, status=400)
+
+        # Delete block
+        block.delete()
         return Response({"message": f"{blocked.username} has been unblocked."}, status=200)
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=404)
     except Exception as e:
         return Response({"error": str(e)}, status=400)
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_blocks(request):
     blocked_users = Block.objects.filter(blocker=request.user).values_list('blocked__username', flat=True)
     return Response({"blocked_users": list(blocked_users)}, status=200)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateLanguage(request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        language = request.data.get('language')
+        
+        if language not in ['french', 'english', 'russian', 'breizh']:
+            return Response({'error': 'Invalid language'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user.language = language
+        user.save()
+        
+        return Response({
+            'message': 'Language updated successfully',
+            'user': UserSerializer(user).data
+        })
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateTheme(request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        theme = request.data.get('theme')
+        
+        if theme not in ['dark', 'light', 'forest']:
+            return Response({'error': 'Invalid theme'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user.theme = theme
+        user.save()
+        
+        return Response({
+            'message': 'Theme updated successfully',
+            'user': UserSerializer(user).data
+        })
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)

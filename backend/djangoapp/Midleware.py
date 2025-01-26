@@ -12,13 +12,13 @@ from django.contrib.auth import get_user_model
 
 class CookieJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
-        # Récupère le token d'accès depuis les cookies
+        # Get access token from cookies
         access_token = request.COOKIES.get('access_token')
 
         if not access_token:
             return None
 
-        # Valide le token
+        # Validate the token
         try:
             validated_token = self.get_validated_token(access_token)
             user = self.get_user(validated_token)

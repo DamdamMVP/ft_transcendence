@@ -2,6 +2,8 @@ import os
 from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand
 from dotenv import load_dotenv
+from djangoapp.models import User
+
 
 def init_superuser():
     load_dotenv()  # Charger les variables d'environnement

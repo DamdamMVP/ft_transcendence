@@ -41,10 +41,10 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,  # Renouvelle le refresh token à chaque utilisation
-    'BLACKLIST_AFTER_ROTATION': True,  # Invalide les anciens refresh tokens après rotation
+    'ROTATE_REFRESH_TOKENS': True,  # Renew refresh token on each use
+    'BLACKLIST_AFTER_ROTATION': True,  # Invalidate old refresh tokens after rotation
     'ALGORITHM': 'HS256',  # Algorithme de cryptage
-    'SIGNING_KEY': SECRET_KEY,  # Remplace par une clé secrète sécurisée
+    'SIGNING_KEY': SECRET_KEY,  # Replace with a secure secret key
 }
 
 # Application definition
@@ -80,7 +80,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('redis', 6379)],  # Assure-toi que Redis est installé et tourne
+            'hosts': [('redis', 6379)],  # Make sure Redis is installed and running
         },
     },
 }
@@ -213,7 +213,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-CSRF_COOKIE_SECURE = False  # Mettre à True en production si HTTPS est utilisé
-CSRF_COOKIE_HTTPONLY = False
-SESSION_COOKIE_SECURE = False  # Mettre à True en production si HTTPS est utilisé
+CSRF_COOKIE_SECURE = False  # Set to True in production if HTTPS is used
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = False  # Set to True in production if HTTPS is used
 SESSION_COOKIE_HTTPONLY = True

@@ -8,10 +8,11 @@ class HistorySerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     histories = HistorySerializer(many=True, read_only=True)  # Relation avec History
+    friends = serializers.PrimaryKeyRelatedField(many=True, read_only=True)  # Liste des IDs des amis
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'histories', 'profile_picture']  # Ajout de histories
+        fields = ['id', 'username', 'email', 'password', 'histories', 'profile_picture', 'language', 'theme', 'friends']  # Ajout de friends
         extra_kwargs = {
             'password': {'write_only': True},  # Cache le mot de passe lors de la lecture
         }

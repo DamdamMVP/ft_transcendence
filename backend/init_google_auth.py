@@ -3,7 +3,7 @@ from django.contrib.sites.models import Site
 from allauth.socialaccount.models import SocialApp
 
 def init_google_auth():
-    # Configure le site par défaut
+    # Configure default site
     site, created = Site.objects.get_or_create(
         id=1,
         defaults={
@@ -16,7 +16,7 @@ def init_google_auth():
         site.name = 'ft_transcendence'
         site.save()
 
-    # Récupère les identifiants Google des variables d'environnement
+    # Get Google credentials from environment variables
     client_id = os.getenv('GOOGLE_CLIENT_ID')
     secret = os.getenv('GOOGLE_SECRET_KEY')
 
@@ -24,7 +24,7 @@ def init_google_auth():
         print('Warning: GOOGLE_CLIENT_ID or GOOGLE_SECRET_KEY not set in environment variables')
         return
 
-    # Configure l'application Google
+    # Configure Google application
     google_app, created = SocialApp.objects.get_or_create(
         provider='google',
         name='Google OAuth',
@@ -39,7 +39,7 @@ def init_google_auth():
         google_app.secret = secret
         google_app.save()
 
-    # Associe l'application au site
+    # Associate application with site
     google_app.sites.add(site)
     
     print('Google authentication configured successfully!')

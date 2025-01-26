@@ -12,7 +12,7 @@ User = get_user_model()
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         if isinstance(self.scope["user"], AnonymousUser):
-            await self.close(code=4001)  # Code WebSocket pour utilisateur non autorisé
+            await self.close(code=4001)  # WebSocket code for unauthorized user
             return
 
         # get chan name from the url
@@ -43,17 +43,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    @database_sync_to_async
-    def get_blocked_by_users(self, user):
-        """
-        Récupère les utilisateurs qui ont bloqué l'utilisateur actuel.
-        """
-        return list(Block.objects.filter(blocked=user).values_list("blocker_id", flat=True))
 
     async def receive(self, text_data):
-        user = self.scope["user"]  # Utilisateur connecté
+        user = self.scope["user"]  # Connected user
 
-        # Décoder les données du message
+        # Decode message data
         try:
             data = json.loads(text_data)
         except json.JSONDecodeError:
@@ -63,7 +57,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not message or not message.strip():
             return
 
-        # Envoyer le message au groupe
+        # Send the message to the group
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -71,31 +65,36 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'sender': user.username,
-                'sender_id': user.id,  # Ajout de l'ID pour gérer les blocs
+                'sender_id': user.id,  # Adding ID for block management
                 'timestamp': timestamp,
             }
         )
 
+
     async def chat_message(self, event):
-        user = self.scope["user"]
-        message = event['message']
-        sender = event['sender']
-        sender_id = event['sender_id']
-        timestamp = event['timestamp']
-
-        # Obtenir les utilisateurs qui ont bloqué l'utilisateur actuel
-        blocked_by_users = await self.get_blocked_by_users(user)
-
-        # Debug : Afficher les utilisateurs qui ont bloqué l'utilisateur actuel
-        print(f"Utilisateur {user.id} est bloqué par : {blocked_by_users}")
-
-        # Ne pas envoyer le message si l'utilisateur qui envoie le message est bloqué
-        if sender_id in blocked_by_users:
-            return
-
-        # Envoyer le message au client
-        await self.send(text_data=json.dumps({
-            'message': message,
-            'sender': sender,
-            'timestamp': timestamp,
-        }))
+            user = self.scope["user"]
+            sender_id = event['sender_id']
+            message = event['message']
+            sender = event['sender']
+            timestamp = event['timestamp']
+    
+            # Check if user has blocked the sender
+            blocked_senders = await self.get_blocked_users(user)
+    
+            # If current user (`user`) has blocked the sender (`sender_id`), ignore message
+            if sender_id in blocked_senders:
+                return
+    
+            # Send message to user
+            await self.send(text_data=json.dumps({
+                'message': message,
+                'sender': sender,
+                'timestamp': timestamp,
+            }))
+    
+    @database_sync_to_async
+    def get_blocked_users(self, user):
+            """
+            Function to retrieve IDs of users blocked by the current user.
+            """
+            return list(Block.objects.filter(blocker=user).values_list("blocked_id", flat=True))

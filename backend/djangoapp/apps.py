@@ -6,4 +6,4 @@ class DjangoappConfig(AppConfig):
     name = 'djangoapp'
 
     def ready(self):
-        import djangoapp.consumers  # Importations tardives pour éviter les erreurs
+        import djangoapp.consumers  # Late imports to avoid errors

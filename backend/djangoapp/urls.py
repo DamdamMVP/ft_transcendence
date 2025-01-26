@@ -1,11 +1,12 @@
 from django.urls import path
 from . import views
 from rest_framework_simplejwt.views import (
-    TokenObtainPairView,  # Génère access et refresh tokens
-    TokenRefreshView,     # Renouvelle un access token
-    TokenVerifyView,      # Vérifie si un token est valide
+    TokenObtainPairView,  # Generates access and refresh tokens
+    TokenRefreshView,     # Renews an access token
+    TokenVerifyView,      # Verifies if a token is valid
 )
 from . import two_factor
+from . import history
 
 urlpatterns = [
     path('', views.getData),
@@ -13,20 +14,29 @@ urlpatterns = [
     path('read/<str:pk>', views.getUser),
     path('update/<str:pk>', views.updateUser),
     path('delete/<str:pk>', views.deleteUser),
-    path('connect', views.connect),  # Route pour la connexion
+    path('connect', views.connect),  # Login route
     path('update_profile_picture/<str:pk>', views.updateProfilePicture),
     path('update_password/<str:pk>', views.updatePassword),
-    path('histories', views.getHistories, name='get_histories'),
-    path('histories/user/<int:user_id>', views.getUserHistory, name='get_user_history'),
-    path('histories/add', views.addHistory, name='add_history'),
-    path('histories/update/<int:pk>', views.updateHistory, name='update_history'),
-    path('histories/delete/<int:pk>', views.deleteHistory, name='delete_history'),
-    path('users/<str:pk>/update_password/', views.updatePassword, name='update-password'),
+    path('update_language/<str:pk>', views.updateLanguage),
+    path('update_theme/<str:pk>', views.updateTheme),
+
+    path('histories', history.getHistories, name='get_histories'),
+    path('histories/user/<int:user_id>', history.getUserHistory, name='get_user_history'),
+    path('histories/add', history.addHistory, name='add_history'),
+    path('histories/update/<int:pk>', history.updateHistory, name='update_history'),
+    path('histories/delete/<int:pk>', history.deleteHistory, name='delete_history'),
+
     path('2fa/setup', two_factor.setup_2fa, name='setup-2fa'),
     path('2fa/verify', two_factor.verify_2fa, name='verify-2fa'),
     path('2fa/disable', two_factor.disable_2fa, name='disable-2fa'),
+
     path('login', views.login),
     path('logout', views.logout),
+
+    path('friends/add/<int:friend_id>', views.add_friend, name='add-friend'),
+    path('friends/remove/<int:friend_id>', views.remove_friend, name='remove-friend'),
+    path('friends', views.get_friends, name='get-friends'),
+
     path('block', views.block_user),
     path('unblock', views.unblock_user),
     path('list_blocked', views.list_blocks),
