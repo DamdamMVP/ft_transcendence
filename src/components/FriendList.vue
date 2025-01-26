@@ -3,55 +3,53 @@
     <!-- Icône de message flottante -->
     <div class="message-icon" @click="toggleExpand">
       <span class="material-icons">chat</span>
-      <div v-if="onlineFriends.length" class="online-badge">{{ onlineFriends.length }}</div>
+      <div v-if="friendStore.onlineFriends.length" class="online-badge">
+        {{ friendStore.onlineFriends.length }}
+      </div>
     </div>
 
     <!-- Panel de la friend list -->
     <div v-if="isExpanded" class="friend-list">
       <div class="friend-list__header" @click="toggleExpand">
         <h3>{{ $t('friendList.title') }}</h3>
-        <span class="friend-list__online-count">{{ onlineFriends.length }} {{ $t('friendList.online') }}</span>
+        <span class="friend-list__online-count"
+          >{{ friendStore.onlineFriends.length }}
+          {{ $t('friendList.online') }}</span
+        >
       </div>
 
       <div class="friend-list__content">
         <div class="friend-list__search">
-          <input 
-            type="text" 
-            v-model="searchQuery" 
+          <input
+            type="text"
+            v-model="searchQuery"
             :placeholder="$t('friendList.search')"
           />
         </div>
 
         <div class="friend-list__friends">
-          <div 
-            v-for="friend in filteredFriends" 
-            :key="friend.id" 
-            class="friend-list__friend"
-          >
-            <div class="friend-list__friend-info">
-              <div class="friend-list__status-indicator" :class="{ 'online': friend.isOnline }"></div>
-              <span class="friend-list__friend-name">{{ friend.username }}</span>
-            </div>
-            <div class="friend-list__actions">
-              <button @click="startChat(friend)" class="friend-list__action-btn" :title="$t('friendList.chat')">
-                <span class="material-icons">{{ $t('friendList.icons.chat') }}</span>
-              </button>
-              <button @click="blockUser(friend)" class="friend-list__action-btn" :title="$t('friendList.block')">
-                <span class="material-icons">{{ $t('friendList.icons.block') }}</span>
-              </button>
-            </div>
-          </div>
+          <FriendItem
+            v-for="friend in filteredFriends"
+            :key="friend.id"
+            :friend="friend"
+            @chat="startChat"
+            @block="blockUser"
+          />
         </div>
 
         <div class="friend-list__add">
-          <input 
-            type="text" 
-            v-model="newFriendUsername" 
+          <input
+            type="text"
+            v-model="newFriendUsername"
             :placeholder="$t('friendList.addFriend')"
             @keyup.enter="addFriend"
           />
-          <button @click="addFriend" class="friend-list__add-btn" :title="$t('friendList.addFriend')">
-            <span class="material-icons">{{ $t('friendList.icons.addFriend') }}</span>
+          <button
+            @click="addFriend"
+            class="friend-list__add-btn"
+            :title="$t('friendList.addFriend')"
+          >
+            <AddFriendIcon class="friend-list__add-icon" />
           </button>
         </div>
       </div>
@@ -60,27 +58,26 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/authStore'
+import { useFriendStore } from '../stores/friendStore'
+import AddFriendIcon from './icons/AddFriendIcon.vue'
+import FriendItem from './FriendItem.vue'
 
 const authStore = useAuthStore()
+const friendStore = useFriendStore()
+
 const isExpanded = ref(false)
 const searchQuery = ref('')
 const newFriendUsername = ref('')
-const friends = ref([
-  // Exemple de données pour le développement
-  { id: 1, username: 'User1', isOnline: true },
-  { id: 2, username: 'User2', isOnline: false },
-])
 
-const onlineFriends = computed(() => {
-  return friends.value.filter(friend => friend.isOnline)
+// Charger la liste d'amis au montage du composant
+onMounted(() => {
+  friendStore.loadFriends()
 })
 
 const filteredFriends = computed(() => {
-  return friends.value.filter(friend => 
-    friend.username.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
+  return friendStore.filteredFriends(searchQuery.value)
 })
 
 const toggleExpand = () => {
@@ -92,15 +89,13 @@ const startChat = (friend) => {
   console.log('Start chat with:', friend.username)
 }
 
-const blockUser = (friend) => {
-  // TODO: Implémenter la logique de blocage
-  console.log('Block user:', friend.username)
+const blockUser = async (friend) => {
+  await friendStore.blockUser(friend.id)
 }
 
-const addFriend = () => {
+const addFriend = async () => {
   if (newFriendUsername.value.trim()) {
-    // TODO: Implémenter la logique d'ajout d'ami
-    console.log('Add friend:', newFriendUsername.value)
+    await friendStore.addFriend(newFriendUsername.value.trim())
     newFriendUsername.value = ''
   }
 }
@@ -195,48 +190,11 @@ const addFriend = () => {
   margin-bottom: 10px;
   background-color: var(--background-color);
   color: var(--text-color);
+  box-sizing: border-box;
 }
 
-.friend-list__friend {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px;
-  border-bottom: 1px solid var(--secondary-color);
-}
-
-.friend-list__friend-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.friend-list__status-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--error-color);
-}
-
-.friend-list__status-indicator.online {
-  background-color: var(--success-color);
-}
-
-.friend-list__actions {
-  display: flex;
-  gap: 5px;
-}
-
-.friend-list__action-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-color);
-  padding: 4px;
-}
-
-.friend-list__action-btn:hover {
-  color: var(--primary-color);
+.friend-list__friends {
+  margin-bottom: 10px;
 }
 
 .friend-list__add {
@@ -256,5 +214,11 @@ const addFriend = () => {
 
 .friend-list__add-btn:hover {
   background-color: var(--primary-hover-color);
+}
+
+.friend-list__add-icon {
+  width: 20px;
+  height: 20px;
+  color: white;
 }
 </style>

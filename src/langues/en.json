@@ -54,8 +54,7 @@
     "chat": "Chat",
     "icons": {
       "chat": "chat",
-      "block": "block",
-      "addFriend": "person_add"
+      "block": "block"
     }
   }
 }
