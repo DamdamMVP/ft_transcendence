@@ -31,8 +31,8 @@ const handleSignIn = async () => {
     })
     
     if (result.success) {
-      // Mettre à jour le store d'authentification
-      authStore.login(result.data.user)
+      // Mettre à jour le store d'authentification avec l'utilisateur et le token
+      authStore.login(result.data.user, result.data.token)
       
       email.value = ''
       password.value = ''
@@ -55,7 +55,7 @@ const forgotPassword = () => {
 </script>
 
 <template>
-  <div class="form-container">
+  <div class="form-content">
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
@@ -106,7 +106,7 @@ const forgotPassword = () => {
 </template>
 
 <style scoped>
-.form-container {
+.form-content {
   width: 100%;
   display: flex;
   flex-direction: column;

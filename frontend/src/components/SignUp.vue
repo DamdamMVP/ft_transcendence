@@ -41,7 +41,7 @@ const handleSignUp = async () => {
 </script>
 
 <template>
-  <div class="form-container">
+  <div class="form-content">
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
@@ -99,7 +99,7 @@ const handleSignUp = async () => {
 </template>
 
 <style scoped>
-.form-container {
+.form-content {
   width: 100%;
   display: flex;
   flex-direction: column;
