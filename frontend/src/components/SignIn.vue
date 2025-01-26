@@ -7,23 +7,35 @@ const emit = defineEmits(['success', 'switch-mode'])
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const isLoading = ref(false)
 
 const { signIn } = useAuth()
 
 const handleSignIn = async () => {
+  if (!email.value || !password.value) {
+    error.value = 'Veuillez remplir tous les champs'
+    return
+  }
+
+  isLoading.value = true
+  error.value = ''
+
   try {
-    await signIn({
+    const result = await signIn({
       email: email.value,
       password: password.value,
     })
     
-    email.value = ''
-    password.value = ''
-    error.value = ''
-    
-    emit('success')
+    if (result.success) {
+      email.value = ''
+      password.value = ''
+      error.value = ''
+      emit('success', result.data)
+    }
   } catch (err) {
     error.value = err.message
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -46,6 +58,8 @@ const forgotPassword = () => {
         v-model="email"
         :placeholder="$t('login.placeholders.email')"
         class="input-field"
+        :disabled="isLoading"
+        @keyup.enter="handleSignIn"
       />
     </div>
 
@@ -57,12 +71,19 @@ const forgotPassword = () => {
         v-model="password"
         :placeholder="$t('login.placeholders.password')"
         class="input-field"
+        :disabled="isLoading"
+        @keyup.enter="handleSignIn"
       />
     </div>
 
     <div class="button-group">
-      <button class="submit-button" @click="handleSignIn">
-        {{ $t('login.signIn') }}
+      <button 
+        class="submit-button" 
+        @click="handleSignIn"
+        :disabled="isLoading"
+      >
+        <span v-if="isLoading">Connexion en cours...</span>
+        <span v-else>{{ $t('login.signIn') }}</span>
       </button>
     </div>
 
@@ -114,6 +135,11 @@ const forgotPassword = () => {
   width: calc(100% - 32px);
 }
 
+.input-field:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
 .button-group {
   width: 100%;
   display: flex;
@@ -129,11 +155,17 @@ const forgotPassword = () => {
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  min-width: 120px;
 }
 
-.submit-button:hover {
+.submit-button:hover:not(:disabled) {
   background: #333;
+}
+
+.submit-button:disabled {
+  background: #666;
+  cursor: not-allowed;
 }
 
 .forgot-password {
