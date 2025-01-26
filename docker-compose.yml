@@ -3,11 +3,16 @@ version: '3.8'
 services:
   frontend:
     container_name: frontend
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - '5173:5173'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
 
@@ -17,7 +22,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8000:8000"
+      - '8000:8000'
     environment:
       - PG_USER=postgres
       - PG_PASSWORD=postgres
@@ -33,9 +38,9 @@ services:
       - db
 
   redis:
-    image: "redis:7.0.0"
+    image: 'redis:7.0.0'
     ports:
-      - "6380:6379"
+      - '6380:6379'
 
   db:
     container_name: db
@@ -45,7 +50,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
 

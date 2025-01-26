@@ -1,5 +1,5 @@
-# Stage de build
-FROM node:18-alpine as build-stage
+# Image de base Node.js
+FROM node:20-alpine
 
 # Définition du répertoire de travail
 WORKDIR /app
@@ -13,17 +13,8 @@ RUN npm install
 # Copie du code source
 COPY . .
 
-# Build de l'application
-RUN npm run build
+# Exposition du port pour Vite (5173 par défaut)
+EXPOSE 5173
 
-# Stage de production
-FROM nginx:stable-alpine as production-stage
-
-# Copie du build depuis l'étape précédente
-COPY --from=build-stage /app/dist /usr/share/nginx/html
-
-# Exposition du port 80
-EXPOSE 80
-
-# Démarrage de nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Commande pour lancer le serveur de développement
+CMD ["npm", "run", "dev", "--", "--host"]
