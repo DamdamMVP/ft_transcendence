@@ -101,6 +101,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+    'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Use our middleware                  
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -110,7 +111,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
-    'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Use our middleware
 ]
 
 ROOT_URLCONF = 'djangotest.urls'
