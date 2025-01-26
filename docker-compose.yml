@@ -1,7 +1,21 @@
+version: '3.8'
+
 services:
-  djangoapp:
+  frontend:
+    container_name: frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  backend:
     container_name: djangoapp
-    build: .
+    build: ./backend
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     environment:
@@ -17,6 +31,7 @@ services:
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
     depends_on:
       - db
+
   redis:
     image: "redis:7.0.0"
     ports:

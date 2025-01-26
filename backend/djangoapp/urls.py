@@ -27,10 +27,7 @@ urlpatterns = [
     path('2fa/disable', two_factor.disable_2fa, name='disable-2fa'),
     path('login', views.login),
     path('logout', views.logout),
-<<<<<<< HEAD
     path('block', views.block_user),
     path('unblock', views.unblock_user),
     path('list_blocked', views.list_blocks),
-=======
->>>>>>> c35a75964efecd843b638411b877eb5299c3f688
 ]
