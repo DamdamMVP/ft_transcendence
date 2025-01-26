@@ -66,7 +66,8 @@ def refresh_token(request):
         access_token = str(refresh.access_token)
 
         response = Response({
-            'message': 'Access token refreshed successfully'
+            'message': 'Access token refreshed successfully',
+            'user.id': refresh['user_id']
         }, status=200)
 
         # Update access token cookie
