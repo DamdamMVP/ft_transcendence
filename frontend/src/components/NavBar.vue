@@ -6,11 +6,6 @@ import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const router = useRouter()
-
-const handleLogin = () => {
-  authStore.login()
-  router.push('/profil/pong')
-}
 </script>
 
 <template>
@@ -22,16 +17,7 @@ const handleLogin = () => {
     </div>
     <div class="spacer"></div>
 
-    <div class="auth-buttons" v-if="!authStore.isAuthenticated">
-      <button class="sign-in-button" @click="handleLogin">
-        {{ $t('navbar.connect') }}
-      </button>
-      <button class="register-button" @click="handleLogin">
-        {{ $t('navbar.create') }}
-      </button>
-    </div>
-
-    <div class="user-options" v-else>
+    <div class="user-options" v-if="authStore.isAuthenticated">
       <router-link to="/pong" class="nav-link">
         {{ $t('navbar.pong') }}
       </router-link>
@@ -78,31 +64,11 @@ const handleLogin = () => {
   flex: 1;
 }
 
-.auth-buttons,
 .user-options {
   display: flex;
   align-items: center;
   gap: 12px;
   padding-right: 32px;
-}
-
-.sign-in-button,
-.register-button,
-.logout-button {
-  flex: 1;
-  height: 32px;
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid;
-  font-family: Inter, sans-serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 16px;
-  cursor: pointer;
-  transition:
-    background 0.3s,
-    border-color 0.3s,
-    color 0.3s;
 }
 
 .nav-link {
@@ -129,26 +95,5 @@ const handleLogin = () => {
 
 .settings-link:hover {
   background-color: var(--secondary-color);
-}
-
-.sign-in-button {
-  background: transparent;
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-}
-
-.sign-in-button:hover {
-  background: var(--primary-color);
-  color: var(--background-color);
-}
-
-.register-button {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: var(--background-color);
-}
-
-.register-button:hover {
-  opacity: 0.9;
 }
 </style>
