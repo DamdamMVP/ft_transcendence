@@ -135,20 +135,29 @@ def addUser(request):
 @permission_classes([IsAuthenticated])
 def updateUser(request, pk):
     try:
+        # Vérifier que l'utilisateur qui fait la requête correspond à l'utilisateur à mettre à jour
+        if request.user.id != pk:
+            return Response({'error': 'You can only update your own account.'}, status=403)
+        
         user = User.objects.get(id=pk)
         data = request.data
 
-        # If password is provided, hash it
-        if 'password' in data:
-            data['password'] = make_password(data['password'])
+        # Autoriser uniquement les champs `username` et `email` à être mis à jour
+        allowed_fields = ['username', 'email']
+        update_data = {field: data[field] for field in allowed_fields if field in data}
 
-        serializer = UserSerializer(instance=user, data=data)
+        # Vérifier que les champs autorisés sont présents et valides
+        if not update_data:
+            return Response({'error': 'Only username and email can be updated.'}, status=400)
+
+        serializer = UserSerializer(instance=user, data=update_data, partial=True)  # Utiliser `partial=True` pour n'exiger que les champs fournis
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=404)
+
 
 
 # Delete a user

@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-from django.contrib.auth.models import AnonymousUser
+
 from channels.middleware import BaseMiddleware
 from channels.db import database_sync_to_async
 from rest_framework_simplejwt.tokens import UntypedToken
@@ -9,6 +9,13 @@ from jwt import decode as jwt_decode, ExpiredSignatureError
 from jwt import decode as jwt_decode
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from channels.db import database_sync_to_async
+
+from django.contrib.auth.models import AnonymousUser
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils.deprecation import MiddlewareMixin
+
 
 class CookieJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
@@ -29,18 +36,6 @@ class CookieJWTAuthentication(JWTAuthentication):
 
 User = get_user_model()
 
-from channels.middleware import BaseMiddleware
-from channels.db import database_sync_to_async
-
-from django.contrib.auth.models import AnonymousUser
-from django.conf import settings
-from django.contrib.auth import get_user_model
-
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.exceptions import InvalidToken
-from jwt import decode as jwt_decode, ExpiredSignatureError
-
-User = get_user_model()
 
 class TokenAuthMiddleware(BaseMiddleware):
     """
@@ -109,3 +104,77 @@ class TokenAuthMiddleware(BaseMiddleware):
 
         except (InvalidToken, User.DoesNotExist):
             return AnonymousUser()
+
+
+
+
+
+User = get_user_model()
+
+class TokenAuthMiddlewareHTTP(MiddlewareMixin):
+    """
+    Middleware pour gérer l'authentification par JWT dans les cookies HTTP.
+    Si le token d'accès est expiré, utilise le token de rafraîchissement pour en générer un nouveau.
+    """
+
+    def process_request(self, request):
+        access_token = request.COOKIES.get("access_token")
+        refresh_token = request.COOKIES.get("refresh_token")
+
+        if not access_token:
+            request.user = AnonymousUser()
+            return
+
+        try:
+            # 1) Tenter de décoder le token d'accès
+            decoded_data = jwt_decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
+            user_id = decoded_data.get("user_id")
+            if not user_id:
+                request.user = AnonymousUser()
+                return
+            
+            # Récupérer l'utilisateur associé
+            request.user = User.objects.get(id=user_id)
+
+        except ExpiredSignatureError:
+            # 2) Si le token d'accès est expiré, tenter de rafraîchir
+            if not refresh_token:
+                request.user = AnonymousUser()
+                return
+
+            try:
+                # Rafraîchir le token
+                refresh = RefreshToken(refresh_token)
+                new_access_token = str(refresh.access_token)
+
+                # Ajouter le nouveau token d'accès dans la réponse (cookies)
+                request.new_access_token = new_access_token
+
+                # Décoder le nouveau token
+                new_decoded_data = jwt_decode(new_access_token, settings.SECRET_KEY, algorithms=["HS256"])
+                user_id = new_decoded_data.get("user_id")
+                if not user_id:
+                    request.user = AnonymousUser()
+                    return
+
+                # Récupérer l'utilisateur
+                request.user = User.objects.get(id=user_id)
+
+            except InvalidToken:
+                request.user = AnonymousUser()
+                return
+
+        except (InvalidToken, User.DoesNotExist):
+            request.user = AnonymousUser()
+
+    def process_response(self, request, response):
+        # Si un nouveau token d'accès a été généré, le placer dans les cookies
+        if hasattr(request, "new_access_token"):
+            response.set_cookie(
+                key="access_token",
+                value=request.new_access_token,
+                httponly=True,
+                secure=settings.DEBUG is False,  # Utilisez HTTPS en production
+                samesite="Lax",
+            )
+        return response

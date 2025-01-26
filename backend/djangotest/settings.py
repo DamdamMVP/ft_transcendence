@@ -95,6 +95,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Utilise notre middleware
 ]
 
 ROOT_URLCONF = 'djangotest.urls'
