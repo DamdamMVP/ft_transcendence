@@ -22,5 +22,9 @@ fi
 python3 manage.py createsuperuser --noinput || true
 echo ====================================
 
+echo "Setting up Google Authentication..."
+python3 manage.py setup_google_auth
+echo ====================================
+
 echo "Starting Server..."
 python3 manage.py runserver 0.0.0.0:8000

@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from rest_framework import status
 
 
@@ -33,9 +33,9 @@ def login(request):
         response.set_cookie(
             key='access_token',
             value=access_token,
-            httponly=True,  # Makes cookie inaccessible via JavaScript
+            httponly=True,  # Make the cookie inaccessible to JavaScript
             secure=True,  # In production, enable this option for HTTPS only
-            samesite='Strict',  # Restricts cookie to same origin (CSRF protection)
+            samesite='Strict',  # Restrict the cookie to the same origin (CSRF protection)
             max_age=60 * 5  # Token lifetime (in seconds)
         )
         response.set_cookie(
@@ -69,7 +69,7 @@ def refresh_token(request):
             'message': 'Access token refreshed successfully'
         }, status=200)
 
-        # Update access cookie
+        # Update access token cookie
         response.set_cookie(
             key='access_token',
             value=access_token,
@@ -163,7 +163,27 @@ def deleteUser(request, pk):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def connect(request):
-    return render(request, 'login.html')
+    from django.shortcuts import redirect
+    import os
+    from urllib.parse import urlencode
+
+    # Google OAuth2 parameters
+    params = {
+        'client_id': os.getenv('GOOGLE_CLIENT_ID'),
+        'redirect_uri': 'http://localhost:8000/accounts/google/login/callback/',
+        'scope': 'email profile',
+        'response_type': 'code',
+        'access_type': 'online',
+        'service': 'lso',
+        'o2v': '2',
+        'flowName': 'GeneralOAuthFlow'
+    }
+    
+    # Construct the Google OAuth URL
+    base_url = 'https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount'
+    oauth_url = f"{base_url}?{urlencode(params)}"
+    
+    return redirect(oauth_url)
 
 
 @api_view(['PUT'])
