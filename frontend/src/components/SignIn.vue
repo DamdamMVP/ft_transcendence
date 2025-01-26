@@ -2,9 +2,11 @@
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 
 const emit = defineEmits(['success', 'switch-mode'])
 const router = useRouter()
+const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
@@ -29,10 +31,14 @@ const handleSignIn = async () => {
     })
     
     if (result.success) {
+      // Mettre à jour le store d'authentification
+      authStore.login(result.data.user)
+      
       email.value = ''
       password.value = ''
       error.value = ''
       emit('success', result.data)
+      
       // Redirection vers la page Pong
       router.push('/pong')
     }
