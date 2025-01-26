@@ -55,6 +55,7 @@
     "theme": "Theme",
     "deleteAccount": "Delete Account",
     "save": "Save",
+    "clickToChange": "Click to change",
     "passwordPlaceholders": {
       "current": "Current password",
       "new": "New password",

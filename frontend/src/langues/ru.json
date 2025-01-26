@@ -55,6 +55,7 @@
     "theme": "Тема",
     "deleteAccount": "Удалить аккаунт",
     "save": "Сохранить",
+    "clickToChange": "Нажмите, чтобы изменить",
     "passwordPlaceholders": {
       "current": "Текущий пароль",
       "new": "Новый пароль",

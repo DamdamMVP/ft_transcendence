@@ -3,9 +3,10 @@ import ThemeSelector from './ThemeSelector.vue'
 import Langage from './Langage.vue'
 import { useAuthStore } from '../stores/authStore'
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
+import axios from 'axios'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -16,20 +17,65 @@ const { locale, t } = useI18n()
 const tempTheme = ref(null)
 const tempLanguage = ref(null)
 
+// Référence vers l'input file caché
+const fileInput = ref(null)
+const selectedFile = ref(null)
+
 // Champs pour la mise à jour des paramètres
-const username = ref('Lisa')
+const username = ref(authStore.user?.username || '')
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
+
+const profilePhotoUrl = computed(() => {
+  if (selectedFile.value) {
+    return URL.createObjectURL(selectedFile.value)
+  }
+  return authStore.user?.profilePicture || 'https://via.placeholder.com/150'
+})
 
 const handleLogout = () => {
   authStore.logout()
   router.push('/')
 }
 
-// Actions de sauvegarde
-const saveProfilePhoto = () => {
-  console.log('Photo de profil sauvegardée')
+const triggerFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.click()
+  }
+}
+
+const handleFileSelect = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    selectedFile.value = file
+  }
+}
+
+const saveProfilePhoto = async () => {
+  if (!selectedFile.value) return
+
+  const formData = new FormData()
+  formData.append('profile_picture', selectedFile.value)
+
+  try {
+    const response = await axios.put(
+      `http://localhost:8000/users/update_profile_picture/${authStore.user.id}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true
+      }
+    )
+    if (response.data.success) {
+      authStore.updateUser({ profilePicture: response.data.profile_picture_url })
+      selectedFile.value = null
+    }
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de la photo de profil:', error)
+  }
 }
 
 const saveUsername = () => {
@@ -47,7 +93,6 @@ const savePassword = () => {
 const saveLanguage = () => {
   if (tempLanguage.value) {
     locale.value = tempLanguage.value
-    console.log('Langue sauvegardée:', tempLanguage.value)
     tempLanguage.value = null
   }
 }
@@ -55,24 +100,21 @@ const saveLanguage = () => {
 const saveTheme = () => {
   if (tempTheme.value) {
     setTheme(tempTheme.value)
-    console.log('Thème sauvegardé:', tempTheme.value)
     tempTheme.value = null
   }
 }
 
-const deleteAccount = () => {
-  console.log('Compte supprimé')
-  authStore.logout()
-  router.push('/')
-}
-
-// Gestionnaires d'événements pour les changements de thème et de langue
 const onThemeUpdate = (theme) => {
   tempTheme.value = theme
 }
 
 const onLanguageUpdate = (lang) => {
   tempLanguage.value = lang
+}
+
+const deleteAccount = () => {
+  authStore.logout()
+  router.push('/')
 }
 </script>
 
@@ -81,12 +123,28 @@ const onLanguageUpdate = (lang) => {
     <!-- Photo de profil -->
     <div class="profile-section">
       <h3>{{ t('settings.profilePhoto') }}</h3>
-      <img
-        src="https://via.placeholder.com/150"
-        :alt="t('settings.profilePhoto')"
-        class="profile-photo"
+      <div class="profile-photo-container">
+        <img
+          :src="profilePhotoUrl"
+          :alt="t('settings.profilePhoto')"
+          class="profile-photo"
+        />
+        <div class="photo-overlay" @click="triggerFileInput">
+          <span>{{ t('settings.clickToChange') }}</span>
+        </div>
+      </div>
+      <input
+        ref="fileInput"
+        type="file"
+        accept="image/*"
+        @change="handleFileSelect"
+        style="display: none"
       />
-      <button class="save-button" @click="saveProfilePhoto">
+      <button
+        class="save-button"
+        @click="saveProfilePhoto"
+        :disabled="!selectedFile"
+      >
         <i class="icon-save"></i> {{ t('settings.save') }}
       </button>
     </div>
@@ -187,12 +245,50 @@ const onLanguageUpdate = (lang) => {
   text-align: center;
 }
 
-.profile-photo {
+.profile-photo-container {
+  position: relative;
   width: 150px;
   height: 150px;
+  margin: 0 auto;
+  cursor: pointer;
+}
+
+.profile-photo {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--primary-color);
+  transition: filter 0.3s ease;
+}
+
+.photo-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.photo-overlay span {
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.profile-photo-container:hover .photo-overlay {
+  opacity: 1;
+}
+
+.profile-photo-container:hover .profile-photo {
+  filter: brightness(0.8);
 }
 
 .input-group {

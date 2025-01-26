@@ -55,6 +55,7 @@
     "theme": "Thème",
     "deleteAccount": "Supprimer le compte",
     "save": "Sauvegarder",
+    "clickToChange": "Cliquer pour changer",
     "passwordPlaceholders": {
       "current": "Ancien mot de passe",
       "new": "Nouveau mot de passe",

@@ -5,13 +5,13 @@
     "connect": "Kevreañ",
     "settings": "Arventennoù",
     "pong": "Pong",
-    "tic-tac-toe": "Tris",
+    "tic-tac-toe": "Tic-Tac-Toe",
     "profil": "Profil",
     "disconnect": "Digevreañ"
   },
   "auth": {
     "login": "Kevreañ",
-    "signup": "Enrollañ"
+    "signup": "En em enskrivañ"
   },
   "login": {
     "email": "Postel",
@@ -21,20 +21,20 @@
     "goToProfil": "Mont d'ar profil",
     "placeholders": {
       "email": "Lakait ho postel",
-      "password": "Lakait ho ger-tremen"
+      "password": "Lakait ho ker-tremen"
     }
   },
   "signup": {
-    "username": "Anv implijer",
+    "username": "Anv-implijer",
     "email": "Postel",
     "password": "Ger-tremen",
     "confirmPassword": "Kadarnaat ar ger-tremen",
-    "signUp": "Enrollañ",
+    "signUp": "En em enskrivañ",
     "placeholders": {
-      "username": "Lakait hoc'h anv implijer",
+      "username": "Lakait hoc'h anv-implijer",
       "email": "Lakait ho postel",
       "password": "Lakait ho ker-tremen",
-      "confirmPassword": "Kadarnaat ho ker-tremen"
+      "confirmPassword": "Kadarnait ho ker-tremen"
     }
   },
   "history": {
@@ -44,17 +44,18 @@
   },
   "navbarProfil": {
     "Pong": "Pong",
-    "Tic-Tac-Toe": "Tris",
+    "Tic-Tac-Toe": "Tic-Tac-Toe",
     "Settings": "Arventennoù"
   },
   "settings": {
-    "profilePhoto": "Skeudenn profil",
-    "username": "Anv implijer",
+    "profilePhoto": "Foto profil",
+    "username": "Anv-implijer",
     "password": "Ger-tremen",
     "language": "Yezh",
     "theme": "Tem",
     "deleteAccount": "Dilemel ar gont",
     "save": "Enrollañ",
+    "clickToChange": "Klikit evit kemmañ",
     "passwordPlaceholders": {
       "current": "Ger-tremen bremañ",
       "new": "Ger-tremen nevez",
@@ -63,14 +64,14 @@
   },
   "friendList": {
     "title": "Ma mignoned",
-    "online": "enlinenn",
+    "online": "war-linenn",
     "search": "Klask ur mignon",
     "addFriend": "Ouzhpennañ ur mignon",
     "block": "Stankañ",
     "unblock": "Distankañ",
     "chat": "Flapañ",
     "icons": {
-      "chat": "flap",
+      "chat": "flapañ",
       "block": "stankañ"
     }
   }
