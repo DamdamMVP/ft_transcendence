@@ -2,29 +2,34 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useAuthStore = defineStore('auth', () => {
+  // État de l'authentification
   const isAuthenticated = ref(false)
   const user = ref(null)
 
   // Initialiser l'état d'authentification au démarrage
   const initAuth = () => {
-    const token = localStorage.getItem('token')
     const userData = localStorage.getItem('user')
-    if (token && userData) {
-      isAuthenticated.value = true
+    if (userData) {
       user.value = JSON.parse(userData)
+      isAuthenticated.value = true
     }
   }
 
   const login = (userData) => {
-    isAuthenticated.value = true
+    // Mettre à jour l'état
     user.value = userData
+    isAuthenticated.value = true
+
+    // Sauvegarder les données utilisateur
     localStorage.setItem('user', JSON.stringify(userData))
   }
 
   const logout = () => {
-    isAuthenticated.value = false
+    // Nettoyer l'état
     user.value = null
-    localStorage.removeItem('token')
+    isAuthenticated.value = false
+
+    // Nettoyer le localStorage
     localStorage.removeItem('user')
   }
 
@@ -32,9 +37,12 @@ export const useAuthStore = defineStore('auth', () => {
   initAuth()
 
   return { 
-    isAuthenticated, 
+    // État
+    isAuthenticated,
     user,
-    login, 
-    logout 
+    
+    // Actions
+    login,
+    logout
   }
 })

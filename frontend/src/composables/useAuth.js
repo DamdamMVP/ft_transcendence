@@ -6,6 +6,9 @@ export function useAuth() {
   const user = ref(null)
   const isAuthenticated = ref(false)
 
+  // Configuration d'axios pour inclure les cookies
+  axios.defaults.withCredentials = true
+
   const signUp = async ({ username, email, password }) => {
     try {
       const response = await axios.post('http://localhost:8000/users/create', {
@@ -32,17 +35,9 @@ export function useAuth() {
       })
 
       if (response.status === 200) {
-        // Stocker les informations de l'utilisateur
+        // Stocker uniquement les informations de l'utilisateur
         user.value = response.data.user
         isAuthenticated.value = true
-
-        // Si l'API renvoie un token, le stocker
-        if (response.data.token) {
-          localStorage.setItem('token', response.data.token)
-          // Configurer axios pour inclure le token dans les futures requêtes
-          axios.defaults.headers.common['Authorization'] =
-            `Bearer ${response.data.token}`
-        }
 
         return { success: true, data: response.data }
       }
@@ -53,12 +48,17 @@ export function useAuth() {
     }
   }
 
-  const signOut = () => {
-    // Nettoyer les données de l'utilisateur
-    user.value = null
-    isAuthenticated.value = false
-    localStorage.removeItem('token')
-    delete axios.defaults.headers.common['Authorization']
+  const signOut = async () => {
+    try {
+      // Appeler le endpoint de déconnexion pour supprimer le cookie
+      await axios.post('http://localhost:8000/users/logout')
+    } catch (err) {
+      console.error('Erreur lors de la déconnexion:', err)
+    } finally {
+      // Nettoyer les données locales de l'utilisateur
+      user.value = null
+      isAuthenticated.value = false
+    }
   }
 
   return {
