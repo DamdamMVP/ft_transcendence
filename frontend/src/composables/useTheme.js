@@ -3,7 +3,9 @@ import { ref } from 'vue'
 const themes = {
   light: {
     '--background-color': '#f0f0f0',
+    '--background-color-secondary': '#ffffff',
     '--text-color': '#333',
+    '--text-color-secondary': '#666',
     '--primary-color': '#007bff',
     '--secondary-color': '#6c757d',
     '--accent-color': '#f1c40f',
@@ -13,10 +15,13 @@ const themes = {
     '--info-color': '#3498db',
     '--primary-hover-color': '#0056b3',
     '--error-hover-color': '#c0392b',
+    '--border-color': '#e0e0e0'
   },
   dark: {
     '--background-color': '#1a1a1a',
+    '--background-color-secondary': '#2d2d2d',
     '--text-color': '#ffffff',
+    '--text-color-secondary': '#aaaaaa',
     '--primary-color': '#3498db',
     '--secondary-color': '#95a5a6',
     '--accent-color': '#f39c12',
@@ -26,10 +31,13 @@ const themes = {
     '--info-color': '#3498db',
     '--primary-hover-color': '#2980b9',
     '--error-hover-color': '#c0392b',
+    '--border-color': '#404040'
   },
   forest: {
     '--background-color': '#2c3e50',
+    '--background-color-secondary': '#34495e',
     '--text-color': '#ecf0f1',
+    '--text-color-secondary': '#bdc3c7',
     '--primary-color': '#27ae60',
     '--secondary-color': '#95a5a6',
     '--accent-color': '#e67e22',
@@ -39,7 +47,8 @@ const themes = {
     '--info-color': '#2980b9',
     '--primary-hover-color': '#219a52',
     '--error-hover-color': '#962c22',
-  },
+    '--border-color': '#46627f'
+  }
 }
 
 const currentTheme = ref(localStorage.getItem('theme') || 'dark')

@@ -13,7 +13,7 @@
     </div>
     <CatchGame 
       v-else
-      :player-username="playerUsername"
+      :player-username="authStore.user?.username || 'Joueur 1'"
       :guest-username="guestUsername"
     />
   </div>
@@ -21,15 +21,21 @@
 
 <script>
 import CatchGame from '@/components/Catch/CatchGame.vue'
+import { useAuthStore } from '@/stores/authStore'
+import { useTheme } from '@/composables/useTheme'
 
 export default {
   name: 'CatchView',
   components: {
     CatchGame
   },
+  setup() {
+    const authStore = useAuthStore()
+    const { currentTheme } = useTheme()
+    return { authStore, currentTheme }
+  },
   data() {
     return {
-      playerUsername: 'Joueur 1',
       guestUsername: null,
       guestInput: ''
     }
@@ -50,17 +56,21 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 80vh;
+  background-color: var(--background-color);
 }
 
 h1 {
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  font-size: 2.5em;
+  color: var(--text-color);
 }
 
 .guest-form {
-  background-color: white;
+  background-color: var(--background-color-secondary);
   padding: 40px;
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   text-align: center;
   max-width: 400px;
   width: 100%;
@@ -69,7 +79,7 @@ h1 {
 }
 
 h2 {
-  color: #2c3e50;
+  color: var(--text-color);
   margin-bottom: 20px;
   font-size: 1.5em;
 }
@@ -78,21 +88,28 @@ h2 {
   width: calc(100% - 24px);
   padding: 12px;
   margin: 0 auto 15px auto;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   font-size: 16px;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
   box-sizing: border-box;
   display: block;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .guest-input:focus {
-  border-color: #2ecc71;
+  border-color: var(--primary-color);
   outline: none;
+  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+}
+
+.guest-input::placeholder {
+  color: var(--text-color-secondary);
 }
 
 .submit-btn {
-  background-color: #2ecc71;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   padding: 12px 30px;
@@ -103,6 +120,6 @@ h2 {
 }
 
 .submit-btn:hover {
-  background-color: #27ae60;
+  background-color: var(--primary-hover-color);
 }
 </style>
