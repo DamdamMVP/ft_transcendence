@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import { useFriendStore } from '../../stores/friendStore'
 import AddFriendIcon from '../icons/AddFriendIcon.vue'
@@ -71,9 +71,34 @@ const isExpanded = ref(false)
 const searchQuery = ref('')
 const newFriendUsername = ref('')
 
-// Charger la liste d'amis au montage du composant
-onMounted(() => {
-  friendStore.loadFriends()
+// Charger la liste d'amis au montage du composant et quand l'authentification change
+onMounted(async () => {
+  if (authStore.isAuthenticated) {
+    console.log('🔄 Chargement initial des amis')
+    try {
+      await friendStore.loadFriends()
+      console.log('✅ Amis chargés:', friendStore.friends)
+    } catch (error) {
+      console.error('❌ Erreur de chargement:', error)
+    }
+  }
+})
+
+// Surveiller les changements d'authentification
+watch(() => authStore.isAuthenticated, async (newValue) => {
+  console.log('👤 Changement d\'authentification:', newValue)
+  if (newValue) {
+    console.log('🔄 Rechargement des amis après connexion')
+    try {
+      await friendStore.loadFriends()
+      console.log('✅ Amis rechargés:', friendStore.friends)
+    } catch (error) {
+      console.error('❌ Erreur de rechargement:', error)
+    }
+  } else {
+    console.log('🧹 Réinitialisation de la liste')
+    friendStore.friends = []
+  }
 })
 
 const filteredFriends = computed(() => {

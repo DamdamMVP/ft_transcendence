@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import axios from 'axios'
 
 export const useFriendStore = defineStore('friend', () => {
   // État
@@ -53,12 +54,39 @@ export const useFriendStore = defineStore('friend', () => {
   }
 
   const loadFriends = async () => {
-    // TODO: Appel API pour charger la liste d'amis
-    // Pour le moment, on utilise des données de test
-    friends.value = [
-      { id: 1, username: 'User1', isOnline: true },
-      { id: 2, username: 'User2', isOnline: false },
-    ]
+    console.log('🔄 Début du chargement des amis...')
+    try {
+      const response = await axios.get('http://localhost:8000/users/friends', {
+        withCredentials: true,
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      })
+
+      console.log("📥 Réponse de l'API:", response)
+
+      if (response.status === 200) {
+        friends.value = response.data.map((friend) => ({
+          ...friend,
+          isOnline: false,
+        }))
+        console.log("✅ Liste d'amis mise à jour:", friends.value)
+      }
+    } catch (error) {
+      console.log('❌ Erreur détaillée:', {
+        message: error.message,
+        response: error.response,
+        config: error.config,
+      })
+      friends.value = []
+    }
+  }
+
+  // Réinitialiser le store
+  const reset = () => {
+    friends.value = []
+    blockedUsers.value = []
   }
 
   return {
@@ -77,5 +105,6 @@ export const useFriendStore = defineStore('friend', () => {
     unblockUser,
     updateFriendStatus,
     loadFriends,
+    reset,
   }
 })
