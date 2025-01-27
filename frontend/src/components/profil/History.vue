@@ -107,17 +107,17 @@ onMounted(() => {
           'draw-card': match.user_score === match.guest_score,
         }"
       >
+        <p class="match-opponent">{{ match.guest_name }}</p>
         <p class="match-result">
-          {{
+          <span class="result-text">{{
             match.user_score > match.guest_score
               ? t('history.win')
               : match.user_score < match.guest_score
                 ? t('history.loose')
                 : t('history.draw')
-          }}
-          : {{ match.user_score }} - {{ match.guest_score }}
+          }}</span>
+          <span class="score-text">: {{ match.user_score }} - {{ match.guest_score }}</span>
         </p>
-        <p class="match-opponent">{{ match.guest_name }}</p>
         <p class="match-date">
           {{ new Date(match.played_at).toLocaleDateString() }}
         </p>
@@ -134,6 +134,10 @@ onMounted(() => {
   border-radius: 8px;
   border: 1px solid #d9d9d9;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  min-height: 60vh;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -177,24 +181,26 @@ h2 {
 }
 
 .match-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   overflow-y: auto;
-  max-height: 60vh;
+  padding-right: 8px;
 }
 
 .match-card {
-  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  padding: 12px 16px;
   border-radius: 8px;
   border: 1px solid #d9d9d9;
-  text-align: center;
   background-color: var(--background-color);
   transition: transform 0.2s;
 }
 
 .match-card:hover {
-  transform: translateY(-2px);
+  transform: translateX(4px);
 }
 
 .win-card {
@@ -215,19 +221,48 @@ h2 {
   color: #666666;
 }
 
-.match-result {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
 .match-opponent {
   font-size: 14px;
-  margin-bottom: 8px;
+  font-weight: bold;
+  padding-right: 16px;
+}
+
+.match-result {
+  font-size: 16px;
+  text-align: center;
 }
 
 .match-date {
   font-size: 12px;
   color: var(--text-secondary-color);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.result-text {
+  font-weight: bold;
+}
+
+.score-text {
+  font-weight: normal;
+}
+
+/* Style de la scrollbar */
+.match-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.match-list::-webkit-scrollbar-track {
+  background: var(--background-color-light);
+  border-radius: 4px;
+}
+
+.match-list::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+.match-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color-dark);
 }
 </style>
