@@ -59,8 +59,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useAuthStore } from '../stores/authStore'
-import { useFriendStore } from '../stores/friendStore'
+import { useAuthStore } from '../../stores/authStore'
+import { useFriendStore } from '../../stores/friendStore'
 import AddFriendIcon from '../icons/AddFriendIcon.vue'
 import FriendItem from './FriendItem.vue'
 

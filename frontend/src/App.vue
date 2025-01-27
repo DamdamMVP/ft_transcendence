@@ -1,7 +1,7 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import NavBar from './components/NavBar.vue'
-import FriendList from './components/FriendList.vue'
+import FriendList from './components/chat/FriendList.vue'
 import { useAuthStore } from './stores/authStore'
 import { useI18n } from 'vue-i18n'
 import { useTheme } from './composables/useTheme'

@@ -8,11 +8,11 @@ export const useFriendStore = defineStore('friend', () => {
 
   // Getters
   const onlineFriends = computed(() => {
-    return friends.value.filter(friend => friend.isOnline)
+    return friends.value.filter((friend) => friend.isOnline)
   })
 
   const filteredFriends = computed(() => (searchQuery) => {
-    return friends.value.filter(friend => 
+    return friends.value.filter((friend) =>
       friend.username.toLowerCase().includes(searchQuery.toLowerCase())
     )
   })
@@ -23,30 +23,30 @@ export const useFriendStore = defineStore('friend', () => {
     const newFriend = {
       id: Date.now(), // Temporaire, à remplacer par l'ID de l'API
       username,
-      isOnline: false
+      isOnline: false,
     }
     friends.value.push(newFriend)
   }
 
   const removeFriend = async (friendId) => {
     // TODO: Appel API pour supprimer un ami
-    friends.value = friends.value.filter(friend => friend.id !== friendId)
+    friends.value = friends.value.filter((friend) => friend.id !== friendId)
   }
 
   const blockUser = async (userId) => {
     // TODO: Appel API pour bloquer un utilisateur
     blockedUsers.value.push(userId)
     // Retirer l'utilisateur de la liste d'amis s'il y est
-    friends.value = friends.value.filter(friend => friend.id !== userId)
+    friends.value = friends.value.filter((friend) => friend.id !== userId)
   }
 
   const unblockUser = async (userId) => {
     // TODO: Appel API pour débloquer un utilisateur
-    blockedUsers.value = blockedUsers.value.filter(id => id !== userId)
+    blockedUsers.value = blockedUsers.value.filter((id) => id !== userId)
   }
 
   const updateFriendStatus = (userId, isOnline) => {
-    const friend = friends.value.find(f => f.id === userId)
+    const friend = friends.value.find((f) => f.id === userId)
     if (friend) {
       friend.isOnline = isOnline
     }
@@ -65,17 +65,17 @@ export const useFriendStore = defineStore('friend', () => {
     // État
     friends,
     blockedUsers,
-    
+
     // Getters
     onlineFriends,
     filteredFriends,
-    
+
     // Actions
     addFriend,
     removeFriend,
     blockUser,
     unblockUser,
     updateFriendStatus,
-    loadFriends
+    loadFriends,
   }
 })
