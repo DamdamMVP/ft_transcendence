@@ -17,7 +17,7 @@
         <div v-if="!gameStarted || gameOver" class="start-message">
           <div v-if="gameOver">
             <div class="game-over-text">Partie terminée!</div>
-            <div class="game-over-text">{{ winner }} gagne!</div>
+            <div class="game-over-text">{{ winner }}</div>
           </div>
           <button @click="startCountdown" class="start-btn">Nouvelle Partie</button>
           <div v-if="!gameStarted && !gameOver" class="controls-info">
@@ -249,11 +249,11 @@ export default {
       }
       
       if (this.catScore > this.mouseScore) {
-        this.winner = 'Le Chat'
+        this.winner = `${this.guestUsername} gagne!`
       } else if (this.mouseScore > this.catScore) {
-        this.winner = 'La Souris'
+        this.winner = `${this.playerUsername} gagne!`
       } else {
-        this.winner = 'Personne ne '
+        this.winner = 'Match nul!'
       }
     },
     startNewGame() {
