@@ -44,4 +44,5 @@ urlpatterns = [
     path('block', views.block_user),
     path('unblock', views.unblock_user),
     path('list_blocked', views.list_blocks),
+    path('list_online', views.online_users),
 ]

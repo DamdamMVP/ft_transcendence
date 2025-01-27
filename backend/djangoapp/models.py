@@ -50,3 +50,11 @@ class History(BaseModel):  # Also inherits from BaseModel
 
     def __str__(self):
         return f"History of {self.user.username} at {self.created_at}"
+
+
+class UserStatus(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="status")
+    is_online = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.username} - {'Online' if self.is_online else 'Offline'}"

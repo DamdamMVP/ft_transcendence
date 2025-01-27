@@ -2,16 +2,17 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
-from . import models
+from .models import Block, UserStatus  # Modèle pour les statuts
 from django.contrib.auth.models import AnonymousUser
 from datetime import datetime
-from .models import Block
 
 User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        if isinstance(self.scope["user"], AnonymousUser):
+        user = self.scope["user"]
+
+        if isinstance(user, AnonymousUser):
             await self.close(code=4001)  # WebSocket code for unauthorized user
             return
 
@@ -27,22 +28,53 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 return
 
             # check if the user is part of the private chat
-            if str(self.scope['user'].username) not in [user1, user2]:
+            if str(user.username) not in [user1, user2]:
                 await self.close()
                 return
 
+        # Mark user as online
+        await self.set_user_online(user)
+
+        # Add user to room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
         await self.accept()
 
+        # Notify group that user has connected
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'user_status',
+                'user_id': user.id,
+                'username': user.username,
+                'is_online': True,
+            }
+        )
+
     async def disconnect(self, close_code):
+        user = self.scope["user"]
+
+        # Mark user as offline
+        await self.set_user_offline(user)
+
+        # Notify group that user has disconnected
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'user_status',
+                'user_id': user.id,
+                'username': user.username,
+                'is_online': False,
+            }
+        )
+
+        # Remove user from room group
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
-
 
     async def receive(self, text_data):
         user = self.scope["user"]  # Connected user
@@ -70,31 +102,54 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
-
     async def chat_message(self, event):
-            user = self.scope["user"]
-            sender_id = event['sender_id']
-            message = event['message']
-            sender = event['sender']
-            timestamp = event['timestamp']
-    
-            # Check if user has blocked the sender
-            blocked_senders = await self.get_blocked_users(user)
-    
-            # If current user (`user`) has blocked the sender (`sender_id`), ignore message
-            if sender_id in blocked_senders:
-                return
-    
-            # Send message to user
-            await self.send(text_data=json.dumps({
-                'message': message,
-                'sender': sender,
-                'timestamp': timestamp,
-            }))
-    
+        user = self.scope["user"]
+        sender_id = event['sender_id']
+        message = event['message']
+        sender = event['sender']
+        timestamp = event['timestamp']
+
+        # Check if user has blocked the sender
+        blocked_senders = await self.get_blocked_users(user)
+
+        # If current user (`user`) has blocked the sender (`sender_id`), ignore message
+        if sender_id in blocked_senders:
+            return
+
+        # Send message to user
+        await self.send(text_data=json.dumps({
+            'message': message,
+            'sender': sender,
+            'timestamp': timestamp,
+        }))
+
+    async def user_status(self, event):
+        """
+        Notify all users in the group about the status change of a user.
+        """
+        await self.send(text_data=json.dumps({
+            'user_id': event['user_id'],
+            'username': event['username'],
+            'is_online': event['is_online'],
+        }))
+
+    @database_sync_to_async
+    def set_user_online(self, user):
+        """
+        Set the user status to online.
+        """
+        UserStatus.objects.update_or_create(user=user, defaults={'is_online': True})
+
+    @database_sync_to_async
+    def set_user_offline(self, user):
+        """
+        Set the user status to offline.
+        """
+        UserStatus.objects.filter(user=user).update(is_online=False)
+
     @database_sync_to_async
     def get_blocked_users(self, user):
-            """
-            Function to retrieve IDs of users blocked by the current user.
-            """
-            return list(Block.objects.filter(blocker=user).values_list("blocked_id", flat=True))
+        """
+        Function to retrieve IDs of users blocked by the current user.
+        """
+        return list(Block.objects.filter(blocker=user).values_list("blocked_id", flat=True))
