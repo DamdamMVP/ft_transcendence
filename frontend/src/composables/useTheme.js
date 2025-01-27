@@ -46,8 +46,7 @@ const themes = {
     '--warning-color': '#f39c12',
     '--info-color': '#2980b9',
     '--primary-hover-color': '#219a52',
-    '--error-hover-color': '#962c22',
-    '--border-color': '#46627f'
+    '--error-hover-color': '#962c22'
   }
 }
 
