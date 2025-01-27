@@ -25,15 +25,15 @@ const selectedFile = ref(null)
 const username = ref(authStore.user?.username || '')
 
 // Surveiller les changements dans authStore.user
-watch(() => authStore.user, (newUser) => {
-  if (newUser) {
-    username.value = newUser.username
-    // Mettre à jour la langue si elle change
-    if (newUser.language) {
-      locale.value = newUser.language
+watch(
+  () => authStore.user,
+  (newUser) => {
+    if (newUser) {
+      username.value = newUser.username
     }
-  }
-}, { deep: true })
+  },
+  { deep: true }
+)
 
 const currentPassword = ref('')
 const newPassword = ref('')
@@ -133,7 +133,7 @@ const savePassword = async () => {
       console.error('❌ Le mot de passe actuel est requis')
       return
     }
-    
+
     if (!newPassword.value || !confirmPassword.value) {
       console.error('❌ Le nouveau mot de passe et sa confirmation sont requis')
       return
@@ -150,12 +150,15 @@ const savePassword = async () => {
         old_password: currentPassword.value,
         password: newPassword.value,
         username: authStore.user.username,
-        email: authStore.user.email
+        email: authStore.user.email,
       },
       { withCredentials: true }
     )
 
-    if (response.data && response.data.message === 'Password updated successfully') {
+    if (
+      response.data &&
+      response.data.message === 'Password updated successfully'
+    ) {
       console.log('✅ Mot de passe mis à jour')
       // Réinitialiser les champs
       currentPassword.value = ''
@@ -181,7 +184,7 @@ const saveLanguage = async () => {
         {
           language: tempLanguage.value,
           username: authStore.user.username,
-          email: authStore.user.email
+          email: authStore.user.email,
         },
         { withCredentials: true }
       )
@@ -202,17 +205,32 @@ const saveLanguage = async () => {
   }
 }
 
-// Initialiser la langue au chargement
-onMounted(() => {
-  if (authStore.user?.language) {
-    locale.value = authStore.user.language
-  }
-})
-
-const saveTheme = () => {
+const saveTheme = async () => {
   if (tempTheme.value) {
-    setTheme(tempTheme.value)
-    tempTheme.value = null
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/users/update_theme/${authStore.user.id}`,
+        {
+          theme: tempTheme.value,
+          username: authStore.user.username,
+          email: authStore.user.email
+        },
+        { withCredentials: true }
+      )
+
+      if (response.data?.user) {
+        setTheme(tempTheme.value)
+        authStore.updateUser(response.data.user)
+        tempTheme.value = null
+      }
+    } catch (error) {
+      if (error.response?.data?.error === 'Invalid theme') {
+        console.error('❌ Thème non valide')
+      } else {
+        console.error('❌ Erreur lors de la mise à jour du thème')
+      }
+      tempTheme.value = authStore.user.theme
+    }
   }
 }
 
