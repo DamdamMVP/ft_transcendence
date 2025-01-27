@@ -1,7 +1,10 @@
 <template>
   <div class="Catch-view">
     <h1>Attrape-moi si tu peux</h1>
-    <CatchGame />
+    <CatchGame 
+      :player-username="playerUsername"
+      :guest-username="guestUsername"
+    />
   </div>
 </template>
 
@@ -12,6 +15,12 @@ export default {
   name: 'CatchView',
   components: {
     CatchGame
+  },
+  data() {
+    return {
+      playerUsername: 'Joueur 1',  // À remplacer par le vrai username
+      guestUsername: 'Joueur 2'    // À remplacer par le vrai username
+    }
   }
 }
 </script>

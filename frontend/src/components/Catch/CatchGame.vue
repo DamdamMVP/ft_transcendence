@@ -1,33 +1,39 @@
 <template>
-  <div class="game-container" tabindex="0" @keydown="handleKeyPress" @keyup="handleKeyUp" ref="gameContainer">
-    <div class="game-board" 
-         :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
-      <div class="mouse" :style="mouseStyle">🐭</div>
-      <div class="cat" :style="catStyle">🐱</div>
-      <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
-      <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
-      <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
-      <div v-if="isPaused" class="pause-message">Capture ! 🎯</div>
-      <div v-if="!gameStarted || gameOver" class="overlay"></div>
-      <div v-if="!gameStarted || gameOver" class="start-message">
-        <div v-if="gameOver">
-          <div class="game-over-text">Partie terminée!</div>
-          <div class="game-over-text">{{ winner }} gagne!</div>
-        </div>
-        <button @click="startCountdown" class="start-btn">Nouvelle Partie</button>
-        <div v-if="!gameStarted && !gameOver" class="controls-info">
-          <p>Souris: WSAD</p>
-          <p>Chat: Pavé numérique 8456</p>
-        </div>
+  <div class="game-container" tabindex="0" ref="gameContainer" @keydown="handleKeyPress" @keyup="handleKeyUp">
+    <div class="game-wrapper">
+      <div class="player-column">
+        <div class="player-name">{{ playerUsername }}</div>
+        <div v-if="gameStarted" class="player-score">Score: {{ mouseScore }}</div>
       </div>
-      <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
+      <div class="game-board" 
+           :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
+        <div class="mouse" :style="mouseStyle">🐭</div>
+        <div class="cat" :style="catStyle">🐱</div>
+        <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
+        <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
+        <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
+        <div v-if="isPaused" class="pause-message">Capture ! 🎯</div>
+        <div v-if="!gameStarted || gameOver" class="overlay"></div>
+        <div v-if="!gameStarted || gameOver" class="start-message">
+          <div v-if="gameOver">
+            <div class="game-over-text">Partie terminée!</div>
+            <div class="game-over-text">{{ winner }} gagne!</div>
+          </div>
+          <button @click="startCountdown" class="start-btn">Nouvelle Partie</button>
+          <div v-if="!gameStarted && !gameOver" class="controls-info">
+            <p>Souris: WSAD</p>
+            <p>Chat: Pavé numérique 8456</p>
+          </div>
+        </div>
+        <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
+      </div>
+      <div class="player-column">
+        <div class="player-name">{{ guestUsername }}</div>
+        <div v-if="gameStarted" class="player-score">Score: {{ catScore }}</div>
+      </div>
     </div>
-    <div class="game-info">
-      <div v-if="!gameOver && gameStarted" class="scores">
-        <div class="player-score">Souris: {{ mouseScore }}</div>
-        <div class="player-score">Chat: {{ catScore }}</div>
-        <div class="timer">Temps: {{ timeLeft }}s</div>
-      </div>
+    <div v-if="gameStarted" class="timer-container">
+      <div class="timer">{{ gameOver ? "Temps écoulé" : `Temps: ${timeLeft}s` }}</div>
     </div>
   </div>
 </template>
@@ -35,6 +41,16 @@
 <script>
 export default {
   name: 'CatAndMouseGame',
+  props: {
+    playerUsername: {
+      type: String,
+      default: 'Joueur'
+    },
+    guestUsername: {
+      type: String,
+      default: 'Invité'
+    }
+  },
   data() {
     return {
       boardWidth: 960,
@@ -288,14 +304,75 @@ export default {
   align-items: center;
   gap: 20px;
   padding: 20px;
-  outline: none;
+  position: relative;
+}
+
+.game-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+}
+
+.player-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-name {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c3e50;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 150px;
+  text-align: center;
+}
+
+.player-score {
+  font-size: 20px;
+  color: #2c3e50;
+  font-weight: bold;
+  padding: 8px 15px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-info {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.scores {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.player-score, .timer {
+  font-size: 18px;
+  color: #2c3e50;
+  font-weight: bold;
 }
 
 .game-board {
   position: relative;
-  background-color: #f0f0f0;
-  border: 2px solid #333;
-  border-radius: 8px;
+  background-color: #f5f6fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -309,27 +386,6 @@ export default {
   font-size: 24px;
   user-select: none;
   transition: all 0.05s linear;
-}
-
-.game-info {
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-}
-
-.scores {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 10px;
-}
-
-.player-score {
-  color: #2c3e50;
-}
-
-.timer {
-  color: #e67e22;
 }
 
 .game-over-text {
@@ -447,5 +503,20 @@ export default {
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
   z-index: 1;
+}
+
+.timer-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.timer {
+  font-size: 20px;
+  color: #e67e22;
+  font-weight: bold;
+  padding: 8px 20px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 </style>
