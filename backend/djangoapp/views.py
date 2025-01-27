@@ -25,6 +25,8 @@ from django.conf import settings
 from django.urls import reverse
 >>>>>>> 6963568 (login 42 seems ok but no popup)
 
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
