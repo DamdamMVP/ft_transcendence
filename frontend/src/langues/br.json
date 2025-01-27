@@ -84,5 +84,10 @@
       "chat": "flapañ",
       "block": "stankañ"
     }
+  },
+  "stats": {
+    "victories": "Trec'hioù",
+    "defeats": "C'hwioù",
+    "winRate": "Feur trec'h"
   }
 }

@@ -4,6 +4,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
+import eventBus from '../../utils/eventBus'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -28,6 +29,8 @@ const fetchHistory = async () => {
       { withCredentials: true }
     )
     userHistory.value = response.data
+    // Émettre l'événement de mise à jour
+    eventBus.emit('history-updated', response.data)
   } catch (err) {
     error.value = 'Erreur lors de la récupération de l\'historique'
   } finally {

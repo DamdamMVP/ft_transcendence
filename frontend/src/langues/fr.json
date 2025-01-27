@@ -89,5 +89,10 @@
       "chat": "chat",
       "block": "block"
     }
+  },
+  "stats": {
+    "victories": "Victoires",
+    "defeats": "Défaites",
+    "winRate": "Ratio de victoires"
   }
 }
