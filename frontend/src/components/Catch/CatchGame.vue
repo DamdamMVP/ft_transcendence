@@ -7,8 +7,8 @@
       </div>
       <div class="game-board" 
            :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
-        <div class="mouse" :style="mouseStyle">🐭</div>
-        <div class="cat" :style="catStyle">🐱</div>
+        <img :src="jerryImage" class="mouse" :style="mouseStyle">
+        <img :src="tomImage" class="cat" :style="catStyle">
         <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
         <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
         <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
@@ -39,6 +39,9 @@
 </template>
 
 <script>
+import jerry from '../../assets/jerry.png'
+import tom from '../../assets/tom.png'
+
 export default {
   name: 'CatAndMouseGame',
   props: {
@@ -53,6 +56,8 @@ export default {
   },
   data() {
     return {
+      jerryImage: jerry,
+      tomImage: tom,
       boardWidth: 960,
       boardHeight: 560,
       mousePos: { x: 40, y: 40 },
@@ -122,51 +127,69 @@ export default {
       if (this.gameOver || this.isPaused || !this.gameStarted || this.countdown != null) return
 
       // Mouvement de la souris (WSAD)
-      const mouseMove = { x: 0, y: 0 }
-      if (this.pressedKeys.has('w')) mouseMove.y -= (this.moveSpeed)
-      if (this.pressedKeys.has('s')) mouseMove.y += (this.moveSpeed)
-      if (this.pressedKeys.has('a')) mouseMove.x -= (this.moveSpeed)
-      if (this.pressedKeys.has('d')) mouseMove.x += (this.moveSpeed)
+      let newMouseX = this.mousePos.x
+      let newMouseY = this.mousePos.y
+      const spriteSize = 15 // Moitié de la taille des sprites (30/2)
+      let mouseMove = { x: 0, y: 0 }
+
+      if (this.pressedKeys.has('w')) {
+        newMouseY = Math.max(spriteSize, this.mousePos.y - this.moveSpeed)
+        mouseMove.y = -this.moveSpeed
+      }
+      if (this.pressedKeys.has('s')) {
+        newMouseY = Math.min(this.boardHeight - spriteSize, this.mousePos.y + this.moveSpeed)
+        mouseMove.y = this.moveSpeed
+      }
+      if (this.pressedKeys.has('a')) {
+        newMouseX = Math.max(spriteSize, this.mousePos.x - this.moveSpeed)
+        mouseMove.x = -this.moveSpeed
+      }
+      if (this.pressedKeys.has('d')) {
+        newMouseX = Math.min(this.boardWidth - spriteSize, this.mousePos.x + this.moveSpeed)
+        mouseMove.x = this.moveSpeed
+      }
 
       // Mouvement du chat (8456)
-      const catMove = { x: 0, y: 0 }
-      if (this.pressedKeys.has('8')) catMove.y -= this.moveSpeed
-      if (this.pressedKeys.has('5')) catMove.y += this.moveSpeed
-      if (this.pressedKeys.has('4')) catMove.x -= this.moveSpeed
-      if (this.pressedKeys.has('6')) catMove.x += this.moveSpeed
+      let newCatX = this.catPos.x
+      let newCatY = this.catPos.y
+      let catMove = { x: 0, y: 0 }
 
-      // Calculer les nouvelles positions
-      const newMousePos = {
-        x: Math.max(0, Math.min(this.mousePos.x + mouseMove.x, this.boardWidth - 30)),
-        y: Math.max(0, Math.min(this.mousePos.y + mouseMove.y, this.boardHeight - 30))
+      if (this.pressedKeys.has('8')) {
+        newCatY = Math.max(spriteSize, this.catPos.y - this.moveSpeed)
+        catMove.y = -this.moveSpeed
+      }
+      if (this.pressedKeys.has('5')) {
+        newCatY = Math.min(this.boardHeight - spriteSize, this.catPos.y + this.moveSpeed)
+        catMove.y = this.moveSpeed
+      }
+      if (this.pressedKeys.has('4')) {
+        newCatX = Math.max(spriteSize, this.catPos.x - this.moveSpeed)
+        catMove.x = -this.moveSpeed
+      }
+      if (this.pressedKeys.has('6')) {
+        newCatX = Math.min(this.boardWidth - spriteSize, this.catPos.x + this.moveSpeed)
+        catMove.x = this.moveSpeed
       }
 
-      const newCatPos = {
-        x: Math.max(0, Math.min(this.catPos.x + catMove.x, this.boardWidth - 30)),
-        y: Math.max(0, Math.min(this.catPos.y + catMove.y, this.boardHeight - 30))
-      }
-
-      // Appliquer les mouvements seulement s'il n'y a pas de collision avec les murs
-      if (!this.checkWallCollision(newMousePos)) {
-        this.mousePos = newMousePos
-      }
-      else{
-        const newMousePos = {
-        x: Math.max(0, Math.min(this.mousePos.x - mouseMove.x * 3.5, this.boardWidth - 30)),
-        y: Math.max(0, Math.min(this.mousePos.y - mouseMove.y * 3.5, this.boardHeight - 30))
+      // Appliquer les mouvements avec rebond sur les murs
+      if (!this.checkWallCollision({ x: newMouseX, y: newMouseY })) {
+        this.mousePos = { x: newMouseX, y: newMouseY }
+      } else {
+        // Rebond de la souris
+        this.mousePos = {
+          x: Math.max(spriteSize, Math.min(this.mousePos.x - mouseMove.x * 3.5, this.boardWidth - spriteSize)),
+          y: Math.max(spriteSize, Math.min(this.mousePos.y - mouseMove.y * 3.5, this.boardHeight - spriteSize))
         }
-        this.mousePos = newMousePos
       }
 
-      if (!this.checkWallCollision(newCatPos)) {
-        this.catPos = newCatPos
-      }
-      else{
-        const newCatPos = {
-        x: Math.max(0, Math.min(this.catPos.x - catMove.x * 3.5, this.boardWidth - 30)),
-        y: Math.max(0, Math.min(this.catPos.y - catMove.y * 3.5, this.boardHeight - 30))
+      if (!this.checkWallCollision({ x: newCatX, y: newCatY })) {
+        this.catPos = { x: newCatX, y: newCatY }
+      } else {
+        // Rebond du chat
+        this.catPos = {
+          x: Math.max(spriteSize, Math.min(this.catPos.x - catMove.x * 3.5, this.boardWidth - spriteSize)),
+          y: Math.max(spriteSize, Math.min(this.catPos.y - catMove.y * 3.5, this.boardHeight - spriteSize))
         }
-        this.catPos = newCatPos
       }
 
       // Vérifier la collecte de fromage
@@ -376,7 +399,24 @@ export default {
   overflow: hidden;
 }
 
-.mouse, .cat, .cheese {
+.mouse, .cat {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  transition: all 0.05s linear;
+  object-fit: contain;
+}
+
+.mouse {
+  z-index: 2;
+}
+
+.cat {
+  z-index: 1;
+}
+
+.cheese {
   position: absolute;
   width: 30px;
   height: 30px;
