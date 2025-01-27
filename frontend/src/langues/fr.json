@@ -53,6 +53,11 @@
     "password": "Mot de passe",
     "language": "Langue",
     "theme": "Thème",
+    "themes": {
+      "light": "Clair",
+      "dark": "Sombre",
+      "forest": "Vert"
+    },
     "deleteAccount": "Supprimer le compte",
     "save": "Sauvegarder",
     "clickToChange": "Cliquer pour changer",

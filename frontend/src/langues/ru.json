@@ -53,6 +53,11 @@
     "password": "Пароль",
     "language": "Язык",
     "theme": "Тема",
+    "themes": {
+      "light": "Светлая",
+      "dark": "Тёмная",
+      "forest": "Зелёная"
+    },
     "deleteAccount": "Удалить аккаунт",
     "save": "Сохранить",
     "clickToChange": "Нажмите, чтобы изменить",

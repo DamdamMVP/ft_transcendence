@@ -48,11 +48,16 @@
     "Settings": "Arventennoù"
   },
   "settings": {
-    "profilePhoto": "Foto profil",
-    "username": "Anv-implijer",
+    "profilePhoto": "Skeudenn profil",
+    "username": "Anv implijer",
     "password": "Ger-tremen",
     "language": "Yezh",
     "theme": "Tem",
+    "themes": {
+      "light": "Sklaer",
+      "dark": "Teñval",
+      "forest": "Gwer"
+    },
     "deleteAccount": "Dilemel ar gont",
     "save": "Enrollañ",
     "clickToChange": "Klikit evit kemmañ",

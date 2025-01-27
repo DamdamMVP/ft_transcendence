@@ -1,5 +1,5 @@
 {
-  "welcome": "Welcome to your site",
+  "welcome": "Welcome to your website",
   "navbar": {
     "create": "Create",
     "connect": "Connect",
@@ -48,11 +48,16 @@
     "Settings": "Settings"
   },
   "settings": {
-    "profilePhoto": "Profile Photo",
+    "profilePhoto": "Profile Picture",
     "username": "Username",
     "password": "Password",
     "language": "Language",
     "theme": "Theme",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "forest": "Green"
+    },
     "deleteAccount": "Delete Account",
     "save": "Save",
     "clickToChange": "Click to change",

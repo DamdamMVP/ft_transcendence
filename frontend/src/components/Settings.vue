@@ -1,406 +1,57 @@
 <script setup>
-import ThemeSelector from './ThemeSelector.vue'
-import Langage from './Langage.vue'
-import { useAuthStore } from '../stores/authStore'
-import { useRouter } from 'vue-router'
-import { ref, computed, watch, onMounted } from 'vue'
-import { useTheme } from '../composables/useTheme'
-import { useI18n } from 'vue-i18n'
-import axios from 'axios'
+import SProfil from './settings/SProfil.vue'
+import SPseudo from './settings/SPseudo.vue'
+import SPassword from './settings/SPassword.vue'
+import SLangage from './settings/SLangage.vue'
+import STheme from './settings/STheme.vue'
+import SDisconnect from './settings/SDisconnect.vue'
+import { ref } from 'vue'
 import Notification from './Notification.vue'
-
-const authStore = useAuthStore()
-const router = useRouter()
-const { setTheme } = useTheme()
-const { locale, t } = useI18n()
-
-// Variables temporaires pour le thème et la langue
-const tempTheme = ref(null)
-const tempLanguage = ref(null)
-
-// Référence vers l'input file caché
-const fileInput = ref(null)
-const selectedFile = ref(null)
-
-// Champs pour la mise à jour des paramètres
-const username = ref(authStore.user?.username || '')
-
-// Surveiller les changements dans authStore.user
-watch(
-  () => authStore.user,
-  (newUser) => {
-    if (newUser) {
-      username.value = newUser.username
-    }
-  },
-  { deep: true }
-)
-
-const currentPassword = ref('')
-const newPassword = ref('')
-const confirmPassword = ref('')
-
-const profilePhotoUrl = computed(() => {
-  if (selectedFile.value) {
-    return URL.createObjectURL(selectedFile.value)
-  }
-  return authStore.user?.profile_picture
-    ? `http://localhost:8000${authStore.user.profile_picture}`
-    : null
-})
-
-const handleLogout = () => {
-  authStore.logout()
-  router.push('/')
-}
-
-const triggerFileInput = () => {
-  if (fileInput.value) {
-    fileInput.value.click()
-  }
-}
-
-const handleFileSelect = (event) => {
-  const file = event.target.files[0]
-  if (file) {
-    selectedFile.value = file
-  }
-}
 
 const showNotification = ref(false)
 const notificationMessage = ref('')
-const notificationType = ref('error')
-
-const showError = (message) => {
-  notificationMessage.value = ''  // Reset message first
-  notificationType.value = 'error'
-  setTimeout(() => {
-    notificationMessage.value = message
-    showNotification.value = true
-  }, 100)
-}
+const notificationType = ref('success')
 
 const showSuccess = (message) => {
-  notificationMessage.value = ''  // Reset message first
+  notificationMessage.value = message
   notificationType.value = 'success'
-  setTimeout(() => {
-    notificationMessage.value = message
-    showNotification.value = true
-  }, 100)
+  showNotification.value = true
 }
 
-const saveProfilePhoto = async () => {
-  if (!selectedFile.value) return
+const showError = (message) => {
+  notificationMessage.value = message
+  notificationType.value = 'error'
+  showNotification.value = true
+}
 
-  // Vérifier la taille du fichier (2Mo max)
-  if (selectedFile.value.size > 2 * 1024 * 1024) {
-    showError('La taille de l\'image ne doit pas dépasser 2 Mo')
-    return
-  }
-
-  const formData = new FormData()
-  formData.append('profile_picture', selectedFile.value)
-
-  try {
-    const response = await axios.put(
-      `http://localhost:8000/users/update_profile_picture/${authStore.user.id}`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true,
-      }
-    )
-
-    // Si la requête réussit (pas d'erreur), on considère que c'est un succès
-    if (response.data.message === 'Profile picture updated successfully') {
-      showSuccess('Photo de profil mise à jour avec succès')
-      // On recharge les données de l'utilisateur pour obtenir la nouvelle URL de la photo
-      const userResponse = await axios.get(
-        `http://localhost:8000/users/read/${authStore.user.id}`,
-        { withCredentials: true }
-      )
-      if (userResponse.data) {
-        // On garde l'URL relative
-        authStore.updateUser(userResponse.data)
-      }
-      selectedFile.value = null
-    }
-  } catch (error) {
-    showError(error.response?.data?.error || 'Erreur lors de la mise à jour de la photo de profil')
-    console.error(
-      'Erreur lors de la mise à jour de la photo de profil:',
-      error.response?.data || error
-    )
+const handleNotification = ({ message, type }) => {
+  if (type === 'success') {
+    showSuccess(message)
+  } else {
+    showError(message)
   }
 }
 
-const saveUsername = async () => {
-  try {
-    const response = await axios.put(
-      `http://localhost:8000/users/update/${authStore.user.id}`,
-      { username: username.value },
-      { withCredentials: true }
-    )
-
-    if (response.data && response.data.username === username.value) {
-      showSuccess('Nom d\'utilisateur mis à jour avec succès')
-      authStore.updateUser(response.data)
-    }
-  } catch (error) {
-    showError(error.response?.data?.error || 'Erreur lors de la mise à jour du nom d\'utilisateur')
-  }
-}
-
-const savePassword = async () => {
-  try {
-    if (!currentPassword.value) {
-      showError('Le mot de passe actuel est requis')
-      return
-    }
-
-    if (!newPassword.value || !confirmPassword.value) {
-      showError('Le nouveau mot de passe et sa confirmation sont requis')
-      return
-    }
-
-    if (newPassword.value !== confirmPassword.value) {
-      showError('Les mots de passe ne correspondent pas')
-      return
-    }
-
-    const response = await axios.put(
-      `http://localhost:8000/users/update_password/${authStore.user.id}`,
-      {
-        old_password: currentPassword.value,
-        password: newPassword.value,
-        username: authStore.user.username,
-        email: authStore.user.email,
-      },
-      { withCredentials: true }
-    )
-
-    if (response.data && response.data.message === 'Password updated successfully') {
-      showSuccess('Mot de passe mis à jour avec succès')
-      currentPassword.value = ''
-      newPassword.value = ''
-      confirmPassword.value = ''
-    }
-  } catch (error) {
-    if (error.response?.data?.error === 'Invalid old password') {
-      showError('Le mot de passe actuel est incorrect')
-    } else {
-      showError(error.response?.data?.error || 'Erreur lors de la mise à jour du mot de passe')
-    }
-  }
-}
-
-const saveLanguage = async () => {
-  if (tempLanguage.value) {
-    try {
-      const response = await axios.put(
-        `http://localhost:8000/users/update_language/${authStore.user.id}`,
-        {
-          language: tempLanguage.value,
-          username: authStore.user.username,
-          email: authStore.user.email,
-        },
-        { withCredentials: true }
-      )
-
-      if (response.data?.user) {
-        showSuccess('Langue mise à jour avec succès')
-        locale.value = tempLanguage.value
-        authStore.updateUser(response.data.user)
-        tempLanguage.value = null
-      }
-    } catch (error) {
-      showError(error.response?.data?.error || 'Erreur lors de la mise à jour de la langue')
-      tempLanguage.value = authStore.user.language
-    }
-  }
-}
-
-const saveTheme = async () => {
-  if (tempTheme.value) {
-    try {
-      const response = await axios.put(
-        `http://localhost:8000/users/update_theme/${authStore.user.id}`,
-        {
-          theme: tempTheme.value,
-          username: authStore.user.username,
-          email: authStore.user.email,
-        },
-        { withCredentials: true }
-      )
-
-      if (response.data?.user) {
-        showSuccess('Thème mis à jour avec succès')
-        setTheme(tempTheme.value)
-        authStore.updateUser(response.data.user)
-        tempTheme.value = null
-      }
-    } catch (error) {
-      showError(error.response?.data?.error || 'Erreur lors de la mise à jour du thème')
-      tempTheme.value = authStore.user.theme
-    }
-  }
-}
-
-const onThemeUpdate = (theme) => {
-  tempTheme.value = theme
-}
-
-const onLanguageUpdate = (lang) => {
-  tempLanguage.value = lang
-}
-
-const showDeleteConfirm = ref(false)
-
-const deleteAccount = async () => {
-  try {
-    const response = await axios.delete(
-      `http://localhost:8000/users/delete/${authStore.user.id}`,
-      { withCredentials: true }
-    )
-
-    if (response.data?.message === 'User successfully deleted!') {
-      showSuccess('Compte supprimé avec succès')
-      authStore.logout()
-      showDeleteConfirm.value = false
-      router.push('/')
-    }
-  } catch (error) {
-    showError(error.response?.data?.error || 'Erreur lors de la suppression du compte')
-    showDeleteConfirm.value = false
-  }
+const closeNotification = () => {
+  showNotification.value = false
 }
 </script>
 
 <template>
   <div class="settings-container">
-    <!-- Photo de profil -->
-    <div class="profile-section">
-      <h3>{{ t('settings.profilePhoto') }}</h3>
-      <div class="profile-photo-container">
-        <img
-          :src="profilePhotoUrl"
-          :alt="t('settings.profilePhoto')"
-          class="profile-photo"
-        />
-        <div class="photo-overlay" @click="triggerFileInput">
-          <span>{{ t('settings.clickToChange') }}</span>
-        </div>
-      </div>
-      <input
-        ref="fileInput"
-        type="file"
-        accept="image/*"
-        @change="handleFileSelect"
-        style="display: none"
-      />
-      <button
-        class="save-button"
-        @click="saveProfilePhoto"
-        :disabled="!selectedFile"
-      >
-        <i class="icon-save"></i> {{ t('settings.save') }}
-      </button>
-    </div>
-
-    <!-- Pseudo -->
-    <div class="setting-item">
-      <h3>{{ t('settings.username') }}</h3>
-      <div class="input-group">
-        <input v-model="username" type="text" class="input-field" />
-        <button class="save-button" @click="saveUsername">
-          <i class="icon-save"></i> {{ t('settings.save') }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Mot de passe -->
-    <div class="setting-item">
-      <h3>{{ t('settings.password') }}</h3>
-      <div class="input-group">
-        <input
-          v-model="currentPassword"
-          type="password"
-          :placeholder="t('settings.passwordPlaceholders.current')"
-          class="input-field"
-        />
-        <input
-          v-model="newPassword"
-          type="password"
-          :placeholder="t('settings.passwordPlaceholders.new')"
-          class="input-field"
-        />
-        <input
-          v-model="confirmPassword"
-          type="password"
-          :placeholder="t('settings.passwordPlaceholders.confirm')"
-          class="input-field"
-        />
-        <button class="save-button" @click="savePassword">
-          <i class="icon-save"></i> {{ t('settings.save') }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Langue -->
-    <div class="setting-item">
-      <h3>{{ t('settings.language') }}</h3>
-      <div class="input-group">
-        <Langage @update:language="onLanguageUpdate" />
-        <button class="save-button" @click="saveLanguage">
-          <i class="icon-save"></i> {{ t('settings.save') }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Thème -->
-    <div class="setting-item">
-      <h3>{{ t('settings.theme') }}</h3>
-      <div class="input-group">
-        <ThemeSelector @update:theme="onThemeUpdate" />
-        <button class="save-button" @click="saveTheme">
-          <i class="icon-save"></i> {{ t('settings.save') }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Suppression du compte -->
-    <div class="delete-account-section">
-      <button class="delete-button" @click="showDeleteConfirm = true">
-        {{ t('settings.deleteAccount') }}
-      </button>
-      <button class="logout-button" @click="handleLogout">
-        {{ t('settings.logout') }}
-      </button>
-    </div>
-
-    <!-- Popup de confirmation -->
-    <div v-if="showDeleteConfirm" class="modal-overlay">
-      <div class="modal-content">
-        <p>{{ t('settings.deleteConfirm') }}</p>
-        <div class="modal-buttons">
-          <button class="delete-button" @click="deleteAccount">
-            {{ t('settings.deleteAccountConfirm') }}
-          </button>
-          <button class="cancel-button" @click="showDeleteConfirm = false">
-            {{ t('settings.cancel') }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <SProfil @showNotification="handleNotification" />
+    <SPseudo @showNotification="handleNotification" />
+    <SPassword @showNotification="handleNotification" />
+    <SLangage @showNotification="handleNotification" />
+    <STheme @showNotification="handleNotification" />
+    <SDisconnect @showNotification="handleNotification" />
 
     <!-- Notification -->
     <Notification
       v-if="showNotification"
       :message="notificationMessage"
       :type="notificationType"
-      @close="showNotification = false"
+      @close="closeNotification"
     />
   </div>
 </template>
@@ -414,72 +65,6 @@ const deleteAccount = async () => {
   margin: 0 auto;
   padding: 20px;
   color: var(--text-color);
-}
-
-.profile-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: var(--background-color);
-  border-radius: 8px;
-  border: 1px solid var(--secondary-color);
-  text-align: center;
-}
-
-.profile-photo-container {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  margin: 0 auto;
-  cursor: pointer;
-}
-
-.profile-photo {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  transition: filter 0.3s ease;
-}
-
-.photo-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.photo-overlay span {
-  color: white;
-  text-align: center;
-  padding: 10px;
-  font-size: 14px;
-}
-
-.profile-photo-container:hover .photo-overlay {
-  opacity: 1;
-}
-
-.profile-photo-container:hover .profile-photo {
-  filter: brightness(0.8);
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-  box-sizing: border-box;
 }
 
 .setting-item {
@@ -498,6 +83,14 @@ h2,
 h3 {
   color: var(--text-color);
   margin: 0;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input-field {
@@ -560,89 +153,6 @@ h3 {
 }
 
 .save-button:hover {
-  background: var(--primary-hover-color);
-}
-
-.delete-account-section {
-  text-align: center;
-  padding: 16px;
-  background: var(--background-color);
-  border-radius: 8px;
-  display: flex;
-  gap: 24px;
-  justify-content: center;
-}
-
-.delete-button {
-  padding: 8px 16px;
-  background: var(--error-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.delete-button:hover {
-  background: var(--error-hover-color);
-}
-
-.logout-button {
-  padding: 8px 16px;
-  background: var(--error-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.logout-button:hover {
-  background: var(--error-hover-color);
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: var(--background-color);
-  padding: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--secondary-color);
-  width: 400px;
-  box-sizing: border-box;
-}
-
-.modal-buttons {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 16px;
-}
-
-.cancel-button {
-  padding: 8px 16px;
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s ease;
-}
-
-.cancel-button:hover {
   background: var(--primary-hover-color);
 }
 </style>
