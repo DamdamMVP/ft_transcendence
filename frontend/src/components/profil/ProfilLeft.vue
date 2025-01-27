@@ -12,9 +12,15 @@ const loading = ref(true)
 
 // Statistiques globales
 const stats = computed(() => {
-  const victories = userHistory.value.filter(match => match.user_score > match.guest_score).length
-  const defeats = userHistory.value.filter(match => match.user_score < match.guest_score).length
-  const draws = userHistory.value.filter(match => match.user_score === match.guest_score).length
+  const victories = userHistory.value.filter(
+    (match) => match.user_score > match.guest_score
+  ).length
+  const defeats = userHistory.value.filter(
+    (match) => match.user_score < match.guest_score
+  ).length
+  const draws = userHistory.value.filter(
+    (match) => match.user_score === match.guest_score
+  ).length
   const total = victories + defeats + draws
   const winRate = total > 0 ? Math.round((victories / total) * 100) : 0
 
@@ -22,7 +28,7 @@ const stats = computed(() => {
     victories,
     defeats,
     draws,
-    winRate
+    winRate,
   }
 })
 
@@ -58,8 +64,8 @@ onUnmounted(() => {
   eventBus.off('history-updated', updateHistory)
 })
 
-const profilePhotoUrl = computed(() => 
-  `http://localhost:8000${authStore.user.profile_picture}`
+const profilePhotoUrl = computed(
+  () => `http://localhost:8000${authStore.user.profile_picture}`
 )
 </script>
 
@@ -147,7 +153,7 @@ const profilePhotoUrl = computed(() =>
   justify-content: space-between;
   align-items: center;
   padding: 8px;
-  background-color: var(--background-color-light);
+  background-color: var(--background-color);
   border-radius: 4px;
 }
 

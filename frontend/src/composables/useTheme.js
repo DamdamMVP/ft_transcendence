@@ -12,7 +12,7 @@ const themes = {
     '--warning-color': '#f39c12',
     '--info-color': '#3498db',
     '--primary-hover-color': '#0056b3',
-    '--error-hover-color': '#c0392b'
+    '--error-hover-color': '#c0392b',
   },
   dark: {
     '--background-color': '#1a1a1a',
@@ -25,7 +25,7 @@ const themes = {
     '--warning-color': '#f39c12',
     '--info-color': '#3498db',
     '--primary-hover-color': '#2980b9',
-    '--error-hover-color': '#c0392b'
+    '--error-hover-color': '#c0392b',
   },
   forest: {
     '--background-color': '#2c3e50',
@@ -38,8 +38,8 @@ const themes = {
     '--warning-color': '#f39c12',
     '--info-color': '#2980b9',
     '--primary-hover-color': '#219a52',
-    '--error-hover-color': '#962c22'
-  }
+    '--error-hover-color': '#962c22',
+  },
 }
 
 const currentTheme = ref(localStorage.getItem('theme') || 'light')
@@ -67,6 +67,6 @@ export function useTheme() {
     setTheme,
     getAvailableThemes,
     getCurrentTheme,
-    currentTheme
+    currentTheme,
   }
 }

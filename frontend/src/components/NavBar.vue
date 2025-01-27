@@ -80,7 +80,8 @@ const router = useRouter()
 }
 
 .nav-link:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
+  color: var(--text-color);
 }
 
 .settings-link {
@@ -94,6 +95,7 @@ const router = useRouter()
 }
 
 .settings-link:hover {
-  background-color: var(--secondary-color);
+  background-color: var(--primary-color);
+  color: var(--text-color);
 }
 </style>
