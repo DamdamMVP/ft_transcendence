@@ -38,6 +38,14 @@ def online_users(request):
 
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from .models import UserStatus
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def online_users(request):
+    online_users = UserStatus.objects.filter(is_online=True).values("user__id", "user__username")
+    return Response({"online_users": list(online_users)}, status=200)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -473,8 +481,6 @@ def add_friend_by_username(request, username):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-<<<<<<< HEAD
-=======
 def add_friend_by_username(request, username):
     try:
         user = request.user
@@ -494,7 +500,6 @@ def add_friend_by_username(request, username):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
->>>>>>> 17587d7 (+: can add user on friendList)
 def remove_friend_by_username(request, username):
     try:
         user = request.user
@@ -522,7 +527,6 @@ def get_friends_by_username(request, username=None):
         serializer = UserSerializer(friends, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
-<<<<<<< HEAD
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
@@ -654,6 +658,3 @@ def fortytwo_callback(request):
     )
     
     return response
-=======
-        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
->>>>>>> 17587d7 (+: can add user on friendList)
