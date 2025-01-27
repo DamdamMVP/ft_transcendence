@@ -7,6 +7,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
+import Notification from './Notification.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -66,8 +67,36 @@ const handleFileSelect = (event) => {
   }
 }
 
+const showNotification = ref(false)
+const notificationMessage = ref('')
+const notificationType = ref('error')
+
+const showError = (message) => {
+  notificationMessage.value = ''  // Reset message first
+  notificationType.value = 'error'
+  setTimeout(() => {
+    notificationMessage.value = message
+    showNotification.value = true
+  }, 100)
+}
+
+const showSuccess = (message) => {
+  notificationMessage.value = ''  // Reset message first
+  notificationType.value = 'success'
+  setTimeout(() => {
+    notificationMessage.value = message
+    showNotification.value = true
+  }, 100)
+}
+
 const saveProfilePhoto = async () => {
   if (!selectedFile.value) return
+
+  // Vérifier la taille du fichier (2Mo max)
+  if (selectedFile.value.size > 2 * 1024 * 1024) {
+    showError('La taille de l\'image ne doit pas dépasser 2 Mo')
+    return
+  }
 
   const formData = new FormData()
   formData.append('profile_picture', selectedFile.value)
@@ -83,16 +112,15 @@ const saveProfilePhoto = async () => {
         withCredentials: true,
       }
     )
-    console.log('Réponse du serveur update:', response.data)
 
     // Si la requête réussit (pas d'erreur), on considère que c'est un succès
     if (response.data.message === 'Profile picture updated successfully') {
+      showSuccess('Photo de profil mise à jour avec succès')
       // On recharge les données de l'utilisateur pour obtenir la nouvelle URL de la photo
       const userResponse = await axios.get(
         `http://localhost:8000/users/read/${authStore.user.id}`,
         { withCredentials: true }
       )
-      console.log('Réponse user data:', userResponse.data)
       if (userResponse.data) {
         // On garde l'URL relative
         authStore.updateUser(userResponse.data)
@@ -100,6 +128,7 @@ const saveProfilePhoto = async () => {
       selectedFile.value = null
     }
   } catch (error) {
+    showError(error.response?.data?.error || 'Erreur lors de la mise à jour de la photo de profil')
     console.error(
       'Erreur lors de la mise à jour de la photo de profil:',
       error.response?.data || error
@@ -116,31 +145,28 @@ const saveUsername = async () => {
     )
 
     if (response.data && response.data.username === username.value) {
-      console.log('✅ Username mis à jour:', response.data.username)
+      showSuccess('Nom d\'utilisateur mis à jour avec succès')
       authStore.updateUser(response.data)
     }
   } catch (error) {
-    console.error(
-      "Erreur lors de la mise à jour du nom d'utilisateur:",
-      error.response?.data || error
-    )
+    showError(error.response?.data?.error || 'Erreur lors de la mise à jour du nom d\'utilisateur')
   }
 }
 
 const savePassword = async () => {
   try {
     if (!currentPassword.value) {
-      console.error('❌ Le mot de passe actuel est requis')
+      showError('Le mot de passe actuel est requis')
       return
     }
 
     if (!newPassword.value || !confirmPassword.value) {
-      console.error('❌ Le nouveau mot de passe et sa confirmation sont requis')
+      showError('Le nouveau mot de passe et sa confirmation sont requis')
       return
     }
 
     if (newPassword.value !== confirmPassword.value) {
-      console.error('❌ Les mots de passe ne correspondent pas')
+      showError('Les mots de passe ne correspondent pas')
       return
     }
 
@@ -155,23 +181,17 @@ const savePassword = async () => {
       { withCredentials: true }
     )
 
-    if (
-      response.data &&
-      response.data.message === 'Password updated successfully'
-    ) {
-      console.log('✅ Mot de passe mis à jour')
-      // Réinitialiser les champs
+    if (response.data && response.data.message === 'Password updated successfully') {
+      showSuccess('Mot de passe mis à jour avec succès')
       currentPassword.value = ''
       newPassword.value = ''
       confirmPassword.value = ''
     }
   } catch (error) {
     if (error.response?.data?.error === 'Invalid old password') {
-      console.error('❌ Le mot de passe actuel est incorrect')
-    } else if (error.response?.data?.error === 'User not found') {
-      console.error('❌ Utilisateur non trouvé')
+      showError('Le mot de passe actuel est incorrect')
     } else {
-      console.error('❌ Erreur lors de la mise à jour du mot de passe')
+      showError(error.response?.data?.error || 'Erreur lors de la mise à jour du mot de passe')
     }
   }
 }
@@ -190,16 +210,13 @@ const saveLanguage = async () => {
       )
 
       if (response.data?.user) {
+        showSuccess('Langue mise à jour avec succès')
         locale.value = tempLanguage.value
         authStore.updateUser(response.data.user)
         tempLanguage.value = null
       }
     } catch (error) {
-      if (error.response?.data?.error === 'Invalid language') {
-        console.error('❌ Langue non valide')
-      } else {
-        console.error('❌ Erreur lors de la mise à jour de la langue')
-      }
+      showError(error.response?.data?.error || 'Erreur lors de la mise à jour de la langue')
       tempLanguage.value = authStore.user.language
     }
   }
@@ -219,16 +236,13 @@ const saveTheme = async () => {
       )
 
       if (response.data?.user) {
+        showSuccess('Thème mis à jour avec succès')
         setTheme(tempTheme.value)
         authStore.updateUser(response.data.user)
         tempTheme.value = null
       }
     } catch (error) {
-      if (error.response?.data?.error === 'Invalid theme') {
-        console.error('❌ Thème non valide')
-      } else {
-        console.error('❌ Erreur lors de la mise à jour du thème')
-      }
+      showError(error.response?.data?.error || 'Erreur lors de la mise à jour du thème')
       tempTheme.value = authStore.user.theme
     }
   }
@@ -252,16 +266,13 @@ const deleteAccount = async () => {
     )
 
     if (response.data?.message === 'User successfully deleted!') {
-      console.log(t('settings.accountDeleted'))
+      showSuccess('Compte supprimé avec succès')
       authStore.logout()
-      // Fermer la popup
       showDeleteConfirm.value = false
-      // Rediriger vers la page de connexion
       router.push('/')
     }
   } catch (error) {
-    console.error('❌ Erreur lors de la suppression du compte')
-    // Fermer la popup en cas d'erreur
+    showError(error.response?.data?.error || 'Erreur lors de la suppression du compte')
     showDeleteConfirm.value = false
   }
 }
@@ -383,6 +394,14 @@ const deleteAccount = async () => {
         </div>
       </div>
     </div>
+
+    <!-- Notification -->
+    <Notification
+      v-if="showNotification"
+      :message="notificationMessage"
+      :type="notificationType"
+      @close="showNotification = false"
+    />
   </div>
 </template>
 
