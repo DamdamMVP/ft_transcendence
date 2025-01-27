@@ -19,6 +19,11 @@ const showNotification = ref(false)
 const notificationMessage = ref('')
 const notificationType = ref('success')
 
+
+const showSuccess = (message) => {
+  notificationMessage.value = message
+  notificationType.value = 'success'
+  showNotification.value = true
 // Variables temporaires pour le thème et la langue
 const tempTheme = ref(null)
 const tempLanguage = ref(null)
