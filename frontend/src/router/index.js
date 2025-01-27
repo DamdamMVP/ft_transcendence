@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ProfilView from '../views/ProfilView.vue'
-import History from '../components/History.vue'
+import History from '../components/profil/History.vue'
 import SettingsView from '../views/SettingsView.vue'
 import PongView from '../views/PongView.vue'
 

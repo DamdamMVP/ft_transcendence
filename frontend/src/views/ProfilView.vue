@@ -1,6 +1,6 @@
 <script setup>
-import ProfilLeft from '../components/ProfilLeft.vue'
-import NavBarProfil from '../components/NavBarProfil.vue'
+import ProfilLeft from '../components/profil/ProfilLeft.vue'
+import NavBarProfil from '../components/profil/NavBarProfil.vue'
 </script>
 
 <template>
@@ -25,10 +25,10 @@ import NavBarProfil from '../components/NavBarProfil.vue'
 }
 
 .profil-content {
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
+  gap: 20px;
+  padding: 20px;
 }
 </style>

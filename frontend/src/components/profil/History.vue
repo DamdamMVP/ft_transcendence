@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
-import { useGamesHistoryStore } from '../stores/gamesHistory'
+import { useGamesHistoryStore } from '../../stores/gamesHistory'
 
 const store = useGamesHistoryStore()
 const route = useRoute() // Récupérer les paramètres de la route
