@@ -8,6 +8,7 @@
       <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
       <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
       <div v-if="isPaused" class="pause-message">Capture ! 🎯</div>
+      <div v-if="!gameStarted || gameOver" class="overlay"></div>
       <div v-if="!gameStarted || gameOver" class="start-message">
         <div v-if="gameOver">
           <div class="game-over-text">Partie terminée!</div>
@@ -345,6 +346,7 @@ export default {
   transform: translate(-50%, -50%);
   text-align: center;
   width: 100%;
+  z-index: 2;
 }
 
 .start-btn {
@@ -433,5 +435,17 @@ export default {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1;
 }
 </style>
