@@ -7,6 +7,7 @@
       <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
       <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
       <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
+      <div v-if="isPaused" class="pause-message">Capture ! 🎯</div>
       <div v-if="!gameStarted || gameOver" class="start-message">
         <div v-if="gameOver">
           <div class="game-over-text">Partie terminée!</div>
