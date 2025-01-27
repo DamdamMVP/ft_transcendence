@@ -8,6 +8,7 @@ import HomePong from '../components/pong/HomePong.vue'
 import PongLocal from '../components/pong/modes/PongLocal.vue'
 import PongVsAI from '../components/pong/modes/PongVsAI.vue'
 import PongTournament from '../components/pong/modes/PongTournament.vue'
+import CatchView from '../views/CatchView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,7 +59,13 @@ const router = createRouter({
           name: 'pong-tournament',
           component: PongTournament
         }
-      ]
+      ],
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/Catch',
+      name: 'Catch',
+      component: CatchView,
     },
   ],
 })
