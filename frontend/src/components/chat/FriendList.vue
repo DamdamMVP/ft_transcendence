@@ -1,5 +1,12 @@
 <template>
   <div v-if="authStore.isAuthenticated" class="friend-list-container">
+    <Notification
+      :message="notification.message"
+      :type="notification.type"
+      v-if="notification.show"
+      @close="notification.show = false"
+    />
+    
     <!-- Icône de message flottante -->
     <div class="message-icon" @click="toggleExpand">
       <span class="material-icons">chat</span>
@@ -63,6 +70,7 @@ import { useAuthStore } from '../../stores/authStore'
 import { useFriendStore } from '../../stores/friendStore'
 import AddFriendIcon from '../icons/AddFriendIcon.vue'
 import FriendItem from './FriendItem.vue'
+import Notification from '../Notification.vue'
 
 const authStore = useAuthStore()
 const friendStore = useFriendStore()
@@ -70,33 +78,32 @@ const friendStore = useFriendStore()
 const isExpanded = ref(false)
 const searchQuery = ref('')
 const newFriendUsername = ref('')
+const notification = ref({
+  show: false,
+  message: '',
+  type: 'error'
+})
+
+const showNotification = (message, type = 'error') => {
+  notification.value = {
+    show: true,
+    message,
+    type
+  }
+}
 
 // Charger la liste d'amis au montage du composant et quand l'authentification change
 onMounted(async () => {
   if (authStore.isAuthenticated) {
-    console.log('🔄 Chargement initial des amis')
-    try {
-      await friendStore.loadFriends()
-      console.log('✅ Amis chargés:', friendStore.friends)
-    } catch (error) {
-      console.error('❌ Erreur de chargement:', error)
-    }
+    await friendStore.loadFriends()
   }
 })
 
 // Surveiller les changements d'authentification
 watch(() => authStore.isAuthenticated, async (newValue) => {
-  console.log('👤 Changement d\'authentification:', newValue)
   if (newValue) {
-    console.log('🔄 Rechargement des amis après connexion')
-    try {
-      await friendStore.loadFriends()
-      console.log('✅ Amis rechargés:', friendStore.friends)
-    } catch (error) {
-      console.error('❌ Erreur de rechargement:', error)
-    }
+    await friendStore.loadFriends()
   } else {
-    console.log('🧹 Réinitialisation de la liste')
     friendStore.friends = []
   }
 })
@@ -111,7 +118,6 @@ const toggleExpand = () => {
 
 const startChat = (friend) => {
   // TODO: Implémenter la logique de chat
-  console.log('Start chat with:', friend.username)
 }
 
 const blockUser = async (friend) => {
@@ -120,8 +126,13 @@ const blockUser = async (friend) => {
 
 const addFriend = async () => {
   if (newFriendUsername.value.trim()) {
-    await friendStore.addFriend(newFriendUsername.value.trim())
-    newFriendUsername.value = ''
+    try {
+      await friendStore.addFriend(newFriendUsername.value.trim())
+      newFriendUsername.value = ''
+      showNotification('Ami ajouté avec succès', 'success')
+    } catch (error) {
+      showNotification(error.message, 'error')
+    }
   }
 }
 </script>

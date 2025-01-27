@@ -20,13 +20,38 @@ export const useFriendStore = defineStore('friend', () => {
 
   // Actions
   const addFriend = async (username) => {
-    // TODO: Appel API pour ajouter un ami
-    const newFriend = {
-      id: Date.now(), // Temporaire, à remplacer par l'ID de l'API
-      username,
-      isOnline: false,
+    try {
+      const addFriendResponse = await axios.post(
+        `http://localhost:8000/users/friends/add/${username}`,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (addFriendResponse.status === 200) {
+        await loadFriends()
+        return true
+      }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new Error('Utilisateur non trouvé')
+      } else if (error.response?.status === 400) {
+        if (error.response?.data?.error === 'You cannot add yourself as a friend') {
+          throw new Error('Vous ne pouvez pas vous ajouter vous-même comme ami')
+        } else if (error.response?.data?.error === 'This user is already your friend') {
+          throw new Error('Cet utilisateur est déjà votre ami')
+        } else {
+          throw new Error(error.response?.data?.error || "Erreur lors de l'ajout d'ami")
+        }
+      } else {
+        throw new Error("Erreur lors de l'ajout d'ami")
+      }
     }
-    friends.value.push(newFriend)
   }
 
   const removeFriend = async (friendId) => {
@@ -54,7 +79,6 @@ export const useFriendStore = defineStore('friend', () => {
   }
 
   const loadFriends = async () => {
-    console.log('🔄 Début du chargement des amis...')
     try {
       const response = await axios.get('http://localhost:8000/users/friends', {
         withCredentials: true,
@@ -64,21 +88,13 @@ export const useFriendStore = defineStore('friend', () => {
         },
       })
 
-      console.log("📥 Réponse de l'API:", response)
-
       if (response.status === 200) {
         friends.value = response.data.map((friend) => ({
           ...friend,
           isOnline: false,
         }))
-        console.log("✅ Liste d'amis mise à jour:", friends.value)
       }
     } catch (error) {
-      console.log('❌ Erreur détaillée:', {
-        message: error.message,
-        response: error.response,
-        config: error.config,
-      })
       friends.value = []
     }
   }

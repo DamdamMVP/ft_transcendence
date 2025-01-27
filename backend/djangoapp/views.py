@@ -413,3 +413,54 @@ def updateTheme(request, pk):
         })
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_friend_by_username(request, username):
+    try:
+        user = request.user
+        friend = User.objects.get(username=username)
+        
+        if user == friend:
+            return Response({'error': 'You cannot add yourself as a friend'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if friend in user.friends.all():
+            return Response({'error': 'This user is already your friend'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.friends.add(friend)
+        return Response({'message': f'Successfully added {friend.username} as friend'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remove_friend_by_username(request, username):
+    try:
+        user = request.user
+        friend = User.objects.get(username=username)
+        
+        if friend not in user.friends.all():
+            return Response({'error': 'This user is not in your friend list'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.friends.remove(friend)
+        return Response({'message': f'Successfully removed {friend.username} from friends'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_friends_by_username(request, username=None):
+    try:
+        if username:
+            user = User.objects.get(username=username)
+        else:
+            user = request.user
+        
+        friends = user.friends.all()
+        serializer = UserSerializer(friends, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)

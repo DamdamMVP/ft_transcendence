@@ -37,6 +37,10 @@ urlpatterns = [
     path('friends/remove/<int:friend_id>', views.remove_friend, name='remove-friend'),
     path('friends', views.get_friends, name='get-friends'),
 
+    path('friends/add/<str:username>', views.add_friend_by_username, name='add-friend-by-username'),
+    path('friends/remove/<str:username>', views.remove_friend_by_username, name='remove-friend-by-username'),
+    path('friends/list/<str:username>', views.get_friends_by_username, name='get-friends-by-username'),
+
     path('block', views.block_user),
     path('unblock', views.unblock_user),
     path('list_blocked', views.list_blocks),
