@@ -4,14 +4,9 @@ import { computed } from 'vue'
 
 const authStore = useAuthStore()
 
-// URL de l'image par défaut avec le bon chemin backend
-const defaultProfilePicture = 'http://localhost:8000/media/profile_pictures/default.jpg'
-
-const profilePhotoUrl = computed(() => {
-  return authStore.user?.profile_picture
-    ? `http://localhost:8000${authStore.user.profile_picture}`
-    : defaultProfilePicture
-})
+const profilePhotoUrl = computed(() => 
+  `http://localhost:8000${authStore.user.profile_picture}`
+)
 </script>
 
 <template>
