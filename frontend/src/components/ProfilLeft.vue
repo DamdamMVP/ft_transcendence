@@ -1,18 +1,27 @@
 <script setup>
 import { useAuthStore } from '../stores/authStore'
+import { computed } from 'vue'
 
 const authStore = useAuthStore()
 
 // URL de l'image par défaut avec le bon chemin backend
 const defaultProfilePicture = 'http://localhost:8000/media/profile_pictures/default.jpg'
+
+const profilePhotoUrl = computed(() => {
+  return authStore.user?.profile_picture
+    ? `http://localhost:8000${authStore.user.profile_picture}`
+    : defaultProfilePicture
+})
 </script>
 
 <template>
   <div class="profile-container">
     <div class="profile-card">
-      <h2 class="profile-name">{{ authStore.user?.username || 'Utilisateur' }}</h2>
+      <h2 class="profile-name">
+        {{ authStore.user?.username || 'Utilisateur' }}
+      </h2>
       <img
-        :src="authStore.user?.profilePicture || defaultProfilePicture"
+        :src="profilePhotoUrl"
         :alt="authStore.user?.username || 'Profile Picture'"
         class="profile-picture"
       />

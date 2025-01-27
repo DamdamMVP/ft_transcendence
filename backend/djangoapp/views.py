@@ -34,10 +34,10 @@ def login(request):
         response.set_cookie(
             key='access_token',
             value=access_token,
-            httponly=True,  # Makes cookie inaccessible via JavaScript
-            secure=True,    # In production, enable this option for HTTPS only
-            samesite='Strict',  # Restricts cookie to same origin (CSRF protection)
-            max_age=60 * 5  # Token lifetime (in seconds)
+            httponly=True,
+            secure=True,
+            samesite='Strict',
+            max_age=60 * 60 * 3  # 3 heures en secondes
         )
         response.set_cookie(
             key='refresh_token',
@@ -45,7 +45,7 @@ def login(request):
             httponly=True,
             secure=True,
             samesite='Strict',
-            max_age=60 * 60 * 24
+            max_age=60 * 60 * 24 * 7  # 7 jours
         )
 
         return response
@@ -68,17 +68,16 @@ def refresh_token(request):
 
         response = Response({
             'message': 'Access token refreshed successfully',
-            'user.id': refresh['user_id']
+            'user_id': refresh['user_id']
         }, status=200)
 
-        # Update access token cookie
         response.set_cookie(
             key='access_token',
             value=access_token,
             httponly=True,
             secure=True,
             samesite='Strict',
-            max_age=60 * 5  # Access token lifetime
+            max_age=60 * 60 * 3  # 3 heures en secondes
         )
         return response
     except Exception as e:
