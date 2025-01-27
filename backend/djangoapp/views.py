@@ -473,6 +473,28 @@ def add_friend_by_username(request, username):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+<<<<<<< HEAD
+=======
+def add_friend_by_username(request, username):
+    try:
+        user = request.user
+        friend = User.objects.get(username=username)
+        
+        if user == friend:
+            return Response({'error': 'You cannot add yourself as a friend'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if friend in user.friends.all():
+            return Response({'error': 'This user is already your friend'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.friends.add(friend)
+        return Response({'message': f'Successfully added {friend.username} as friend'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+>>>>>>> 17587d7 (+: can add user on friendList)
 def remove_friend_by_username(request, username):
     try:
         user = request.user
@@ -500,6 +522,7 @@ def get_friends_by_username(request, username=None):
         serializer = UserSerializer(friends, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
+<<<<<<< HEAD
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
@@ -631,3 +654,6 @@ def fortytwo_callback(request):
     )
     
     return response
+=======
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+>>>>>>> 17587d7 (+: can add user on friendList)
