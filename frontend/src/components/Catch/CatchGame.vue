@@ -3,7 +3,7 @@
     <div class="game-wrapper">
       <div class="player-column">
         <div class="player-name">{{ playerUsername }}</div>
-        <div v-if="gameStarted" class="player-score">Score: {{ mouseScore }}</div>
+        <div v-if="gameStarted || gameOver" class="player-score">Score: {{ mouseScore }}</div>
       </div>
       <div class="game-board" 
            :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
@@ -29,11 +29,11 @@
       </div>
       <div class="player-column">
         <div class="player-name">{{ guestUsername }}</div>
-        <div v-if="gameStarted" class="player-score">Score: {{ catScore }}</div>
+        <div v-if="gameStarted || gameOver" class="player-score">Score: {{ catScore }}</div>
       </div>
     </div>
     <div v-if="gameStarted" class="timer-container">
-      <div class="timer">{{ gameOver ? "Temps écoulé" : `Temps: ${timeLeft}s` }}</div>
+      <div class="timer">{{ gameOver ? "Tempsécoulé" : `Temps: ${timeLeft}s` }}</div>
     </div>
   </div>
 </template>
