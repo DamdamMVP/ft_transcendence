@@ -40,7 +40,12 @@
   "history": {
     "title": "History",
     "win": "Victory",
-    "loose": "Defeat"
+    "loose": "Defeat",
+    "draw": "Draw",
+    "addTest": "Add test match",
+    "loading": "Loading history...",
+    "error": "Error loading history",
+    "noGames": "No games played yet"
   },
   "navbarProfil": {
     "Pong": "Pong",

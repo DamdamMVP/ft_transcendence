@@ -46,6 +46,7 @@ class History(BaseModel):  # Also inherits from BaseModel
     user_score = models.IntegerField()  # User's score
     guest_score = models.IntegerField()  # Opponent's score
     played_at = models.DateTimeField(auto_now_add=True)  # Date and time of the match
+    game_name = models.CharField(max_length=50, default="pong")
 
     def __str__(self):
         return f"History of {self.user.username} at {self.created_at}"

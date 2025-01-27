@@ -40,7 +40,12 @@
   "history": {
     "title": "Historique",
     "win": "Victoire",
-    "loose": "Défaite"
+    "loose": "Défaite",
+    "draw": "Égalité",
+    "addTest": "Ajouter un match test",
+    "loading": "Chargement de l'historique...",
+    "error": "Erreur lors de la récupération de l'historique",
+    "noGames": "Aucune partie jouée pour le moment"
   },
   "navbarProfil": {
     "Pong": "Pong",

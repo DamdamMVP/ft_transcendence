@@ -4,7 +4,7 @@ from .models import User, History
 class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = History
-        fields = ['id', 'user', 'guest_name', 'user_score', 'guest_score', 'played_at']
+        fields = ['id', 'user', 'guest_name', 'user_score', 'guest_score', 'played_at', 'game_name']
 
 class UserSerializer(serializers.ModelSerializer):
     histories = HistorySerializer(many=True, read_only=True)  # Relation avec History

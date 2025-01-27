@@ -1,64 +1,110 @@
 <script setup>
 import { useRoute } from 'vue-router'
-import { computed } from 'vue'
-import { useGamesHistoryStore } from '../../stores/gamesHistory'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useAuthStore } from '../../stores/authStore'
+import axios from 'axios'
+import { useI18n } from 'vue-i18n'
 
-const store = useGamesHistoryStore()
-const route = useRoute() // Récupérer les paramètres de la route
+const route = useRoute()
+const authStore = useAuthStore()
+const userHistory = ref([])
+const loading = ref(true)
+const error = ref(null)
+const { t } = useI18n()
 
-// Filtrer les matchs en fonction du jeu sélectionné
-const filteredMatches = computed(() =>
-  store.matches
-    .filter(
-      (match) => match.game.toLowerCase() === route.params.game?.toLowerCase()
+// Filtre l'historique par jeu et trie par date
+const filteredAndSortedHistory = computed(() => {
+  return [...userHistory.value]
+    .filter(match => match.game_name?.toLowerCase() === route.params.game?.toLowerCase())
+    .sort((a, b) => new Date(b.played_at) - new Date(a.played_at))
+})
+
+const fetchHistory = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    const response = await axios.get(
+      `http://localhost:8000/users/histories/user/${authStore.user.id}`,
+      { withCredentials: true }
     )
-    .sort((a, b) => b.date - a.date)
-)
+    userHistory.value = response.data
+  } catch (err) {
+    error.value = 'Erreur lors de la récupération de l\'historique'
+  } finally {
+    loading.value = false
+  }
+}
 
-// Ajouter un match pour tester
-setTimeout(() => {
-  store.addMatch({
-    id: 4,
-    game: 'Pong',
-    win: true,
-    score: '3-1',
-    opponent: 'Roger',
-    date: Date.now(),
-  })
-}, 1000)
+const createTestMatch = async () => {
+  try {
+    const testMatch = {
+      user: authStore.user.id,
+      guest_name: 'Bot_' + Math.floor(Math.random() * 1000),
+      user_score: Math.floor(Math.random() * 10),
+      guest_score: Math.floor(Math.random() * 10),
+      played_at: new Date().toISOString(),
+      game_name: route.params.game?.toLowerCase() || 'pong'
+    }
 
-setTimeout(() => {
-  store.addMatch({
-    id: 5,
-    game: 'Tic-Tac-Toe',
-    win: true,
-    score: '3-0',
-    opponent: 'Albert',
-    date: Date.now(),
-  })
-}, 1000)
+    await axios.post('http://localhost:8000/users/histories/add', testMatch, {
+      withCredentials: true
+    })
+    
+    await fetchHistory()
+  } catch (err) {
+    error.value = 'Erreur lors de la création du match test'
+  }
+}
+
+// Recharger l'historique quand le jeu change
+watch(() => route.params.game, () => {
+  fetchHistory()
+})
+
+onMounted(() => {
+  fetchHistory()
+})
 </script>
 
 <template>
   <div class="history-container">
-    <h2>{{ $t('history.title') }}</h2>
-    <div class="match-list">
+    <div class="header">
+      <h2>{{ t('history.title') }} - {{ route.params.game }}</h2>
+      <button @click="createTestMatch" class="test-button">
+        {{ t('history.addTest') }}
+      </button>
+    </div>
+    
+    <div v-if="loading" class="loading">
+      {{ t('history.loading') }}
+    </div>
+    
+    <div v-else-if="error" class="error">
+      {{ t('history.error') }}
+    </div>
+    
+    <div v-else-if="filteredAndSortedHistory.length === 0" class="no-history">
+      {{ t('history.noGames') }}
+    </div>
+    
+    <div v-else class="match-list">
       <div
-        v-for="match in filteredMatches"
+        v-for="match in filteredAndSortedHistory"
         :key="match.id"
         class="match-card"
         :class="{
-          'win-card': match.win,
-          'loose-card': !match.win,
+          'win-card': match.user_score > match.guest_score,
+          'loose-card': match.user_score < match.guest_score,
+          'draw-card': match.user_score === match.guest_score
         }"
       >
         <p class="match-result">
-          {{ match.win ? $t('history.win') : $t('history.loose') }} :
-          {{ match.score }}
+          {{ match.user_score > match.guest_score ? t('history.win') : match.user_score < match.guest_score ? t('history.loose') : t('history.draw') }}
+          : {{ match.user_score }} - {{ match.guest_score }}
         </p>
-        <p class="match-opponent">{{ match.opponent }}</p>
+        <p class="match-opponent">{{ match.guest_name }}</p>
         <p class="match-date">
-          {{ new Date(match.date).toLocaleDateString() }}
+          {{ new Date(match.played_at).toLocaleDateString() }}
         </p>
       </div>
     </div>
@@ -75,18 +121,49 @@ setTimeout(() => {
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.test-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.test-button:hover {
+  background-color: var(--primary-color-dark);
+}
+
 h2 {
-  margin-bottom: 16px;
+  margin: 0;
   font-size: 20px;
   font-weight: bold;
   color: var(--text-color);
+}
+
+.loading, .error, .no-history {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-color);
+}
+
+.error {
+  color: #ff4444;
 }
 
 .match-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
-  overflow-y: scroll;
+  overflow-y: auto;
   max-height: 60vh;
 }
 
@@ -96,6 +173,11 @@ h2 {
   border: 1px solid #d9d9d9;
   text-align: center;
   background-color: var(--background-color);
+  transition: transform 0.2s;
+}
+
+.match-card:hover {
+  transform: translateY(-2px);
 }
 
 .win-card {
@@ -110,24 +192,25 @@ h2 {
   color: #ff4d4d;
 }
 
+.draw-card {
+  background-color: #f0f0f0;
+  border-color: #666666;
+  color: #666666;
+}
+
 .match-result {
   font-size: 16px;
   font-weight: bold;
-  color: #333;
+  margin-bottom: 8px;
 }
 
 .match-opponent {
   font-size: 14px;
-  color: #333;
+  margin-bottom: 8px;
 }
 
 .match-date {
-  font-size: 14px;
-  color: #333;
-}
-
-.match-stats {
   font-size: 12px;
-  color: #333;
+  color: var(--text-secondary-color);
 }
 </style>
