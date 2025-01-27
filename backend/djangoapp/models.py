@@ -19,7 +19,7 @@ class User(AbstractUser):  # Replaces Django's default user model
         default="profile_pictures/default.jpg",  # Default image if no photo is provided
         blank=True  # Allows this field to be empty
     )
-    language = models.CharField(max_length=20, default="french")
+    language = models.CharField(max_length=20, default="fr")
     theme = models.CharField(max_length=20, default="dark")
     friends = models.ManyToManyField('self', symmetrical=False, blank=True)
 

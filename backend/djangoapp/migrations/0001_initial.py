@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
                 ('email', models.EmailField(max_length=254, unique=True)),
                 ('profile_picture', models.ImageField(blank=True, default='profile_pictures/default.jpg', upload_to='profile_pictures/')),
-                ('language', models.CharField(default='french', max_length=20)),
+                ('language', models.CharField(default='fr', max_length=20)),
                 ('theme', models.CharField(default='dark', max_length=20)),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),

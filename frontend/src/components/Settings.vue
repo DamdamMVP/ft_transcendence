@@ -3,7 +3,7 @@ import ThemeSelector from './ThemeSelector.vue'
 import Langage from './Langage.vue'
 import { useAuthStore } from '../stores/authStore'
 import { useRouter } from 'vue-router'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useTheme } from '../composables/useTheme'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
@@ -28,6 +28,10 @@ const username = ref(authStore.user?.username || '')
 watch(() => authStore.user, (newUser) => {
   if (newUser) {
     username.value = newUser.username
+    // Mettre à jour la langue si elle change
+    if (newUser.language) {
+      locale.value = newUser.language
+    }
   }
 }, { deep: true })
 
@@ -169,12 +173,41 @@ const savePassword = async () => {
   }
 }
 
-const saveLanguage = () => {
+const saveLanguage = async () => {
   if (tempLanguage.value) {
-    locale.value = tempLanguage.value
-    tempLanguage.value = null
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/users/update_language/${authStore.user.id}`,
+        {
+          language: tempLanguage.value,
+          username: authStore.user.username,
+          email: authStore.user.email
+        },
+        { withCredentials: true }
+      )
+
+      if (response.data?.user) {
+        locale.value = tempLanguage.value
+        authStore.updateUser(response.data.user)
+        tempLanguage.value = null
+      }
+    } catch (error) {
+      if (error.response?.data?.error === 'Invalid language') {
+        console.error('❌ Langue non valide')
+      } else {
+        console.error('❌ Erreur lors de la mise à jour de la langue')
+      }
+      tempLanguage.value = authStore.user.language
+    }
   }
 }
+
+// Initialiser la langue au chargement
+onMounted(() => {
+  if (authStore.user?.language) {
+    locale.value = authStore.user.language
+  }
+})
 
 const saveTheme = () => {
   if (tempTheme.value) {
