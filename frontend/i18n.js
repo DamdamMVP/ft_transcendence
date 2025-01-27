@@ -6,14 +6,14 @@ function loadLocaleMessages() {
   const messages = {}
   for (const path in locales) {
     const locale = path.match(/([A-Za-z0-9-_]+)\.json$/i)[1] // Récupérer le code langue (ex : "en" ou "fr")
-    messages[locale] = locales[path]
+    messages[locale] = locales[path].default
   }
   return messages
 }
 
 const i18n = createI18n({
   legacy: false, // Utiliser l'API Composition
-  locale: 'en', // Langue par défaut
+  locale: localStorage.getItem('language') || 'fr', // Langue par défaut
   fallbackLocale: 'en',
   globalInjection: true, // Permet d'utiliser $t directement dans les composants
   messages: loadLocaleMessages(), // Charger les messages dynamiquement

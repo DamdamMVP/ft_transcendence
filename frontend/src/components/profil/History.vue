@@ -16,7 +16,10 @@ const { t } = useI18n()
 // Filtre l'historique par jeu et trie par date
 const filteredAndSortedHistory = computed(() => {
   return [...userHistory.value]
-    .filter(match => match.game_name?.toLowerCase() === route.params.game?.toLowerCase())
+    .filter(
+      (match) =>
+        match.game_name?.toLowerCase() === route.params.game?.toLowerCase()
+    )
     .sort((a, b) => new Date(b.played_at) - new Date(a.played_at))
 })
 
@@ -32,7 +35,7 @@ const fetchHistory = async () => {
     // Émettre l'événement de mise à jour
     eventBus.emit('history-updated', response.data)
   } catch (err) {
-    error.value = 'Erreur lors de la récupération de l\'historique'
+    error.value = "Erreur lors de la récupération de l'historique"
   } finally {
     loading.value = false
   }
@@ -46,13 +49,13 @@ const createTestMatch = async () => {
       user_score: Math.floor(Math.random() * 10),
       guest_score: Math.floor(Math.random() * 10),
       played_at: new Date().toISOString(),
-      game_name: route.params.game?.toLowerCase() || 'pong'
+      game_name: route.params.game?.toLowerCase() || 'pong',
     }
 
     await axios.post('http://localhost:8000/users/histories/add', testMatch, {
-      withCredentials: true
+      withCredentials: true,
     })
-    
+
     await fetchHistory()
   } catch (err) {
     error.value = 'Erreur lors de la création du match test'
@@ -60,9 +63,12 @@ const createTestMatch = async () => {
 }
 
 // Recharger l'historique quand le jeu change
-watch(() => route.params.game, () => {
-  fetchHistory()
-})
+watch(
+  () => route.params.game,
+  () => {
+    fetchHistory()
+  }
+)
 
 onMounted(() => {
   fetchHistory()
@@ -77,19 +83,19 @@ onMounted(() => {
         {{ t('history.addTest') }}
       </button>
     </div>
-    
+
     <div v-if="loading" class="loading">
       {{ t('history.loading') }}
     </div>
-    
+
     <div v-else-if="error" class="error">
       {{ t('history.error') }}
     </div>
-    
+
     <div v-else-if="filteredAndSortedHistory.length === 0" class="no-history">
       {{ t('history.noGames') }}
     </div>
-    
+
     <div v-else class="match-list">
       <div
         v-for="match in filteredAndSortedHistory"
@@ -98,11 +104,17 @@ onMounted(() => {
         :class="{
           'win-card': match.user_score > match.guest_score,
           'loose-card': match.user_score < match.guest_score,
-          'draw-card': match.user_score === match.guest_score
+          'draw-card': match.user_score === match.guest_score,
         }"
       >
         <p class="match-result">
-          {{ match.user_score > match.guest_score ? t('history.win') : match.user_score < match.guest_score ? t('history.loose') : t('history.draw') }}
+          {{
+            match.user_score > match.guest_score
+              ? t('history.win')
+              : match.user_score < match.guest_score
+                ? t('history.loose')
+                : t('history.draw')
+          }}
           : {{ match.user_score }} - {{ match.guest_score }}
         </p>
         <p class="match-opponent">{{ match.guest_name }}</p>
@@ -152,7 +164,9 @@ h2 {
   color: var(--text-color);
 }
 
-.loading, .error, .no-history {
+.loading,
+.error,
+.no-history {
   text-align: center;
   padding: 20px;
   color: var(--text-color);
