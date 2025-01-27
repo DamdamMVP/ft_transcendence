@@ -5,7 +5,7 @@
         <div class="player-name">{{ playerUsername }}</div>
         <div v-if="gameStarted || gameOver" class="player-score">Score: {{ mouseScore }}</div>
       </div>
-      <div class="game-board" 
+      <div class="game-board" :class="{ 'blurred': !gameStarted || gameOver }"
            :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
         <img :src="jerryImage" class="mouse" :style="mouseStyle">
         <img :src="tomImage" class="cat" :style="catStyle">
@@ -397,6 +397,12 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+}
+
+.game-board.blurred .mouse,
+.game-board.blurred .cat,
+.game-board.blurred .cheese {
+  filter: blur(5px);
 }
 
 .mouse, .cat {

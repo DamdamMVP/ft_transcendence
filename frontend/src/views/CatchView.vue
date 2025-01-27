@@ -58,12 +58,14 @@ h1 {
 
 .guest-form {
   background-color: white;
-  padding: 30px;
+  padding: 40px;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
   max-width: 400px;
   width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 h2 {
@@ -73,13 +75,15 @@ h2 {
 }
 
 .guest-input {
-  width: 100%;
+  width: calc(100% - 24px);
   padding: 12px;
-  margin-bottom: 15px;
+  margin: 0 auto 15px auto;
   border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 16px;
   transition: border-color 0.3s;
+  box-sizing: border-box;
+  display: block;
 }
 
 .guest-input:focus {
