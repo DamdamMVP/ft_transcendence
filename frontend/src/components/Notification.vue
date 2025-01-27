@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 
 const props = defineProps({
   message: {
@@ -16,26 +16,47 @@ const props = defineProps({
   },
 })
 
-const show = ref(true)
+const emit = defineEmits(['close'])
+const show = ref(false)
 let timeout = null
 
-const startTimer = () => {
-  show.value = true
-  if (timeout) clearTimeout(timeout)
-  timeout = setTimeout(() => {
-    show.value = false
-  }, props.duration)
+const hideNotification = () => {
+  show.value = false
+  emit('close')
 }
 
-watch(
-  () => props.message,
-  () => {
-    if (props.message) {
-      startTimer()
-    }
-  },
-  { immediate: true }
-)
+const showNotification = () => {
+  // Nettoyer le timeout existant si présent
+  if (timeout) {
+    clearTimeout(timeout)
+  }
+  
+  // Forcer la réinitialisation en cachant puis montrant
+  show.value = false
+  setTimeout(() => {
+    show.value = true
+    timeout = setTimeout(hideNotification, props.duration)
+  }, 50)
+}
+
+// Regarder les changements de message
+watch(() => props.message, (newMessage, oldMessage) => {
+  if (newMessage && (newMessage !== oldMessage || !show.value)) {
+    showNotification()
+  }
+})
+
+// Nettoyer le timeout lors de la destruction du composant
+onUnmounted(() => {
+  if (timeout) {
+    clearTimeout(timeout)
+  }
+})
+
+// Montrer la notification initialement si un message est présent
+if (props.message) {
+  showNotification()
+}
 </script>
 
 <template>
