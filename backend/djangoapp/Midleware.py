@@ -118,64 +118,73 @@ class TokenAuthMiddlewareHTTP(MiddlewareMixin):
     """
 
     def process_request(self, request):
-        # Get access token from cookies
+        # Get tokens from cookies
         access_token = request.COOKIES.get('access_token')
         refresh_token = request.COOKIES.get('refresh_token')
 
+        # Default to anonymous user
+        request.user = AnonymousUser()
+
         if not access_token:
-            request.user = AnonymousUser()
-            return
+            return None
 
         try:
             # Try to decode the current access token
             decoded_data = jwt_decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
             user_id = decoded_data.get("user_id")
-            if not user_id:
-                request.user = AnonymousUser()
-                return
             
-            # Get user from database
-            request.user = User.objects.get(id=user_id)
+            if user_id:
+                try:
+                    request.user = User.objects.get(id=user_id)
+                except User.DoesNotExist:
+                    pass
 
         except ExpiredSignatureError:
-            # If access token is expired, try to use refresh token
-            if not refresh_token:
-                request.user = AnonymousUser()
-                return
+            # Access token expired, try refresh flow
+            if refresh_token:
+                try:
+                    # Attempt to refresh the token
+                    refresh = RefreshToken(refresh_token)
+                    new_access_token = str(refresh.access_token)
+                    
+                    # Decode the new token
+                    new_decoded_data = jwt_decode(
+                        new_access_token, 
+                        settings.SECRET_KEY, 
+                        algorithms=["HS256"]
+                    )
+                    user_id = new_decoded_data.get("user_id")
+                    
+                    if user_id:
+                        try:
+                            request.user = User.objects.get(id=user_id)
+                            # Store the new token to be set in response
+                            request.new_access_token = new_access_token
+                        except User.DoesNotExist:
+                            pass
+                            
+                except (InvalidToken, Exception) as e:
+                    # Log the error for debugging
+                    print(f"Token refresh failed: {str(e)}")
+                    pass
 
-            try:
-                # Refresh the token
-                refresh = RefreshToken(refresh_token)
-                new_access_token = str(refresh.access_token)
+        except (InvalidToken, Exception) as e:
+            # Log the error for debugging
+            print(f"Token validation failed: {str(e)}")
+            pass
 
-                # Add the new access token to the response (cookies)
-                request.new_access_token = new_access_token
-
-                # Decode the new access token
-                new_decoded_data = jwt_decode(new_access_token, settings.SECRET_KEY, algorithms=["HS256"])
-                user_id = new_decoded_data.get("user_id")
-                if not user_id:
-                    request.user = AnonymousUser()
-                    return
-
-                # Get user from database
-                request.user = User.objects.get(id=user_id)
-
-            except InvalidToken:
-                request.user = AnonymousUser()
-                return
-
-        except (InvalidToken, User.DoesNotExist):
-            request.user = AnonymousUser()
+        return None
 
     def process_response(self, request, response):
-        # If we generated a new access token, set it in the response cookies
-        if hasattr(request, "new_access_token"):
+        # Set the new access token in cookies if it was refreshed
+        if hasattr(request, 'new_access_token'):
             response.set_cookie(
-                key="access_token",
+                key='access_token',
                 value=request.new_access_token,
                 httponly=True,
-                secure=settings.DEBUG is False,  # Use HTTPS in production
-                samesite="Lax",
+                secure=not settings.DEBUG,  # True in production
+                samesite='Lax',
+                max_age=900  # 15 minutes, matching ACCESS_TOKEN_LIFETIME
             )
+        
         return response

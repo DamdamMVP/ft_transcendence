@@ -9,7 +9,8 @@ from .serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import render, redirect
 from rest_framework import status
-
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -123,6 +124,13 @@ def addUser(request):
     data = request.data
 
     # Hash password
+    password = data.get('password')
+
+    try:
+        validate_password(password)
+    except ValidationError as e:
+        return Response({'error': e.messages}, status=status.HTTP_400_BAD_REQUEST)
+
     data['password'] = make_password(data['password'])
     serializer = UserSerializer(data=data)
 
@@ -224,6 +232,11 @@ def updatePassword(request, pk):
         if not check_password(data['old_password'], user.password):
             return Response({'error': 'Invalid old password'}, status=400)
 
+        password = data.get('password')
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            return Response({'error': e.messages}, status=status.HTTP_400_BAD_REQUEST)
         data['password'] = make_password(data['password'])
         serializer = UserSerializer(instance=user, data=data)
         if serializer.is_valid():

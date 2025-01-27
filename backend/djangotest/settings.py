@@ -39,6 +39,7 @@ REST_FRAMEWORK = {
     ),
 }
 
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
@@ -101,8 +102,8 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Use our middleware                  
     'django.middleware.security.SecurityMiddleware',
+    'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Use our middleware                  
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
