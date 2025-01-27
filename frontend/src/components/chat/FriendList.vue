@@ -6,7 +6,11 @@
       v-if="notification.show"
       @close="notification.show = false"
     />
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 90af558 (+: can add user on friendList)
     <!-- Icône de message flottante -->
     <div class="message-icon" @click="toggleExpand">
       <span class="material-icons">chat</span>
@@ -88,9 +92,13 @@ import { useFriendStore } from '../../stores/friendStore'
 import { useUserStatus } from '../../composables/useUserStatus'
 import AddFriendIcon from '../icons/AddFriendIcon.vue'
 import FriendItem from './FriendItem.vue'
+<<<<<<< HEAD
 import GeneralChannel from './GeneralChannel.vue'
 import Notification from '../Notification.vue'
 import ChatWindow from './ChatWindow.vue'
+=======
+import Notification from '../Notification.vue'
+>>>>>>> 90af558 (+: can add user on friendList)
 
 const authStore = useAuthStore()
 const friendStore = useFriendStore()
@@ -99,6 +107,7 @@ const { onlineUsers } = useUserStatus()
 const isExpanded = ref(false)
 const searchQuery = ref('')
 const newFriendUsername = ref('')
+<<<<<<< HEAD
 const activeChatFriend = ref(null)
 const notification = ref({
   show: false,
@@ -118,6 +127,21 @@ const filteredFriends = computed(() => {
     friend.username.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
+=======
+const notification = ref({
+  show: false,
+  message: '',
+  type: 'error'
+})
+
+const showNotification = (message, type = 'error') => {
+  notification.value = {
+    show: true,
+    message,
+    type
+  }
+}
+>>>>>>> 90af558 (+: can add user on friendList)
 
 // Charger la liste d'amis au montage du composant et quand l'authentification change
 onMounted(async () => {
@@ -127,6 +151,7 @@ onMounted(async () => {
 })
 
 // Surveiller les changements d'authentification
+<<<<<<< HEAD
 watch(
   () => authStore.isAuthenticated,
   async (newValue) => {
@@ -135,6 +160,13 @@ watch(
     } else {
       friendStore.friends = []
     }
+=======
+watch(() => authStore.isAuthenticated, async (newValue) => {
+  if (newValue) {
+    await friendStore.loadFriends()
+  } else {
+    friendStore.friends = []
+>>>>>>> 90af558 (+: can add user on friendList)
   }
 )
 
@@ -143,6 +175,7 @@ const toggleExpand = () => {
 }
 
 const startChat = (friend) => {
+<<<<<<< HEAD
   // Si c'est le canal général
   if (friend.isChannel) {
     activeChatFriend.value = friend
@@ -159,6 +192,9 @@ const closeChat = () => {
 const handleSendMessage = (message) => {
   console.log('Message envoyé:', message)
   // Ici vous pourrez ajouter la logique pour envoyer le message via l'API
+=======
+  // TODO: Implémenter la logique de chat
+>>>>>>> 90af558 (+: can add user on friendList)
 }
 
 const blockUser = async (friend) => {

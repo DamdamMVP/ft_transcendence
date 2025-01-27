@@ -43,7 +43,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1500),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,  # Renew refresh token on each use
     'BLACKLIST_AFTER_ROTATION': True,  # Invalidate old refresh tokens after rotation
@@ -107,24 +107,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'djangotest.urls'
 
-def get_local_ip():
-    hostname = socket.gethostname()
-    try:
-        # Résolution de l'adresse IP depuis le nom d'hôte
-        local_ip = socket.gethostbyname(hostname)
-        if local_ip.startswith("127."):
-            # Méthode de secours si l'adresse est locale (127.x.x.x)
-            local_ip = [ip[4][0] for ip in socket.getaddrinfo(hostname, None, socket.AF_INET) if not ip[4][0].startswith("127.")][0]
-        return local_ip
-    except Exception as e:
-        print(f"Error retrieving local IP: {e}")
-        return "127.0.0.1"  # Retourne localhost par défaut en cas d'erreur
-
-local_ip = get_local_ip()
-print(local_ip)
-
-print("local_ip : ",local_ip)
-# print(local_ip)
 
 
 
