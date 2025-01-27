@@ -46,8 +46,8 @@ const themes = {
     '--warning-color': '#f39c12',
     '--info-color': '#2980b9',
     '--primary-hover-color': '#219a52',
-    '--error-hover-color': '#962c22'
-  }
+    '--error-hover-color': '#962c22',
+  },
 }
 
 const currentTheme = ref(localStorage.getItem('theme') || 'dark')
