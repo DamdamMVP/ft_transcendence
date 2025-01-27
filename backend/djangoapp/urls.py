@@ -48,4 +48,5 @@ urlpatterns = [
 
     path('fortytwo/login/', views.fortytwo_login, name='fortytwo_login'),
     path('fortytwo/callback/', views.fortytwo_callback, name='fortytwo_callback'),
+    path('list_online', views.online_users),
 ]
