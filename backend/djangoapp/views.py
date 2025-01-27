@@ -469,7 +469,39 @@ def fortytwo_callback(request):
     
     # Create or get user
     try:
-        user = User.objects.get(email=user_data['email'])
+        user = User.objects.get(id=pk)
+        language = request.data.get('language')
+        
+        if language not in ['french', 'english', 'russian', 'breizh']:
+            return Response({'error': 'Invalid language'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user.language = language
+        user.save()
+        
+        return Response({
+            'message': 'Language updated successfully',
+            'user': UserSerializer(user).data
+        })
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateTheme(request, pk):
+    try:
+        user = User.objects.get(id=pk)
+        theme = request.data.get('theme')
+        
+        if theme not in ['dark', 'light', 'forest']:
+            return Response({'error': 'Invalid theme'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user.theme = theme
+        user.save()
+        
+        return Response({
+            'message': 'Theme updated successfully',
+            'user': UserSerializer(user).data
+        })
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 

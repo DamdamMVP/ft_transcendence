@@ -5,17 +5,58 @@ import SPassword from './settings/SPassword.vue'
 import SLangage from './settings/SLangage.vue'
 import STheme from './settings/STheme.vue'
 import SDisconnect from './settings/SDisconnect.vue'
-import { ref } from 'vue'
 import Notification from './Notification.vue'
+import ThemeSelector from './ThemeSelector.vue'
+import Langage from './Langage.vue'
+import { useAuthStore } from '../stores/authStore'
+import { useRouter } from 'vue-router'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useTheme } from '../composables/useTheme'
+import { useI18n } from 'vue-i18n'
+import axios from 'axios'
 
 const showNotification = ref(false)
 const notificationMessage = ref('')
 const notificationType = ref('success')
 
-const showSuccess = (message) => {
-  notificationMessage.value = message
-  notificationType.value = 'success'
-  showNotification.value = true
+// Variables temporaires pour le thème et la langue
+const tempTheme = ref(null)
+const tempLanguage = ref(null)
+
+// Référence vers l'input file caché
+const fileInput = ref(null)
+const selectedFile = ref(null)
+
+// Champs pour la mise à jour des paramètres
+const username = ref(authStore.user?.username || '')
+
+// Surveiller les changements dans authStore.user
+watch(() => authStore.user, (newUser) => {
+  if (newUser) {
+    username.value = newUser.username
+    // Mettre à jour la langue si elle change
+    if (newUser.language) {
+      locale.value = newUser.language
+    }
+  }
+}, { deep: true })
+
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+
+const profilePhotoUrl = computed(() => {
+  if (selectedFile.value) {
+    return URL.createObjectURL(selectedFile.value)
+  }
+  return authStore.user?.profile_picture
+    ? `http://localhost:8000${authStore.user.profile_picture}`
+    : null
+})
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/')
 }
 
 const showError = (message) => {
@@ -32,8 +73,174 @@ const handleNotification = ({ message, type }) => {
   }
 }
 
-const closeNotification = () => {
-  showNotification.value = false
+const handleFileSelect = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    selectedFile.value = file
+  }
+}
+
+const saveProfilePhoto = async () => {
+  if (!selectedFile.value) return
+
+  const formData = new FormData()
+  formData.append('profile_picture', selectedFile.value)
+
+  try {
+    const response = await axios.put(
+      `http://localhost:8000/users/update_profile_picture/${authStore.user.id}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true,
+      }
+    )
+    console.log('Réponse du serveur update:', response.data)
+
+    // Si la requête réussit (pas d'erreur), on considère que c'est un succès
+    if (response.data.message === 'Profile picture updated successfully') {
+      // On recharge les données de l'utilisateur pour obtenir la nouvelle URL de la photo
+      const userResponse = await axios.get(
+        `http://localhost:8000/users/read/${authStore.user.id}`,
+        { withCredentials: true }
+      )
+      console.log('Réponse user data:', userResponse.data)
+      if (userResponse.data) {
+        // On garde l'URL relative
+        authStore.updateUser(userResponse.data)
+      }
+      selectedFile.value = null
+    }
+  } catch (error) {
+    console.error(
+      'Erreur lors de la mise à jour de la photo de profil:',
+      error.response?.data || error
+    )
+  }
+}
+
+const saveUsername = async () => {
+  try {
+    const response = await axios.put(
+      `http://localhost:8000/users/update/${authStore.user.id}`,
+      { username: username.value },
+      { withCredentials: true }
+    )
+
+    if (response.data && response.data.username === username.value) {
+      console.log('✅ Username mis à jour:', response.data.username)
+      authStore.updateUser(response.data)
+    }
+  } catch (error) {
+    console.error(
+      "Erreur lors de la mise à jour du nom d'utilisateur:",
+      error.response?.data || error
+    )
+  }
+}
+
+const savePassword = async () => {
+  try {
+    if (!currentPassword.value) {
+      console.error('❌ Le mot de passe actuel est requis')
+      return
+    }
+    
+    if (!newPassword.value || !confirmPassword.value) {
+      console.error('❌ Le nouveau mot de passe et sa confirmation sont requis')
+      return
+    }
+
+    if (newPassword.value !== confirmPassword.value) {
+      console.error('❌ Les mots de passe ne correspondent pas')
+      return
+    }
+
+    const response = await axios.put(
+      `http://localhost:8000/users/update_password/${authStore.user.id}`,
+      {
+        old_password: currentPassword.value,
+        password: newPassword.value,
+        username: authStore.user.username,
+        email: authStore.user.email
+      },
+      { withCredentials: true }
+    )
+
+    if (response.data && response.data.message === 'Password updated successfully') {
+      console.log('✅ Mot de passe mis à jour')
+      // Réinitialiser les champs
+      currentPassword.value = ''
+      newPassword.value = ''
+      confirmPassword.value = ''
+    }
+  } catch (error) {
+    if (error.response?.data?.error === 'Invalid old password') {
+      console.error('❌ Le mot de passe actuel est incorrect')
+    } else if (error.response?.data?.error === 'User not found') {
+      console.error('❌ Utilisateur non trouvé')
+    } else {
+      console.error('❌ Erreur lors de la mise à jour du mot de passe')
+    }
+  }
+}
+
+const saveLanguage = async () => {
+  if (tempLanguage.value) {
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/users/update_language/${authStore.user.id}`,
+        {
+          language: tempLanguage.value,
+          username: authStore.user.username,
+          email: authStore.user.email
+        },
+        { withCredentials: true }
+      )
+
+      if (response.data?.user) {
+        locale.value = tempLanguage.value
+        authStore.updateUser(response.data.user)
+        tempLanguage.value = null
+      }
+    } catch (error) {
+      if (error.response?.data?.error === 'Invalid language') {
+        console.error('❌ Langue non valide')
+      } else {
+        console.error('❌ Erreur lors de la mise à jour de la langue')
+      }
+      tempLanguage.value = authStore.user.language
+    }
+  }
+}
+
+// Initialiser la langue au chargement
+onMounted(() => {
+  if (authStore.user?.language) {
+    locale.value = authStore.user.language
+  }
+})
+
+const saveTheme = () => {
+  if (tempTheme.value) {
+    setTheme(tempTheme.value)
+    tempTheme.value = null
+  }
+}
+
+const onThemeUpdate = (theme) => {
+  tempTheme.value = theme
+}
+
+const onLanguageUpdate = (lang) => {
+  tempLanguage.value = lang
+}
+
+const deleteAccount = () => {
+  authStore.logout()
+  router.push('/')
 }
 </script>
 
