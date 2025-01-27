@@ -134,6 +134,7 @@ onMounted(() => {
   border-radius: 8px;
   border: 1px solid #d9d9d9;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+<<<<<<< HEAD
   min-height: 60vh;
   max-height: 60vh;
   display: flex;
@@ -163,11 +164,18 @@ onMounted(() => {
 
 h2 {
   margin: 0;
+=======
+}
+
+h2 {
+  margin-bottom: 16px;
+>>>>>>> 442b837 (+: profil folder)
   font-size: 20px;
   font-weight: bold;
   color: var(--text-color);
 }
 
+<<<<<<< HEAD
 .loading,
 .error,
 .no-history {
@@ -201,6 +209,22 @@ h2 {
 
 .match-card:hover {
   transform: translateX(4px);
+=======
+.match-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  overflow-y: scroll;
+  max-height: 60vh;
+}
+
+.match-card {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+  text-align: center;
+  background-color: var(--background-color);
+>>>>>>> 442b837 (+: profil folder)
 }
 
 .win-card {
@@ -215,14 +239,22 @@ h2 {
   color: #ff4d4d;
 }
 
+<<<<<<< HEAD
 .draw-card {
   background-color: #f0f0f0;
   border-color: #666666;
   color: #666666;
+=======
+.match-result {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+>>>>>>> 442b837 (+: profil folder)
 }
 
 .match-opponent {
   font-size: 14px;
+<<<<<<< HEAD
   font-weight: bold;
   padding-right: 16px;
 }
@@ -264,5 +296,18 @@ h2 {
 
 .match-list::-webkit-scrollbar-thumb:hover {
   background: var(--primary-color-dark);
+=======
+  color: #333;
+}
+
+.match-date {
+  font-size: 14px;
+  color: #333;
+}
+
+.match-stats {
+  font-size: 12px;
+  color: #333;
+>>>>>>> 442b837 (+: profil folder)
 }
 </style>
