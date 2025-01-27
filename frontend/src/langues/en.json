@@ -60,7 +60,12 @@
       "current": "Current password",
       "new": "New password",
       "confirm": "Confirm new password"
-    }
+    },
+    "deleteConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
+    "deleteAccountConfirm": "Yes, delete my account",
+    "cancel": "Cancel",
+    "accountDeleted": "Account successfully deleted",
+    "logout": "Logout"
   },
   "friendList": {
     "title": "My Friends",

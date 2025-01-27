@@ -60,7 +60,12 @@
       "current": "Ger-tremen bremañ",
       "new": "Ger-tremen nevez",
       "confirm": "Kadarnaat ar ger-tremen nevez"
-    }
+    },
+    "deleteConfirm": "Ha sur oc'h e fell deoc'h dilemel ho kont? Ne c'haller ket nullañ an obererezh-mañ.",
+    "deleteAccountConfirm": "Ya, dilemel ma c'hont",
+    "cancel": "Nullañ",
+    "accountDeleted": "Kont dilemet gant berzh",
+    "logout": "Digevreañ"
   },
   "friendList": {
     "title": "Ma mignoned",

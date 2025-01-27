@@ -60,7 +60,12 @@
       "current": "Ancien mot de passe",
       "new": "Nouveau mot de passe",
       "confirm": "Confirmer le nouveau mot de passe"
-    }
+    },
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.",
+    "deleteAccountConfirm": "Oui, supprimer mon compte",
+    "cancel": "Annuler",
+    "accountDeleted": "Compte supprimé avec succès",
+    "logout": "Se déconnecter"
   },
   "friendList": {
     "title": "Mes amis",

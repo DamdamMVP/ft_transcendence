@@ -213,7 +213,7 @@ const saveTheme = async () => {
         {
           theme: tempTheme.value,
           username: authStore.user.username,
-          email: authStore.user.email
+          email: authStore.user.email,
         },
         { withCredentials: true }
       )
@@ -242,9 +242,28 @@ const onLanguageUpdate = (lang) => {
   tempLanguage.value = lang
 }
 
-const deleteAccount = () => {
-  authStore.logout()
-  router.push('/')
+const showDeleteConfirm = ref(false)
+
+const deleteAccount = async () => {
+  try {
+    const response = await axios.delete(
+      `http://localhost:8000/users/delete/${authStore.user.id}`,
+      { withCredentials: true }
+    )
+
+    if (response.data?.message === 'User successfully deleted!') {
+      console.log(t('settings.accountDeleted'))
+      authStore.logout()
+      // Fermer la popup
+      showDeleteConfirm.value = false
+      // Rediriger vers la page de connexion
+      router.push('/')
+    }
+  } catch (error) {
+    console.error('❌ Erreur lors de la suppression du compte')
+    // Fermer la popup en cas d'erreur
+    showDeleteConfirm.value = false
+  }
 }
 </script>
 
@@ -342,12 +361,27 @@ const deleteAccount = () => {
 
     <!-- Suppression du compte -->
     <div class="delete-account-section">
-      <button class="delete-button" @click="deleteAccount">
-        {{ t('settings.deleteAccount') }} <i class="icon-delete"></i>
+      <button class="delete-button" @click="showDeleteConfirm = true">
+        {{ t('settings.deleteAccount') }}
       </button>
       <button class="logout-button" @click="handleLogout">
-        {{ t('navbar.disconnect') }}
+        {{ t('settings.logout') }}
       </button>
+    </div>
+
+    <!-- Popup de confirmation -->
+    <div v-if="showDeleteConfirm" class="modal-overlay">
+      <div class="modal-content">
+        <p>{{ t('settings.deleteConfirm') }}</p>
+        <div class="modal-buttons">
+          <button class="delete-button" @click="deleteAccount">
+            {{ t('settings.deleteAccountConfirm') }}
+          </button>
+          <button class="cancel-button" @click="showDeleteConfirm = false">
+            {{ t('settings.cancel') }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -548,5 +582,48 @@ h3 {
 
 .logout-button:hover {
   background: var(--error-hover-color);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: var(--background-color);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--secondary-color);
+  width: 400px;
+  box-sizing: border-box;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.cancel-button {
+  padding: 8px 16px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.cancel-button:hover {
+  background: var(--primary-hover-color);
 }
 </style>
