@@ -182,8 +182,8 @@ class TokenAuthMiddlewareHTTP(MiddlewareMixin):
                 key='access_token',
                 value=request.new_access_token,
                 httponly=True,
-                secure=not settings.DEBUG,  # True in production
-                samesite='Lax',
+                secure=True,  # True in production
+                samesite='None',
                 max_age=900  # 15 minutes, matching ACCESS_TOKEN_LIFETIME
             )
         

@@ -44,15 +44,15 @@ def login(request):
             value=access_token,
             httponly=True,
             secure=True,
-            samesite='Strict',
-            max_age=60 * 60 * 3  # 3 heures en secondes
+            samesite='None',
+            max_age=900 
         )
         response.set_cookie(
             key='refresh_token',
             value=str(refresh),
             httponly=True,
             secure=True,
-            samesite='Strict',
+            samesite='None',
             max_age=60 * 60 * 24 * 7  # 7 jours
         )
 

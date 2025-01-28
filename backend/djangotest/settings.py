@@ -140,11 +140,26 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True  # Requis avec SameSite='None'
+SESSION_COOKIE_SECURE = True
 
-CORS_ALLOW_HEADERS = list(default_headers) + [
+CORS_ALLOW_HEADERS = list(default_headers) [
     "access-control-allow-credentials",
     "access-control-allow-origin",
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
 ]
+
+CORS_EXPOSE_HEADERS = ['content-type', 'x-csrftoken']
 
 TEMPLATES = [
     {
