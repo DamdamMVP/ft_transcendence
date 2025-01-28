@@ -54,16 +54,99 @@ export const useFriendStore = defineStore('friend', () => {
     }
   }
 
-  const removeFriend = async (friendId) => {
-    // TODO: Appel API pour supprimer un ami
-    friends.value = friends.value.filter((friend) => friend.id !== friendId)
+  const removeFriend = async (username) => {
+    try {
+      console.log('Removing friend:', username)
+      const response = await axios.post(
+        `http://localhost:8000/users/friends/remove/${username}`,
+        {},
+        {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.status === 200) {
+        console.log('Friend removed successfully')
+        await loadFriends() // Recharger la liste des amis
+        return true
+      }
+    } catch (error) {
+      console.error('Error removing friend:', error)
+      if (error.response?.status === 404) {
+        throw new Error('Utilisateur non trouvé')
+      } else {
+        throw new Error(error.response?.data?.error || "Erreur lors de la suppression de l'ami")
+      }
+    }
   }
 
-  const blockUser = async (userId) => {
-    // TODO: Appel API pour bloquer un utilisateur
-    blockedUsers.value.push(userId)
-    // Retirer l'utilisateur de la liste d'amis s'il y est
-    friends.value = friends.value.filter((friend) => friend.id !== userId)
+  const blockUser = async (username) => {
+    try {
+      console.log('Blocking user:', username)
+      
+      // D'abord trouver l'ID de l'utilisateur à bloquer dans la liste des amis
+      const userToBlock = friends.value.find(friend => friend.username === username)
+      console.log('User to block:', userToBlock)
+      if (!userToBlock) {
+        throw new Error('Utilisateur non trouvé dans la liste des amis')
+      }
+
+      // Garder l'ID pour plus tard
+      const userIdToBlock = userToBlock.id
+
+      // Supprimer de la liste d'amis
+      await removeFriend(username)
+
+      // Ensuite bloquer l'utilisateur avec l'ID sauvegardé
+      console.log('Sending block request with ID:', userIdToBlock)
+      const response = await axios.post(
+        'http://localhost:8000/users/block',
+        { blocked_id: userIdToBlock },
+        {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      console.log('Block response:', response)
+
+      if (response.status === 200 || response.status === 201) {
+        console.log('User blocked successfully')
+        // Mettre à jour la liste des utilisateurs bloqués
+        const blockedResponse = await axios.get('http://localhost:8000/users/list_blocked', {
+          withCredentials: true,
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (blockedResponse.status === 200) {
+          blockedUsers.value = blockedResponse.data
+          await loadFriends() // Recharger la liste des amis une dernière fois pour s'assurer qu'elle est à jour
+          console.log('Updated blocked users list and friends list')
+        }
+        return true
+      }
+    } catch (error) {
+      console.error('Error blocking user:', error)
+      console.error('Error response:', error.response?.data)
+      console.error('Error status:', error.response?.status)
+      if (error.response?.status === 404) {
+        throw new Error('Utilisateur non trouvé')
+      } else if (error.response?.data?.error) {
+        throw new Error(error.response.data.error)
+      } else {
+        throw new Error("Erreur lors du blocage de l'utilisateur")
+      }
+    }
   }
 
   const unblockUser = async (userId) => {
@@ -80,6 +163,7 @@ export const useFriendStore = defineStore('friend', () => {
 
   const loadFriends = async () => {
     try {
+      console.log('Loading friends list')
       const response = await axios.get('http://localhost:8000/users/friends', {
         withCredentials: true,
         headers: {
@@ -93,8 +177,10 @@ export const useFriendStore = defineStore('friend', () => {
           ...friend,
           isOnline: false,
         }))
+        console.log('Friends list updated:', friends.value)
       }
     } catch (error) {
+      console.error('Error loading friends:', error)
       friends.value = []
     }
   }

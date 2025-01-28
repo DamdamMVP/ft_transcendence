@@ -121,7 +121,12 @@ const startChat = (friend) => {
 }
 
 const blockUser = async (friend) => {
-  await friendStore.blockUser(friend.id)
+  try {
+    await friendStore.blockUser(friend.username)
+    showNotification('Utilisateur bloqué avec succès', 'success')
+  } catch (error) {
+    showNotification(error.message, 'error')
+  }
 }
 
 const addFriend = async () => {
