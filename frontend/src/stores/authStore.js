@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useAuth } from '../composables/useAuth'
 
 export const useAuthStore = defineStore('auth', () => {
   // État de l'authentification
   const isAuthenticated = ref(false)
   const user = ref(null)
+  const { signOut } = useAuth()
 
   // Initialiser l'état d'authentification au démarrage
   const initAuth = () => {
@@ -36,26 +38,27 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const logout = () => {
-    // Nettoyer l'état
-    user.value = null
-    isAuthenticated.value = false
+  const logout = async () => {
+    try {
+      await signOut()
+    } finally {
+      // Nettoyer l'état
+      user.value = null
+      isAuthenticated.value = false
 
-    // Nettoyer le localStorage
-    localStorage.removeItem('user')
+      // Nettoyer le localStorage
+      localStorage.removeItem('user')
+    }
   }
 
   // Initialiser l'état au démarrage
   initAuth()
 
   return { 
-    // État
-    isAuthenticated,
     user,
-    
-    // Actions
+    isAuthenticated,
     login,
     logout,
-    updateUser
+    updateUser,
   }
 })

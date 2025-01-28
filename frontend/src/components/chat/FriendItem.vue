@@ -3,7 +3,7 @@
     <div class="friend-item__info">
       <div
         class="friend-item__status-indicator"
-        :class="{ online: friend.isOnline }"
+        :class="{ online: isUserOnline(friend.id) }"
       ></div>
       <span class="friend-item__name">{{ friend.username }}</span>
     </div>
@@ -34,12 +34,16 @@
 </template>
 
 <script setup>
-defineProps({
+import { useUserStatus } from '@/composables/useUserStatus'
+
+const props = defineProps({
   friend: {
     type: Object,
     required: true,
   },
 })
+
+const { isUserOnline } = useUserStatus()
 
 defineEmits(['chat', 'block', 'delete'])
 </script>

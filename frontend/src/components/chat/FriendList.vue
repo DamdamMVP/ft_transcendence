@@ -10,8 +10,8 @@
     <!-- Icône de message flottante -->
     <div class="message-icon" @click="toggleExpand">
       <span class="material-icons">chat</span>
-      <div v-if="friendStore.onlineFriends.length" class="online-badge">
-        {{ friendStore.onlineFriends.length }}
+      <div v-if="onlineFriendsCount" class="online-badge">
+        {{ onlineFriendsCount }}
       </div>
     </div>
 
@@ -20,7 +20,7 @@
       <div class="friend-list__header" @click="toggleExpand">
         <h3>{{ $t('friendList.title') }}</h3>
         <span class="friend-list__online-count"
-          >{{ friendStore.onlineFriends.length }}
+          >{{ onlineFriendsCount }}
           {{ $t('friendList.online') }}</span
         >
       </div>
@@ -69,12 +69,14 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import { useFriendStore } from '../../stores/friendStore'
+import { useUserStatus } from '../../composables/useUserStatus'
 import AddFriendIcon from '../icons/AddFriendIcon.vue'
 import FriendItem from './FriendItem.vue'
 import Notification from '../Notification.vue'
 
 const authStore = useAuthStore()
 const friendStore = useFriendStore()
+const { onlineUsers } = useUserStatus()
 
 const isExpanded = ref(false)
 const searchQuery = ref('')
@@ -83,6 +85,10 @@ const notification = ref({
   show: false,
   message: '',
   type: 'error',
+})
+
+const onlineFriendsCount = computed(() => {
+  return friendStore.friends.filter(friend => onlineUsers.value.has(friend.id)).length
 })
 
 const showNotification = (message, type = 'error') => {

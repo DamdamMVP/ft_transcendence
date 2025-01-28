@@ -41,12 +41,18 @@ export const useFriendStore = defineStore('friend', () => {
       if (error.response?.status === 404) {
         throw new Error('Utilisateur non trouvé')
       } else if (error.response?.status === 400) {
-        if (error.response?.data?.error === 'You cannot add yourself as a friend') {
+        if (
+          error.response?.data?.error === 'You cannot add yourself as a friend'
+        ) {
           throw new Error('Vous ne pouvez pas vous ajouter vous-même comme ami')
-        } else if (error.response?.data?.error === 'This user is already your friend') {
+        } else if (
+          error.response?.data?.error === 'This user is already your friend'
+        ) {
           throw new Error('Cet utilisateur est déjà votre ami')
         } else {
-          throw new Error(error.response?.data?.error || "Erreur lors de l'ajout d'ami")
+          throw new Error(
+            error.response?.data?.error || "Erreur lors de l'ajout d'ami"
+          )
         }
       } else {
         throw new Error("Erreur lors de l'ajout d'ami")
@@ -79,7 +85,10 @@ export const useFriendStore = defineStore('friend', () => {
       if (error.response?.status === 404) {
         throw new Error('Utilisateur non trouvé')
       } else {
-        throw new Error(error.response?.data?.error || "Erreur lors de la suppression de l'ami")
+        throw new Error(
+          error.response?.data?.error ||
+            "Erreur lors de la suppression de l'ami"
+        )
       }
     }
   }
@@ -87,9 +96,11 @@ export const useFriendStore = defineStore('friend', () => {
   const blockUser = async (username) => {
     try {
       console.log('Blocking user:', username)
-      
+
       // D'abord trouver l'ID de l'utilisateur à bloquer dans la liste des amis
-      const userToBlock = friends.value.find(friend => friend.username === username)
+      const userToBlock = friends.value.find(
+        (friend) => friend.username === username
+      )
       console.log('User to block:', userToBlock)
       if (!userToBlock) {
         throw new Error('Utilisateur non trouvé dans la liste des amis')
@@ -120,13 +131,16 @@ export const useFriendStore = defineStore('friend', () => {
       if (response.status === 200 || response.status === 201) {
         console.log('User blocked successfully')
         // Mettre à jour la liste des utilisateurs bloqués
-        const blockedResponse = await axios.get('http://localhost:8000/users/list_blocked', {
-          withCredentials: true,
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-        })
+        const blockedResponse = await axios.get(
+          'http://localhost:8000/users/list_blocked',
+          {
+            withCredentials: true,
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
+          }
+        )
 
         if (blockedResponse.status === 200) {
           blockedUsers.value = blockedResponse.data

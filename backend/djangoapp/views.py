@@ -16,8 +16,8 @@ from .models import UserStatus
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def online_users(request):
-    online_users = UserStatus.objects.filter(is_online=True).values("user__id", "user__username")
-    return Response({"online_users": list(online_users)}, status=200)
+    online_users = UserStatus.objects.filter(is_online=True).values_list('user_id', flat=True)
+    return Response(list(online_users), status=200)
 
 
 @api_view(['POST'])
@@ -31,6 +31,11 @@ def login(request):
     user = authenticate(request, username=email, password=password)
 
     if user:
+        # Mettre à jour le statut en ligne
+        status, _ = UserStatus.objects.get_or_create(user=user)
+        status.is_online = True
+        status.save()
+
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
@@ -96,6 +101,12 @@ def refresh_token(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
+    # Mettre à jour le statut en ligne
+    user = request.user
+    status, _ = UserStatus.objects.get_or_create(user=user)
+    status.is_online = False
+    status.save()
+
     response = Response({'message': 'Logged out successfully'}, status=200)
 
     # Delete cookies

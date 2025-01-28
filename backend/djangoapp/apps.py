@@ -6,4 +6,5 @@ class DjangoappConfig(AppConfig):
     name = 'djangoapp'
 
     def ready(self):
+        import djangoapp.signals  # noqa
         import djangoapp.consumers  # Late imports to avoid errors

@@ -51,7 +51,7 @@ export function useAuth() {
   const signOut = async () => {
     try {
       // Appeler le endpoint de déconnexion pour supprimer le cookie
-      await axios.post('http://localhost:800/users/logout')
+      await axios.post('/users/logout')
     } catch (err) {
       console.error('Erreur lors de la déconnexion:', err)
     } finally {
