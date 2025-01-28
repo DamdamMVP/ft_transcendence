@@ -15,7 +15,7 @@ const password = ref('')
 const error = ref('')
 const isLoading = ref(false)
 
-const { signIn } = useAuth()
+const { signIn, googleSignIn } = useAuth()
 
 const handleSignIn = async () => {
   if (!email.value || !password.value) {
@@ -52,6 +52,10 @@ const handleSignIn = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const handleGoogleSignIn = () => {
+  window.location.href = 'http://localhost:8000/users/connect'
 }
 
 const forgotPassword = () => {
@@ -99,6 +103,14 @@ const forgotPassword = () => {
       >
         <span v-if="isLoading">Connexion en cours...</span>
         <span v-else>{{ $t('login.signIn') }}</span>
+      </button>
+      <button 
+        class="google-button" 
+        @click="handleGoogleSignIn"
+        :disabled="isLoading"
+      >
+        <img src="@/assets/google-icon.svg" alt="Google" class="google-icon" />
+        <span>Connect with Google</span>
       </button>
     </div>
 
@@ -159,6 +171,7 @@ const forgotPassword = () => {
   width: 100%;
   display: flex;
   justify-content: center;
+  gap: 16px;
   margin-top: 16px;
 }
 
@@ -181,6 +194,34 @@ const forgotPassword = () => {
 .submit-button:disabled {
   background: #666;
   cursor: not-allowed;
+}
+
+.google-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: white;
+  color: #1e1e1e;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.google-button:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+.google-button:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .forgot-password {
