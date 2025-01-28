@@ -58,6 +58,10 @@ const handleGoogleSignIn = () => {
   window.location.href = 'http://localhost:8000/accounts/google/login/'
 }
 
+const handle42SignIn = () => {
+  window.location.href = 'http://localhost:8000/users/fortytwo/login/'
+}
+
 const forgotPassword = () => {
   console.log('Forgot password clicked')
 }
@@ -104,13 +108,22 @@ const forgotPassword = () => {
         <span v-if="isLoading">Connexion en cours...</span>
         <span v-else>{{ $t('login.signIn') }}</span>
       </button>
+    </div>
+
+    <div class="social-buttons">
       <button 
-        class="google-button" 
+        class="google-button"
         @click="handleGoogleSignIn"
         :disabled="isLoading"
       >
-        <img src="@/assets/google-icon.svg" alt="Google" class="google-icon" />
-        <span>Connect with Google</span>
+        Connect with Google
+      </button>
+      <button 
+        class="fortytwo-button"
+        @click="handle42SignIn"
+        :disabled="isLoading"
+      >
+        Connect with 42
       </button>
     </div>
 
@@ -196,32 +209,40 @@ const forgotPassword = () => {
   cursor: not-allowed;
 }
 
-.google-button {
+.social-buttons {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: white;
-  color: #1e1e1e;
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.google-button,
+.fortytwo-button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
-  transition: all 0.2s;
+  font-weight: bold;
+  transition: background-color 0.3s;
 }
 
-.google-button:hover:not(:disabled) {
-  background: #f5f5f5;
+.google-button {
+  background-color: #4285f4;
+  color: white;
 }
 
-.google-button:disabled {
-  background: #f5f5f5;
-  cursor: not-allowed;
+.fortytwo-button {
+  background-color: #00babc;
+  color: white;
 }
 
-.google-icon {
-  width: 18px;
-  height: 18px;
+.google-button:hover {
+  background-color: #357abd;
+}
+
+.fortytwo-button:hover {
+  background-color: #00a2a4;
 }
 
 .forgot-password {

@@ -45,4 +45,7 @@ urlpatterns = [
     path('unblock', views.unblock_user),
     path('list_blocked', views.list_blocks),
     path('list_online', views.online_users),
+
+    path('fortytwo/login/', views.fortytwo_login, name='fortytwo_login'),
+    path('fortytwo/callback/', views.fortytwo_callback, name='fortytwo_callback'),
 ]

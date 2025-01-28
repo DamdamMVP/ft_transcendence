@@ -199,7 +199,11 @@ LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Configuration of the Google provider
+# Configuration de l'API 42
+FORTYTWO_CLIENT_ID = os.environ.get('FORTYTWO_CLIENT_ID')
+FORTYTWO_CLIENT_SECRET = os.environ.get('FORTYTWO_CLIENT_SECRET')
+
+# Configuration des providers sociaux
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
