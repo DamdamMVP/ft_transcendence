@@ -78,16 +78,18 @@
     "logout": "Logout"
   },
   "friendList": {
-    "title": "My Friends",
+    "title": "My friends",
     "online": "online",
     "search": "Search a friend",
     "addFriend": "Add friend",
     "block": "Block",
     "unblock": "Unblock",
     "chat": "Chat",
+    "delete": "Delete",
     "icons": {
       "chat": "chat",
-      "block": "block"
+      "block": "block",
+      "delete": "delete"
     }
   },
   "stats": {

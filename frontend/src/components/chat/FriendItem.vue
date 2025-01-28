@@ -27,7 +27,7 @@
         class="friend-item__action-btn"
         :title="$t('friendList.delete')"
       >
-        <span class="material-icons">delete</span>
+        <span class="material-icons">{{ $t('friendList.icons.delete') }}</span>
       </button>
     </div>
   </div>

@@ -80,9 +80,11 @@
     "block": "Stankañ",
     "unblock": "Distankañ",
     "chat": "Flapañ",
+    "delete": "Dilemel",
     "icons": {
       "chat": "flapañ",
-      "block": "stankañ"
+      "block": "stankañ",
+      "delete": "delete"
     }
   },
   "stats": {

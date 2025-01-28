@@ -85,9 +85,11 @@
     "block": "Bloquer",
     "unblock": "Débloquer",
     "chat": "Discuter",
+    "delete": "Supprimer",
     "icons": {
       "chat": "chat",
-      "block": "block"
+      "block": "bloquer",
+      "delete": "supprimer"
     }
   },
   "stats": {
