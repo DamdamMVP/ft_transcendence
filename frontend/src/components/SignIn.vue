@@ -55,7 +55,7 @@ const handleSignIn = async () => {
 }
 
 const handleGoogleSignIn = () => {
-  window.location.href = 'http://localhost:8000/users/connect'
+  window.location.href = 'http://localhost:8000/accounts/google/login/'
 }
 
 const forgotPassword = () => {
