@@ -9,7 +9,6 @@ from .serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import render, redirect
 from rest_framework import status
-<<<<<<< HEAD
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import UserStatus
@@ -19,11 +18,9 @@ from .models import UserStatus
 def online_users(request):
     online_users = UserStatus.objects.filter(is_online=True).values_list('user_id', flat=True)
     return Response(list(online_users), status=200)
-=======
 import requests
 from django.conf import settings
 from django.urls import reverse
->>>>>>> 6963568 (login 42 seems ok but no popup)
 
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
