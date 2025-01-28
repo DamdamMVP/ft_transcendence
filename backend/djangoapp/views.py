@@ -563,3 +563,87 @@ def get_friends_by_username(request, username=None):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def fortytwo_login(request):
+    """
+    Initiate the 42 OAuth flow
+    """
+    client_id = settings.FORTYTWO_CLIENT_ID
+    redirect_uri = 'http://localhost:8000/users/fortytwo/callback/'
+    auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code'
+    return redirect(auth_url)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def fortytwo_callback(request):
+    """
+    Handle the 42 OAuth callback
+    """
+    code = request.GET.get('code')
+    if not code:
+        return Response({'error': 'No code provided'}, status=400)
+
+    # Exchange the code for an access token
+    token_url = 'https://api.intra.42.fr/oauth/token'
+    data = {
+        'grant_type': 'authorization_code',
+        'client_id': settings.FORTYTWO_CLIENT_ID,
+        'client_secret': settings.FORTYTWO_CLIENT_SECRET,
+        'code': code,
+        'redirect_uri': 'http://localhost:8000/users/fortytwo/callback/'
+    }
+    
+    response = requests.post(token_url, data=data)
+    if not response.ok:
+        return Response({'error': 'Failed to get access token'}, status=400)
+
+    access_token = response.json()['access_token']
+
+    # Get user info from 42 API
+    user_url = 'https://api.intra.42.fr/v2/me'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    response = requests.get(user_url, headers=headers)
+    
+    if not response.ok:
+        return Response({'error': 'Failed to get user info'}, status=400)
+
+    user_data = response.json()
+    
+    # Create or get user
+    try:
+        user = User.objects.get(email=user_data['email'])
+    except User.DoesNotExist:
+        user = User.objects.create_user(
+            email=user_data['email'],
+            username=user_data['login'],
+            first_name=user_data.get('first_name', ''),
+            last_name=user_data.get('last_name', ''),
+            password=None  # No password needed for OAuth
+        )
+
+    # Log the user in
+    login(request._request, user)
+
+    # Create JWT tokens
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+
+    response = redirect('http://localhost:5173')  # Redirect to frontend
+    response.set_cookie(
+        'access_token',
+        access_token,
+        max_age=3600,
+        httponly=True,
+        samesite='Lax'
+    )
+    response.set_cookie(
+        'refresh_token',
+        str(refresh),
+        max_age=3600 * 24 * 7,
+        httponly=True,
+        samesite='Lax'
+    )
+    
+    return response
