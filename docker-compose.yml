@@ -33,7 +33,7 @@ services:
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
     volumes:
-      - ./backend/media:/app/media # Monte le répertoire 'media'
+      - ./backend/media:/app/media
     depends_on:
       - db
 
@@ -54,6 +54,22 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  caddy:
+    container_name: caddy
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    ports:
+      - "8443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+
 volumes:
   pgdata: {}
   media: {}
+  caddy_data: {}
+  caddy_config: {}

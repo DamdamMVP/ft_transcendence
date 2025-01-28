@@ -11,7 +11,7 @@ export function useAuth() {
 
   const signUp = async ({ username, email, password }) => {
     try {
-      const response = await axios.post('http://localhost:8000/users/create', {
+      const response = await axios.post('/users/create', {
         username,
         email,
         password,
@@ -29,7 +29,7 @@ export function useAuth() {
 
   const signIn = async ({ email, password }) => {
     try {
-      const response = await axios.post('http://localhost:8000/users/login', {
+      const response = await axios.post('/users/login', {
         email,
         password,
       })
@@ -51,7 +51,7 @@ export function useAuth() {
   const signOut = async () => {
     try {
       // Appeler le endpoint de déconnexion pour supprimer le cookie
-      await axios.post('http://localhost:8000/users/logout')
+      await axios.post('http://localhost:800/users/logout')
     } catch (err) {
       console.error('Erreur lors de la déconnexion:', err)
     } finally {

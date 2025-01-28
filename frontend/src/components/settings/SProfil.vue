@@ -49,7 +49,7 @@ const saveProfilePhoto = async () => {
 
   try {
     const response = await axios.put(
-      `http://localhost:8000/users/update_profile_picture/${authStore.user.id}`,
+      `/users/update_profile_picture/${authStore.user.id}`,
       formData,
       {
         headers: {
@@ -66,7 +66,7 @@ const saveProfilePhoto = async () => {
       })
 
       const userResponse = await axios.get(
-        `http://localhost:8000/users/read/${authStore.user.id}`,
+        `/users/read/${authStore.user.id}`,
         { withCredentials: true }
       )
       if (userResponse.data) {

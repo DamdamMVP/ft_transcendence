@@ -92,7 +92,7 @@ CHANNEL_LAYERS = {
 
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Use our middleware                  
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -129,37 +129,8 @@ ALLOWED_HOSTS = [
 print("local_ip : ",local_ip)
 # print(local_ip)
 
-CORS_ALLOW_ALL_ORIGINS = False
 
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^http://10\.12\.\d{1,3}\.\d{1,3}(:\d+)?$",
-]
 
-CORS_ALLOWED_ORIGINS = [
-    f"http://{local_ip}:5173",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-CSRF_COOKIE_SAMESITE = 'None'
-SESSION_COOKIE_SAMESITE = 'None'
-CSRF_COOKIE_SECURE = True  # Requis avec SameSite='None'
-SESSION_COOKIE_SECURE = True
-
-CORS_ALLOW_HEADERS = list(default_headers) [
-    "access-control-allow-credentials",
-    "access-control-allow-origin",
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-
-CORS_EXPOSE_HEADERS = ['content-type', 'x-csrftoken']
 
 TEMPLATES = [
     {

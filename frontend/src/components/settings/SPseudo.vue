@@ -22,7 +22,7 @@ watch(
 const saveUsername = async () => {
   try {
     const response = await axios.put(
-      `http://localhost:8000/users/update/${authStore.user.id}`,
+      `/users/update/${authStore.user.id}`,
       { username: username.value },
       { withCredentials: true }
     )

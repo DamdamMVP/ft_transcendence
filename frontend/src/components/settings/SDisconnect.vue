@@ -12,7 +12,7 @@ const showDeleteConfirm = ref(false)
 const deleteAccount = async () => {
   try {
     const response = await axios.delete(
-      `http://localhost:8000/users/delete/${authStore.user.id}`,
+      `/users/delete/${authStore.user.id}`,
       { withCredentials: true }
     )
 

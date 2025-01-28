@@ -37,7 +37,7 @@ const savePassword = async () => {
     }
 
     const response = await axios.put(
-      `http://localhost:8000/users/update_password/${authStore.user.id}`,
+      `/users/update_password/${authStore.user.id}`,
       {
         old_password: currentPassword.value,
         password: newPassword.value,

@@ -21,7 +21,7 @@ const saveLanguage = async () => {
   if (tempLanguage.value) {
     try {
       const response = await axios.put(
-        `http://localhost:8000/users/update_language/${authStore.user.id}`,
+        `/users/update_language/${authStore.user.id}`,
         {
           language: tempLanguage.value,
           username: authStore.user.username,

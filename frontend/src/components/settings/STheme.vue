@@ -16,7 +16,7 @@ const saveTheme = async () => {
   if (tempTheme.value) {
     try {
       const response = await axios.put(
-        `http://localhost:8000/users/update_theme/${authStore.user.id}`,
+        `/users/update_theme/${authStore.user.id}`,
         {
           theme: tempTheme.value,
           username: authStore.user.username,

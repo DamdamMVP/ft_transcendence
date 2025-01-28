@@ -22,7 +22,7 @@ export const useFriendStore = defineStore('friend', () => {
   const addFriend = async (username) => {
     try {
       const addFriendResponse = await axios.post(
-        `http://localhost:8000/users/friends/add/${username}`,
+        `/users/friends/add/${username}`,
         {},
         {
           withCredentials: true,
@@ -58,7 +58,7 @@ export const useFriendStore = defineStore('friend', () => {
     try {
       console.log('Removing friend:', username)
       const response = await axios.post(
-        `http://localhost:8000/users/friends/remove/${username}`,
+        `/users/friends/remove/${username}`,
         {},
         {
           withCredentials: true,
@@ -104,7 +104,7 @@ export const useFriendStore = defineStore('friend', () => {
       // Ensuite bloquer l'utilisateur avec l'ID sauvegardé
       console.log('Sending block request with ID:', userIdToBlock)
       const response = await axios.post(
-        'http://localhost:8000/users/block',
+        '/users/block',
         { blocked_id: userIdToBlock },
         {
           withCredentials: true,
@@ -164,7 +164,7 @@ export const useFriendStore = defineStore('friend', () => {
   const loadFriends = async () => {
     try {
       console.log('Loading friends list')
-      const response = await axios.get('http://localhost:8000/users/friends', {
+      const response = await axios.get('/users/friends', {
         withCredentials: true,
         headers: {
           Accept: 'application/json',

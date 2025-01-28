@@ -28,7 +28,7 @@ const fetchHistory = async () => {
     loading.value = true
     error.value = null
     const response = await axios.get(
-      `http://localhost:8000/users/histories/user/${authStore.user.id}`,
+      `/users/histories/user/${authStore.user.id}`,
       { withCredentials: true }
     )
     userHistory.value = response.data
@@ -52,7 +52,7 @@ const createTestMatch = async () => {
       game_name: route.params.game?.toLowerCase() || 'pong',
     }
 
-    await axios.post('http://localhost:8000/users/histories/add', testMatch, {
+    await axios.post('/users/histories/add', testMatch, {
       withCredentials: true,
     })
 

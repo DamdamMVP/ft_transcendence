@@ -37,7 +37,7 @@ const fetchHistory = async () => {
   try {
     loading.value = true
     const response = await axios.get(
-      `http://localhost:8000/users/histories/user/${authStore.user.id}`,
+      `/users/histories/user/${authStore.user.id}`,
       { withCredentials: true }
     )
     userHistory.value = response.data
