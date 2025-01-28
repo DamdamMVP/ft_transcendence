@@ -393,9 +393,15 @@ export default {
 
 .game-board {
   position: relative;
-  background-color: #f5f6fa;
+  background-color: #f2ddc3;
+  background-image: 
+    linear-gradient(90deg, rgba(139, 69, 19, 0.02) 50%, transparent 50%),
+    linear-gradient(90deg, rgba(139, 69, 19, 0.03) 50%, transparent 50%),
+    linear-gradient(90deg, transparent 50%, rgba(139, 69, 19, 0.04) 50%),
+    linear-gradient(90deg, transparent 50%, rgba(139, 69, 19, 0.05) 50%);
+  background-size: 13px, 29px, 37px, 53px;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(101, 67, 33, 0.1);
   overflow: hidden;
 }
 
@@ -479,17 +485,27 @@ export default {
 
 .wall {
   position: absolute;
-  background-color: #34495e;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .wall.horizontal {
   height: 10px;
+  background-color: #34495e;
+  opacity: 0;
 }
 
 .wall.vertical {
-  width: 10px;
+  width: 15px;
+  background-color: #c0392b;
+  background-image: 
+    linear-gradient(0deg, rgba(255,255,255,0.1) 0%, 
+                         rgba(255,255,255,0.2) 10%,
+                         rgba(255,255,255,0.1) 20%,
+                         rgba(255,255,255,0.05) 100%);
+  box-shadow: 
+    2px 0 5px rgba(0,0,0,0.1),
+    inset -1px 0 3px rgba(0,0,0,0.2);
 }
 
 .pause-message {
