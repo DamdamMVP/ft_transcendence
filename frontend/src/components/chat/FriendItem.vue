@@ -22,6 +22,13 @@
       >
         <span class="material-icons">{{ $t('friendList.icons.block') }}</span>
       </button>
+      <button
+        @click="$emit('delete', friend)"
+        class="friend-item__action-btn"
+        :title="$t('friendList.delete')"
+      >
+        <span class="material-icons">delete</span>
+      </button>
     </div>
   </div>
 </template>
@@ -34,7 +41,7 @@ defineProps({
   },
 })
 
-defineEmits(['chat', 'block'])
+defineEmits(['chat', 'block', 'delete'])
 </script>
 
 <style scoped>

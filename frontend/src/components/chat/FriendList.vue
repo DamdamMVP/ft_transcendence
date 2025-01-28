@@ -6,7 +6,7 @@
       v-if="notification.show"
       @close="notification.show = false"
     />
-    
+
     <!-- Icône de message flottante -->
     <div class="message-icon" @click="toggleExpand">
       <span class="material-icons">chat</span>
@@ -41,6 +41,7 @@
             :friend="friend"
             @chat="startChat"
             @block="blockUser"
+            @delete="deleteFriend"
           />
         </div>
 
@@ -81,14 +82,14 @@ const newFriendUsername = ref('')
 const notification = ref({
   show: false,
   message: '',
-  type: 'error'
+  type: 'error',
 })
 
 const showNotification = (message, type = 'error') => {
   notification.value = {
     show: true,
     message,
-    type
+    type,
   }
 }
 
@@ -100,13 +101,16 @@ onMounted(async () => {
 })
 
 // Surveiller les changements d'authentification
-watch(() => authStore.isAuthenticated, async (newValue) => {
-  if (newValue) {
-    await friendStore.loadFriends()
-  } else {
-    friendStore.friends = []
+watch(
+  () => authStore.isAuthenticated,
+  async (newValue) => {
+    if (newValue) {
+      await friendStore.loadFriends()
+    } else {
+      friendStore.friends = []
+    }
   }
-})
+)
 
 const filteredFriends = computed(() => {
   return friendStore.filteredFriends(searchQuery.value)
@@ -124,6 +128,15 @@ const blockUser = async (friend) => {
   try {
     await friendStore.blockUser(friend.username)
     showNotification('Utilisateur bloqué avec succès', 'success')
+  } catch (error) {
+    showNotification(error.message, 'error')
+  }
+}
+
+const deleteFriend = async (friend) => {
+  try {
+    await friendStore.removeFriend(friend.username)
+    showNotification('Ami supprimé avec succès', 'success')
   } catch (error) {
     showNotification(error.message, 'error')
   }
@@ -193,7 +206,7 @@ const addFriend = async () => {
   position: absolute;
   bottom: 60px;
   right: 0;
-  width: 300px;
+  width: 400px;
   background-color: var(--background-color);
   border: 1px solid var(--secondary-color);
   border-radius: 8px;
