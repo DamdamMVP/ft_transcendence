@@ -16,12 +16,11 @@
     </div>
 
     <!-- Panel de la friend list -->
-    <div v-if="isExpanded" class="friend-list">
+    <div v-if="isExpanded && !activeChatFriend" class="friend-list">
       <div class="friend-list__header" @click="toggleExpand">
         <h3>{{ $t('friendList.title') }}</h3>
         <span class="friend-list__online-count"
-          >{{ onlineFriendsCount }}
-          {{ $t('friendList.online') }}</span
+          >{{ onlineFriendsCount }} {{ $t('friendList.online') }}</span
         >
       </div>
 
@@ -62,6 +61,15 @@
         </div>
       </div>
     </div>
+
+    <!-- Fenêtres de chat -->
+    <ChatWindow
+      v-if="activeChatFriend && isExpanded"
+      :friend="activeChatFriend"
+      :is-open="true"
+      @close="closeChat"
+      @send-message="handleSendMessage"
+    />
   </div>
 </template>
 
@@ -73,6 +81,7 @@ import { useUserStatus } from '../../composables/useUserStatus'
 import AddFriendIcon from '../icons/AddFriendIcon.vue'
 import FriendItem from './FriendItem.vue'
 import Notification from '../Notification.vue'
+import ChatWindow from './ChatWindow.vue'
 
 const authStore = useAuthStore()
 const friendStore = useFriendStore()
@@ -87,8 +96,12 @@ const notification = ref({
   type: 'error',
 })
 
+const activeChatFriend = ref(null)
+
 const onlineFriendsCount = computed(() => {
-  return friendStore.friends.filter(friend => onlineUsers.value.has(friend.id)).length
+  return friendStore.friends.filter((friend) =>
+    onlineUsers.value.has(friend.id)
+  ).length
 })
 
 const showNotification = (message, type = 'error') => {
@@ -128,6 +141,16 @@ const toggleExpand = () => {
 
 const startChat = (friend) => {
   // TODO: Implémenter la logique de chat
+  activeChatFriend.value = friend
+}
+
+const closeChat = () => {
+  activeChatFriend.value = null
+}
+
+const handleSendMessage = (message) => {
+  console.log('Message envoyé:', message)
+  // Ici vous pourrez ajouter la logique pour envoyer le message via l'API
 }
 
 const blockUser = async (friend) => {

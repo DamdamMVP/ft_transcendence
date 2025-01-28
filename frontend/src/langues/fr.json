@@ -92,6 +92,11 @@
       "delete": "supprimer"
     }
   },
+  "chat": {
+    "typemessage": "Écrivez votre message...",
+    "send": "Envoyer",
+    "close": "Fermer"
+  },
   "stats": {
     "victories": "Victoires",
     "defeats": "Défaites",

@@ -74,7 +74,7 @@
   },
   "friendList": {
     "title": "Ma mignoned",
-    "online": "war-linenn",
+    "online": "enlinenn",
     "search": "Klask ur mignon",
     "addFriend": "Ouzhpennañ ur mignon",
     "block": "Stankañ",
@@ -84,8 +84,13 @@
     "icons": {
       "chat": "flapañ",
       "block": "stankañ",
-      "delete": "delete"
+      "delete": "dilemel"
     }
+  },
+  "chat": {
+    "typemessage": "Skrivit ho kemennadenn...",
+    "send": "Kas",
+    "close": "Serriñ"
   },
   "stats": {
     "victories": "Trec'hioù",
