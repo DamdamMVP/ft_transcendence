@@ -24,7 +24,7 @@ export function useUserStatus() {
     }
 
     console.log('Connecting to WebSocket...')
-    socket.value = new WebSocket('ws://localhost:8000/ws/status/')
+    socket.value = new WebSocket('/ws/status/')
 
     socket.value.onopen = () => {
       console.log('WebSocket connected')

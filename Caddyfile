@@ -3,16 +3,6 @@ localhost:443, c2r3p6:443 {
 
     # Frontend routes
     handle {
-        # WebSocket route
-        @websockets {
-            header Connection *Upgrade*
-            header Upgrade websocket
-        }
-        handle @websockets {
-            reverse_proxy backend:8000
-        }
-
-        # Static assets
         handle /assets/* {
             reverse_proxy frontend:5173
         }
@@ -24,6 +14,7 @@ localhost:443, c2r3p6:443 {
     }
 
     # Backend routes
+	
     handle /users/* {
         reverse_proxy backend:8000
     }
@@ -31,6 +22,12 @@ localhost:443, c2r3p6:443 {
         reverse_proxy backend:8000
     }
     handle /media/* {
+        reverse_proxy backend:8000
+    }
+	handle /ws/status/* {
+        reverse_proxy backend:8000
+    }
+	handle /ws/chat/* {
         reverse_proxy backend:8000
     }
 }
