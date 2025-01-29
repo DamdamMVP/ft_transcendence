@@ -3,7 +3,7 @@
     <div class="game-wrapper">
       <div class="player-column">
         <div class="player-name">{{ playerUsername }}</div>
-        <div v-if="gameStarted || gameOver" class="player-score">Score: {{ mouseScore }}</div>
+		        <div v-if="gameStarted || gameOver" class="player-score">Score: {{ mouseScore }}</div>
       </div>
       <div class="game-board" :class="{ 'blurred': !gameStarted || gameOver }"
            :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
@@ -39,10 +39,22 @@
 </template>
 
 <script>
+
 import jerry from '../../assets/jerry.png'
 import tom from '../../assets/tom.png'
+import { useRoute } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useAuthStore } from '../../stores/authStore'
+import axios from 'axios'
+import { useI18n } from 'vue-i18n'
+import eventBus from '../../utils/eventBus'
+
 
 export default {
+	setup() {
+    const authStore = useAuthStore()
+    return { authStore }
+  },
   name: 'CatAndMouseGame',
   props: {
     playerUsername: {
@@ -52,7 +64,7 @@ export default {
     guestUsername: {
       type: String,
       default: 'Invité'
-    }
+    },
   },
   data() {
     return {
@@ -76,9 +88,10 @@ export default {
       pressedKeys: new Set(),
       isPaused: false,
       countdown: 0,
+      isOvertime: false,
       walls: [
-        { x: 240, y: 150, width: 8, height: 240 },  // mur vertical gauche
-        { x: 720, y: 150, width: 8, height: 240 }   // mur vertical droit
+        { x: 240, y: 150, width: 8, height: 240 },
+        { x: 720, y: 150, width: 8, height: 240 }
       ]
     }
   },
@@ -113,12 +126,11 @@ export default {
     checkWallCollision(pos) {
       const playerSize = 20
       for (const wall of this.walls) {
-        // Vérifier si le joueur touche le mur
         if (pos.x < wall.x + wall.width &&
             pos.x + playerSize > wall.x &&
             pos.y < wall.y + wall.height &&
             pos.y + playerSize > wall.y) {
-          return true // Collision détectée
+          return true
         }
       }
       return false
@@ -126,10 +138,9 @@ export default {
     updatePositions() {
       if (this.gameOver || this.isPaused || !this.gameStarted || this.countdown != null) return
 
-      // Mouvement de la souris (WSAD)
       let newMouseX = this.mousePos.x
       let newMouseY = this.mousePos.y
-      const spriteSize = 15 // Moitié de la taille des sprites (30/2)
+      const spriteSize = 15
       let mouseMove = { x: 0, y: 0 }
 
       if (this.pressedKeys.has('w')) {
@@ -149,7 +160,6 @@ export default {
         mouseMove.x = this.moveSpeed
       }
 
-      // Mouvement du chat (8456)
       let newCatX = this.catPos.x
       let newCatY = this.catPos.y
       let catMove = { x: 0, y: 0 }
@@ -171,11 +181,9 @@ export default {
         catMove.x = this.moveSpeed
       }
 
-      // Appliquer les mouvements avec rebond sur les murs
       if (!this.checkWallCollision({ x: newMouseX, y: newMouseY })) {
         this.mousePos = { x: newMouseX, y: newMouseY }
       } else {
-        // Rebond de la souris
         this.mousePos = {
           x: Math.max(spriteSize, Math.min(this.mousePos.x - mouseMove.x * 3.5, this.boardWidth - spriteSize)),
           y: Math.max(spriteSize, Math.min(this.mousePos.y - mouseMove.y * 3.5, this.boardHeight - spriteSize))
@@ -185,27 +193,26 @@ export default {
       if (!this.checkWallCollision({ x: newCatX, y: newCatY })) {
         this.catPos = { x: newCatX, y: newCatY }
       } else {
-        // Rebond du chat
         this.catPos = {
           x: Math.max(spriteSize, Math.min(this.catPos.x - catMove.x * 3.5, this.boardWidth - spriteSize)),
           y: Math.max(spriteSize, Math.min(this.catPos.y - catMove.y * 3.5, this.boardHeight - spriteSize))
         }
       }
 
-      // Vérifier la collecte de fromage
       this.checkCheeseCollection()
 
-      // Vérifier la capture
       const dx = this.mousePos.x - this.catPos.x
       const dy = this.mousePos.y - this.catPos.y
       const distance = Math.sqrt(dx * dx + dy * dy)
 
       if (distance < this.catchDistance) {
         this.catScore++
+        if (this.isOvertime) {
+          this.endGame('cat')
+          return
+        }
         this.isPaused = true
         this.resetPositions()
-        
-        // Reprendre le jeu après 3 secondes
         this.spawnCheese()
         setTimeout(() => {
           this.isPaused = false
@@ -213,7 +220,6 @@ export default {
       }
     },
     spawnCheese() {
-      // Générer une position aléatoire pour le fromage
       const margin = 30
       let newPos
       do {
@@ -221,24 +227,26 @@ export default {
           x: margin + Math.random() * (this.boardWidth - 2 * margin),
           y: margin + Math.random() * (this.boardHeight - 2 * margin)
         }
-      } while (this.checkWallCollision(newPos)) // Réessayer si le fromage apparaît dans un mur
+      } while (this.checkWallCollision(newPos))
       
       this.cheesePos = newPos
     },
     checkCheeseCollection() {
       if (!this.cheesePos) return
 
-      // Calculer la distance entre la souris et le fromage
       const dx = this.mousePos.x - this.cheesePos.x
       const dy = this.mousePos.y - this.cheesePos.y
       const distance = Math.sqrt(dx * dx + dy * dy)
 
-      // Si la souris est assez proche du fromage
       if (distance < 30) {
-        this.mouseScore++ // Augmenter le score de la souris
-        this.cheesePos = null // Faire disparaître le fromage immédiatement
+        this.mouseScore++
+        if (this.isOvertime) {
+          this.endGame('mouse')
+          return
+        }
+        this.cheesePos = null
         setTimeout(() => {
-          this.spawnCheese() // Faire réapparaître un nouveau fromage après 1 seconde
+          this.spawnCheese()
         }, 1500)
       }
     },
@@ -246,8 +254,27 @@ export default {
       this.mousePos = { x: 40, y: 40 }
       this.catPos = { x: 900, y: 500 }
     },
+    async saveGameHistory() {
+      try {
+        const historyData = {
+		  user: this.authStore.user.id,
+          guest_name: this.guestUsername,
+          user_score: this.mouseScore,
+          guest_score: this.catScore,
+		  played_at: new Date().toISOString(),
+          game_name: 'catch',
+        }
+
+        await axios.post('/users/histories/add', historyData, {
+            withCredentials: true,
+        })
+        console.log('Historique sauvegardé avec succès')
+      } catch (error) {
+        console.error('Erreur lors de la sauvegarde de l\'historique:', error)
+      }
+    },
     startGame() {
-      this.spawnCheese() // Faire apparaître le premier fromage
+      this.spawnCheese()
       this.gameLoop = setInterval(this.updatePositions, 20)
       this.timer = setInterval(this.updateTimer, 1000)
       this.$refs.gameContainer.focus()
@@ -255,11 +282,16 @@ export default {
     updateTimer() {
       if (this.timeLeft > 0 && !this.isPaused && this.gameStarted && this.countdown == null) {
         this.timeLeft--
-      } else if (this.timeLeft <= 0 && !this.isPaused && this.gameStarted){
-        this.endGame()
+      } else if (this.timeLeft <= 0 && !this.isPaused && this.gameStarted) {
+        if (this.mouseScore === this.catScore) {
+          this.isOvertime = true
+          this.winner = 'Prolongation! Premier point gagne!'
+        } else {
+          this.endGame(this.mouseScore > this.catScore ? 'mouse' : 'cat')
+        }
       }
     },
-    endGame() {
+    endGame(winner) {
       this.gameStarted = false
       this.gameOver = true
       if (this.gameLoop) {
@@ -271,13 +303,13 @@ export default {
         this.timer = null
       }
       
-      if (this.catScore > this.mouseScore) {
+      if (winner === 'cat') {
         this.winner = `${this.guestUsername} gagne!`
-      } else if (this.mouseScore > this.catScore) {
-        this.winner = `${this.playerUsername} gagne!`
       } else {
-        this.winner = 'Match nul!'
+        this.winner = `${this.playerUsername} gagne!`
       }
+
+      this.saveGameHistory()
     },
     startNewGame() {
       this.gameStarted = true
@@ -285,10 +317,11 @@ export default {
       this.catPos = { x: 900, y: 500 }
       this.mouseScore = 0
       this.catScore = 0
-      this.timeLeft = 45
+      this.timeLeft = 40
       this.gameOver = false
       this.winner = ''
       this.pressedKeys.clear()
+      this.isOvertime = false
       this.startGame()
     },
     startCountdown() {
