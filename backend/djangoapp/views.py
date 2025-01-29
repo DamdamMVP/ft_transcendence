@@ -25,6 +25,8 @@ from django.urls import reverse
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import UserStatus
+import secrets
+import string
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -251,7 +253,6 @@ def updateProfilePicture(request, pk):
         return Response({'message': 'Profile picture updated successfully'}, status=200)
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=404)
-
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -608,24 +609,29 @@ def fortytwo_callback(request):
 
     user_data = response.json()
     
-    # Create or get user
     try:
         user = User.objects.get(email=user_data['email'])
     except User.DoesNotExist:
+        # Générer un mot de passe aléatoire sécurisé
+        random_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
         user = User.objects.create_user(
             email=user_data['email'],
             username=user_data['login'],
             first_name=user_data.get('first_name', ''),
             last_name=user_data.get('last_name', ''),
-            password=None  # No password needed for OAuth
+            password=random_password  # Utiliser le mot de passe aléatoire
         )
 
-    # Log the user in
+    # Authentifier et connecter l'utilisateur directement
+    user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request._request, user)
 
     # Create JWT tokens
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
+
+    print(f"User authentication status: {user.is_authenticated}")
+    print(f"Current user: {user.username}")
 
     response = redirect('/pong')  # Redirect to frontend
     response.set_cookie(
