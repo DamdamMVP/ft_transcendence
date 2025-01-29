@@ -610,6 +610,7 @@ def fortytwo_callback(request):
         return Response({'error': 'Failed to get user info'}, status=400)
 
     user_data = response.json()
+    print("42 API user data:", user_data)  # Debug log
     
     try:
         user = User.objects.get(email=user_data['email'])
@@ -623,6 +624,34 @@ def fortytwo_callback(request):
             last_name=user_data.get('last_name', ''),
             password=random_password  # Utiliser le mot de passe aléatoire
         )
+
+    # Récupérer et sauvegarder l'image de profil 42
+    if 'image' in user_data and 'link' in user_data['image']:
+        image_url = user_data['image']['link']
+        print("Image URL from 42:", image_url)  # Debug log
+        
+        image_response = requests.get(image_url)
+        print("Image response status:", image_response.status_code)  # Debug log
+        
+        if image_response.ok:
+            from django.core.files.base import ContentFile
+            import os
+            
+            # Créer un nom de fichier unique basé sur l'username
+            image_name = f"42_profile_{user.username}{os.path.splitext(image_url)[1]}"
+            print("Saving image as:", image_name)  # Debug log
+            
+            # Sauvegarder l'image
+            user.profile_picture.save(
+                image_name,
+                ContentFile(image_response.content),
+                save=True
+            )
+            print("Image saved successfully")  # Debug log
+        else:
+            print("Failed to download image:", image_response.text)  # Debug log
+    else:
+        print("No image URL found in user data")  # Debug log
 
     # Authentifier et connecter l'utilisateur directement
     user.backend = 'django.contrib.auth.backends.ModelBackend'
