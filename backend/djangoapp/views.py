@@ -627,7 +627,7 @@ def fortytwo_callback(request):
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
 
-    response = redirect('/users/login')  # Redirect to frontend
+    response = redirect('/pong')  # Redirect to frontend
     response.set_cookie(
         'access_token',
         access_token,
