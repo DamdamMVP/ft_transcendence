@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useAuth } from '../composables/useAuth'
+import { useUserStatus } from '../composables/useUserStatus'
 
 export const useAuthStore = defineStore('auth', () => {
   // État de l'authentification
   const isAuthenticated = ref(false)
   const user = ref(null)
   const { signOut } = useAuth()
+  const { closeWebSocket } = useUserStatus()
 
   // Initialiser l'état d'authentification au démarrage
   const initAuth = () => {
@@ -40,7 +42,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   const logout = async () => {
     try {
+      // Fermer le WebSocket avant la déconnexion
+      closeWebSocket()
+      
       await signOut()
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error)
     } finally {
       // Nettoyer l'état
       user.value = null

@@ -53,7 +53,11 @@ export function useAuth() {
       // Appeler le endpoint de déconnexion pour supprimer le cookie
       await axios.post('/users/logout')
     } catch (err) {
-      console.error('Erreur lors de la déconnexion:', err)
+      // Si l'erreur est 401, c'est normal (token expiré), on continue la déconnexion
+      if (err.response?.status !== 401) {
+        console.error('Erreur lors de la déconnexion:', err)
+        throw err
+      }
     } finally {
       // Nettoyer les données locales de l'utilisateur
       user.value = null
