@@ -67,6 +67,11 @@ const router = createRouter({
       name: 'Catch',
       component: CatchView,
     },
+    {
+      path: '/auth-callback',
+      name: 'AuthCallback',
+      component: () => import('../views/AuthCallback.vue')
+    },
   ],
 })
 

@@ -27,6 +27,8 @@ from django.core.exceptions import ValidationError
 from .models import UserStatus
 import secrets
 import string
+import json
+import urllib.parse
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -633,7 +635,19 @@ def fortytwo_callback(request):
     print(f"User authentication status: {user.is_authenticated}")
     print(f"Current user: {user.username}")
 
-    response = redirect('/pong')  # Redirect to frontend
+    # Créer l'URL avec les paramètres utilisateur
+    user_data = {
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'profile_picture': user.profile_picture.url if user.profile_picture else None,
+        'language': user.language,
+        'theme': user.theme,
+    }
+    
+    frontend_url = f'https://localhost:8443/auth-callback?user={urllib.parse.quote(json.dumps(user_data))}&token={access_token}'
+    response = redirect(frontend_url)
+    
     response.set_cookie(
         'access_token',
         access_token,
