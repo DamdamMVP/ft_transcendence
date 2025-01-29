@@ -64,8 +64,13 @@ const gameState = ref({
     y: canvasHeight / 2 - 40,
     width: 10,
     height: 80,
-    baseSpeed: 3,
+    baseSpeed: 2,
     targetY: canvasHeight / 2,
+    upPressed: false,
+    downPressed: false,
+    lastUpdateTime: 0,
+    updateInterval: 1000, // 1 seconde entre chaque mise à jour
+    predictedBallY: canvasHeight / 2,
   },
   ball: {
     x: canvasWidth / 2,
@@ -109,13 +114,59 @@ const paddleBounce = (who) => {
   }
 }
 
-const updateAITarget = () => {
+const predictBallPosition = () => {
   const state = gameState.value
-  state.ai.targetY = state.ball.y - state.ai.height / 2
-  state.ai.targetY = Math.min(
-    Math.max(state.ai.targetY, 0),
-    canvasHeight - state.ai.height
-  )
+  
+  // Si la balle s'éloigne de l'IA, rester au centre
+  if (state.ball.speedX <= 0) {
+    return canvasHeight / 2
+  }
+  
+  let futureX = state.ball.x
+  let futureY = state.ball.y
+  let speedX = state.ball.speedX
+  let speedY = state.ball.speedY
+  
+  // Prédire la trajectoire jusqu'à la raquette de l'IA
+  while (futureX < state.ai.x) {
+    futureX += speedX
+    futureY += speedY
+    
+    // Rebonds sur les murs
+    if (futureY < 0 || futureY > canvasHeight) {
+      speedY = -speedY
+    }
+  }
+  
+  return futureY
+}
+
+const updateAI = () => {
+  const state = gameState.value
+  const currentTime = Date.now()
+  
+  // Ne mettre à jour que toutes les secondes
+  if (currentTime - state.ai.lastUpdateTime >= state.ai.updateInterval) {
+    state.ai.lastUpdateTime = currentTime
+    
+    // Prédire où la balle va arriver
+    state.ai.predictedBallY = predictBallPosition()
+    
+    // Simuler des entrées clavier basées sur la prédiction
+    const paddleCenter = state.ai.y + state.ai.height / 2
+    const moveThreshold = 20 // Zone de tolérance
+    
+    if (paddleCenter < state.ai.predictedBallY - moveThreshold) {
+      state.ai.upPressed = false
+      state.ai.downPressed = true
+    } else if (paddleCenter > state.ai.predictedBallY + moveThreshold) {
+      state.ai.upPressed = true
+      state.ai.downPressed = false
+    } else {
+      state.ai.upPressed = false
+      state.ai.downPressed = false
+    }
+  }
 }
 
 const updateGame = () => {
@@ -137,23 +188,17 @@ const updateGame = () => {
     state.player.y += state.player.speed
   }
 
-  // Update AI target
-  updateAITarget()
-
-  // Mouvement constant de l'IA vers sa cible
-  const aiDiff = state.ai.targetY - state.ai.y
-  const aiCurrentSpeed =
-    state.ai.baseSpeed * (1 + playerScore.value * SPEED_INCREASE)
-
-  if (aiDiff > 0) {
-    state.ai.y += aiCurrentSpeed
-  } else if (aiDiff < 0) {
+  // Update AI
+  updateAI()
+  
+  // Appliquer les mouvements de l'IA basés sur les touches simulées
+  const aiCurrentSpeed = state.ai.baseSpeed * (1 + playerScore.value * SPEED_INCREASE)
+  
+  if (state.ai.upPressed && state.ai.y > 0) {
     state.ai.y -= aiCurrentSpeed
   }
-
-  if (state.ai.y < 0) state.ai.y = 0
-  if (state.ai.y + state.ai.height > canvasHeight) {
-    state.ai.y = canvasHeight - state.ai.height
+  if (state.ai.downPressed && state.ai.y + state.ai.height < canvasHeight) {
+    state.ai.y += aiCurrentSpeed
   }
 
   // Calculer la prochaine position de la balle

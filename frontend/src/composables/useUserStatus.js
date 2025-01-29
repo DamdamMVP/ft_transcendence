@@ -99,6 +99,6 @@ export function useUserStatus() {
     initializeWebSocket,
     closeWebSocket,
     isUserOnline,
-    onlineUsers
+    onlineUsers,
   }
 }
