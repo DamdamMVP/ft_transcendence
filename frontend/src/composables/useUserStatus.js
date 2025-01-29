@@ -2,9 +2,11 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
 
+// Singleton pattern pour le WebSocket
+let socket = null
+const onlineUsers = ref(new Set())
+
 export function useUserStatus() {
-  const socket = ref(null)
-  const onlineUsers = ref(new Set())
   const authStore = useAuthStore()
 
   const fetchOnlineUsers = async () => {
@@ -17,21 +19,26 @@ export function useUserStatus() {
     }
   }
 
-  const connectWebSocket = () => {
+  const initializeWebSocket = () => {
+    if (socket) {
+      console.log('WebSocket already initialized')
+      return
+    }
+
     if (!authStore.isAuthenticated) {
       console.log('Not connecting WebSocket: user not authenticated')
       return
     }
 
     console.log('Connecting to WebSocket...')
-    socket.value = new WebSocket('/ws/status/')
+    socket = new WebSocket('/ws/status/')
 
-    socket.value.onopen = () => {
+    socket.onopen = () => {
       console.log('WebSocket connected')
-      fetchOnlineUsers() // Récupérer la liste initiale une fois connecté
+      fetchOnlineUsers()
     }
 
-    socket.value.onmessage = (event) => {
+    socket.onmessage = (event) => {
       const data = JSON.parse(event.data)
       console.log('WebSocket message received:', data)
       if (data.type === 'user_status') {
@@ -44,10 +51,13 @@ export function useUserStatus() {
       }
     }
 
-    socket.value.onclose = () => {
+    socket.onclose = (event) => {
+      console.log('WebSocket closed:', event)
+      socket = null
+      onlineUsers.value.clear()
       if (authStore.isAuthenticated) {
         console.log('WebSocket disconnected, attempting to reconnect...')
-        setTimeout(connectWebSocket, 1000)
+        setTimeout(initializeWebSocket, 1000)
       } else {
         console.log(
           'WebSocket disconnected, not reconnecting (user not authenticated)'
@@ -55,50 +65,40 @@ export function useUserStatus() {
       }
     }
 
-    socket.value.onerror = (error) => {
+    socket.onerror = (error) => {
       console.error('WebSocket error:', error)
+      socket = null
     }
   }
 
   const closeWebSocket = () => {
-    if (socket.value) {
+    if (socket) {
       console.log('Closing WebSocket connection...')
-      socket.value.close()
-      socket.value = null
+      socket.close()
+      socket = null
       onlineUsers.value.clear()
     }
   }
 
   const isUserOnline = (userId) => {
-    const isOnline = onlineUsers.value.has(userId)
-    console.log('Checking online status for user', userId, ':', isOnline)
-    return isOnline
+    return onlineUsers.value.has(userId)
   }
 
-  // Watch for authentication changes
   watch(
     () => authStore.isAuthenticated,
     (isAuthenticated) => {
       if (isAuthenticated) {
-        connectWebSocket()
+        initializeWebSocket()
       } else {
         closeWebSocket()
       }
     }
   )
 
-  onMounted(() => {
-    if (authStore.isAuthenticated) {
-      connectWebSocket()
-    }
-  })
-
-  onUnmounted(() => {
-    closeWebSocket()
-  })
-
   return {
+    initializeWebSocket,
+    closeWebSocket,
     isUserOnline,
-    onlineUsers,
+    onlineUsers
   }
 }

@@ -3,7 +3,7 @@
     <div class="friend-item__info">
       <div
         class="friend-item__status-indicator"
-        :class="{ online: isUserOnline(friend.id) }"
+        :class="{ online: isOnline }"
       ></div>
       <span class="friend-item__name">{{ friend.username }}</span>
     </div>
@@ -35,6 +35,7 @@
 
 <script setup>
 import { useUserStatus } from '@/composables/useUserStatus'
+import { computed } from 'vue'
 
 const props = defineProps({
   friend: {
@@ -43,7 +44,11 @@ const props = defineProps({
   },
 })
 
-const { isUserOnline } = useUserStatus()
+const { onlineUsers } = useUserStatus()
+
+const isOnline = computed(() => {
+  return onlineUsers.value.has(props.friend.id)
+})
 
 defineEmits(['chat', 'block', 'delete'])
 </script>

@@ -3,10 +3,12 @@ import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useUserStatus } from '@/composables/useUserStatus'
 
 const emit = defineEmits(['success', 'switch-mode'])
 const router = useRouter()
 const authStore = useAuthStore()
+const { initializeWebSocket } = useUserStatus()
 
 const email = ref('')
 const password = ref('')
@@ -33,6 +35,9 @@ const handleSignIn = async () => {
     if (result.success) {
       // Mettre à jour le store d'authentification avec l'utilisateur et le token
       authStore.login(result.data.user, result.data.token)
+      
+      // Initialiser le WebSocket
+      initializeWebSocket()
       
       email.value = ''
       password.value = ''

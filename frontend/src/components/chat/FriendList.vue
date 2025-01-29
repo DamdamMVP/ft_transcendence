@@ -90,27 +90,23 @@ const { onlineUsers } = useUserStatus()
 const isExpanded = ref(false)
 const searchQuery = ref('')
 const newFriendUsername = ref('')
+const activeChatFriend = ref(null)
 const notification = ref({
   show: false,
   message: '',
   type: 'error',
 })
 
-const activeChatFriend = ref(null)
-
 const onlineFriendsCount = computed(() => {
-  return friendStore.friends.filter((friend) =>
-    onlineUsers.value.has(friend.id)
-  ).length
+  return friendStore.friends.filter((friend) => onlineUsers.value.has(friend.id)).length
 })
 
-const showNotification = (message, type = 'error') => {
-  notification.value = {
-    show: true,
-    message,
-    type,
-  }
-}
+const filteredFriends = computed(() => {
+  return friendStore.friends.filter(
+    (friend) =>
+      friend.username.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
 
 // Charger la liste d'amis au montage du composant et quand l'authentification change
 onMounted(async () => {
@@ -130,10 +126,6 @@ watch(
     }
   }
 )
-
-const filteredFriends = computed(() => {
-  return friendStore.filteredFriends(searchQuery.value)
-})
 
 const toggleExpand = () => {
   isExpanded.value = !isExpanded.value
@@ -180,6 +172,14 @@ const addFriend = async () => {
     } catch (error) {
       showNotification(error.message, 'error')
     }
+  }
+}
+
+const showNotification = (message, type = 'error') => {
+  notification.value = {
+    show: true,
+    message,
+    type,
   }
 }
 </script>
