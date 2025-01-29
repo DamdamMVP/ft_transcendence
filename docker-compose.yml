@@ -52,6 +52,7 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - HOSTNAME=${HOSTNAME}
     ports:
       - '5432:5432'
     volumes:
@@ -62,8 +63,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.caddy
+    env_file:
+      - .env
     ports:
-      - "8443:443"
+      - '8443:443'
     volumes:
       - caddy_data:/data
       - caddy_config:/config
