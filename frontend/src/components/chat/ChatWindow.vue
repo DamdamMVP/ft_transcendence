@@ -20,8 +20,11 @@
             : 'message--received',
         ]"
       >
-        <p>{{ message.message }}</p>
-        <span class="message__time">{{ formatTime(message.timestamp) }}</span>
+        <div class="message__header">
+          <span class="message__sender">{{ message.sender }}</span>
+          <span class="message__time">{{ formatTime(message.timestamp) }}</span>
+        </div>
+        <p class="message__content">{{ message.message }}</p>
       </div>
     </div>
 
@@ -59,7 +62,11 @@ const emit = defineEmits(['close'])
 const messageText = ref('')
 const messages = ref([])
 const messagesContainer = ref(null)
-const { connectToChat, disconnectFromChat, sendMessage: sendWebSocketMessage } = usePrivateChat()
+const {
+  connectToChat,
+  disconnectFromChat,
+  sendMessage: sendWebSocketMessage,
+} = usePrivateChat()
 const authStore = useAuthStore()
 
 // Obtenir l'utilisateur actuel directement depuis le store
@@ -69,7 +76,9 @@ const currentUser = computed(() => authStore.user)
 const isGeneralChannel = computed(() => props.friend.isChannel)
 
 // Obtient le nom d'affichage approprié
-const displayName = computed(() => isGeneralChannel.value ? '#general' : props.friend.username)
+const displayName = computed(() =>
+  isGeneralChannel.value ? '#general' : props.friend.username
+)
 
 const closeChat = () => {
   if (currentUser.value && props.friend) {
@@ -154,22 +163,25 @@ onUnmounted(() => {
   }
 })
 
-watch(() => props.isOpen, (newValue) => {
-  if (newValue && props.friend && currentUser.value && !ws) {
-    if (isGeneralChannel.value) {
-      ws = connectToChat('general', 'general')
-    } else {
-      ws = connectToChat(currentUser.value.username, props.friend.username)
+watch(
+  () => props.isOpen,
+  (newValue) => {
+    if (newValue && props.friend && currentUser.value && !ws) {
+      if (isGeneralChannel.value) {
+        ws = connectToChat('general', 'general')
+      } else {
+        ws = connectToChat(currentUser.value.username, props.friend.username)
+      }
+    } else if (!newValue && ws && currentUser.value && props.friend) {
+      if (isGeneralChannel.value) {
+        disconnectFromChat('general', 'general')
+      } else {
+        disconnectFromChat(currentUser.value.username, props.friend.username)
+      }
+      ws = null
     }
-  } else if (!newValue && ws && currentUser.value && props.friend) {
-    if (isGeneralChannel.value) {
-      disconnectFromChat('general', 'general')
-    } else {
-      disconnectFromChat(currentUser.value.username, props.friend.username)
-    }
-    ws = null
   }
-})
+)
 </script>
 
 <style scoped>
@@ -207,31 +219,49 @@ watch(() => props.isOpen, (newValue) => {
 }
 
 .message {
-  max-width: 70%;
+  margin: 8px;
   padding: 8px 12px;
-  border-radius: 12px;
-  position: relative;
+  border-radius: 8px;
+  max-width: 70%;
 }
 
-.message--sent {
-  align-self: flex-end;
-  background-color: var(--primary-color);
-  color: white;
-  border-bottom-right-radius: 4px;
+.message__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 0.8em;
 }
 
-.message--received {
-  align-self: flex-start;
-  background-color: var(--secondary-color);
-  color: var(--text-color);
-  border-bottom-left-radius: 4px;
+.message__sender {
+  font-weight: 500;
+  color: var(--text-secondary-color);
 }
 
 .message__time {
-  font-size: 0.75rem;
-  opacity: 0.7;
-  margin-top: 4px;
-  display: block;
+  color: var(--text-secondary-color);
+  margin-left: 8px;
+}
+
+.message__content {
+  margin: 0;
+  word-break: break-word;
+}
+
+.message--sent {
+  background-color: var(--primary-color);
+  color: white;
+  margin-left: auto;
+}
+
+.message--sent .message__sender,
+.message--sent .message__time {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.message--received {
+  background-color: var(--secondary-color);
+  margin-right: auto;
 }
 
 .chat-window__input {
