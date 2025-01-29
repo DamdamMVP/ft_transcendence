@@ -195,33 +195,6 @@ def deleteUser(request, pk):
     user.delete()
     return Response({'message': 'User successfully deleted!'}, status=200)
 
-# User login
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def connect(request):
-    from django.shortcuts import redirect
-    import os
-    from urllib.parse import urlencode
-
-    # Google OAuth2 parameters
-    params = {
-        'client_id': os.getenv('GOOGLE_CLIENT_ID'),
-        'redirect_uri': 'http://localhost:8000/accounts/google/login/callback/',
-        'scope': 'email profile',
-        'response_type': 'code',
-        'access_type': 'online',
-        'service': 'lso',
-        'o2v': '2',
-        'flowName': 'GeneralOAuthFlow'
-    }
-    
-    # Construct the Google OAuth URL
-    base_url = 'https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount'
-    oauth_url = f"{base_url}?{urlencode(params)}"
-    
-    return redirect(oauth_url)
-
-
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def updateProfilePicture(request, pk):
@@ -509,8 +482,10 @@ def fortytwo_login(request):
     Initiate the 42 OAuth flow
     """
     client_id = settings.FORTYTWO_CLIENT_ID
-    redirect_uri = 'https://localhost:8443/users/fortytwo/callback/'
+    hostname = settings.HOSTNAME  # Récupère le hostname défini dans l'environnement
+    redirect_uri = f'https://{hostname}:8443/users/fortytwo/callback/'  # Remplace localhost
     auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code'
+    
     return redirect(auth_url)
 
 @api_view(['GET'])
@@ -530,7 +505,7 @@ def fortytwo_callback(request):
         'client_id': settings.FORTYTWO_CLIENT_ID,
         'client_secret': settings.FORTYTWO_CLIENT_SECRET,
         'code': code,
-        'redirect_uri': 'https://localhost:8443/users/fortytwo/callback/'
+        'redirect_uri': f'https://{settings.HOSTNAME}:8443/users/fortytwo/callback/'
     }
     
     response = requests.post(token_url, data=data)
@@ -612,7 +587,7 @@ def fortytwo_callback(request):
         'theme': user.theme,
     }
     
-    frontend_url = f'https://localhost:8443/auth-callback?user={urllib.parse.quote(json.dumps(user_data))}&token={access_token}'
+    frontend_url = f'https://{settings.HOSTNAME}:8443/auth-callback?user={urllib.parse.quote(json.dumps(user_data))}&token={access_token}'
     response = redirect(frontend_url)
     
     response.set_cookie(

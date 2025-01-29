@@ -15,8 +15,6 @@ const password = ref('')
 const error = ref('')
 const isLoading = ref(false)
 
-const { signIn, googleSignIn } = useAuth()
-
 const handleSignIn = async () => {
   if (!email.value || !password.value) {
     error.value = 'Veuillez remplir tous les champs'
@@ -54,12 +52,8 @@ const handleSignIn = async () => {
   }
 }
 
-const handleGoogleSignIn = () => {
-  window.location.href = 'http://localhost:8000/accounts/google/login/'
-}
-
 const handle42SignIn = () => {
-  window.location.href = 'http://localhost:8000/users/fortytwo/login/'
+  window.location.href = '/users/fortytwo/login/'
 }
 
 const forgotPassword = () => {
@@ -111,13 +105,6 @@ const forgotPassword = () => {
     </div>
 
     <div class="social-buttons">
-      <button 
-        class="google-button"
-        @click="handleGoogleSignIn"
-        :disabled="isLoading"
-      >
-        Connect with Google
-      </button>
       <button 
         class="fortytwo-button"
         @click="handle42SignIn"
@@ -216,7 +203,6 @@ const forgotPassword = () => {
   margin-top: 20px;
 }
 
-.google-button,
 .fortytwo-button {
   width: 100%;
   padding: 10px;
@@ -227,18 +213,9 @@ const forgotPassword = () => {
   transition: background-color 0.3s;
 }
 
-.google-button {
-  background-color: #4285f4;
-  color: white;
-}
-
 .fortytwo-button {
   background-color: #00babc;
   color: white;
-}
-
-.google-button:hover {
-  background-color: #357abd;
 }
 
 .fortytwo-button:hover {

@@ -14,7 +14,6 @@ urlpatterns = [
     path('read/<str:pk>', views.getUser),
     path('update/<str:pk>', views.updateUser),
     path('delete/<str:pk>', views.deleteUser),
-    path('connect', views.connect),  # Login route
     path('update_profile_picture/<str:pk>', views.updateProfilePicture),
     path('update_password/<str:pk>', views.updatePassword),
     path('update_language/<str:pk>', views.updateLanguage),
