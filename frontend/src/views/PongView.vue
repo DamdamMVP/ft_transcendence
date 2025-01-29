@@ -1,6 +1,6 @@
 <template>
   <div class="pong-container">
-    pong
+    <router-view></router-view>
   </div>
 </template>
 
@@ -9,6 +9,8 @@
 
 <style scoped>
 .pong-container {
-  padding: 20px;
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
 }
 </style>
