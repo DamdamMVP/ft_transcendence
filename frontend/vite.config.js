@@ -16,6 +16,6 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     cors: true,
-    allowedHosts: ['c2r3p6', 'c2r3p5'] 
+    allowedHosts: ['c2r3p6', 'c2r3p6'] 
   },
 })

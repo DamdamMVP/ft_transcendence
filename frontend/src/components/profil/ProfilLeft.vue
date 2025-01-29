@@ -1,6 +1,5 @@
 <script setup>
 import { useAuthStore } from '../../stores/authStore'
-<<<<<<< HEAD
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
@@ -68,20 +67,6 @@ onUnmounted(() => {
 const profilePhotoUrl = computed(
   () => `http://localhost:8000${authStore.user.profile_picture}`
 )
-=======
-import { computed } from 'vue'
-
-const authStore = useAuthStore()
-
-// URL de l'image par défaut avec le bon chemin backend
-const defaultProfilePicture = 'http://localhost:8000/media/profile_pictures/default.jpg'
-
-const profilePhotoUrl = computed(() => {
-  return authStore.user?.profile_picture
-    ? `http://localhost:8000${authStore.user.profile_picture}`
-    : defaultProfilePicture
-})
->>>>>>> 442b837 (+: profil folder)
 </script>
 
 <template>
@@ -95,7 +80,6 @@ const profilePhotoUrl = computed(() => {
         :alt="authStore.user?.username || 'Profile Picture'"
         class="profile-picture"
       />
-<<<<<<< HEAD
       <div class="stats-container">
         <div class="stat-item">
           <span class="stat-label">{{ t('stats.victories') }}</span>
@@ -110,8 +94,6 @@ const profilePhotoUrl = computed(() => {
           <span class="stat-value">{{ stats.winRate }}%</span>
         </div>
       </div>
-=======
->>>>>>> 442b837 (+: profil folder)
       <p class="profile-stats" v-if="authStore.user?.stats">
         W: {{ authStore.user.stats.wins || 0 }} | L:
         {{ authStore.user.stats.losses || 0 }}

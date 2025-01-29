@@ -1,4 +1,4 @@
-localhost:443, c2r2p6:443 {
+localhost:443, c2r3p6:443 {
     tls internal
 
     # Frontend routes

@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-vvw5a!owa!r6eqep12wpb1!k^bzx+ey=_z11-5n_$y6dfi$a!6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['c2r3p6', 'c2r3p5', 'localhost']
+ALLOWED_HOSTS = ['c2r3p6', 'c2r3p6', 'localhost']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -122,11 +122,6 @@ def get_local_ip():
 
 local_ip = get_local_ip()
 print(local_ip)
-
-print("local_ip : ",local_ip)
-# print(local_ip)
-
-
 
 ALLOWED_HOSTS = [
     '*',

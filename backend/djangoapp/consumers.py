@@ -153,7 +153,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         Function to retrieve IDs of users blocked by the current user.
         """
         return list(Block.objects.filter(blocker=user).values_list("blocked_id", flat=True))
-<<<<<<< HEAD
 
 
 class StatusConsumer(AsyncWebsocketConsumer):
@@ -191,5 +190,3 @@ class StatusConsumer(AsyncWebsocketConsumer):
             "is_online": event["is_online"]
         }))
 
-=======
->>>>>>> 7845085 (+: add online status via websocket)
