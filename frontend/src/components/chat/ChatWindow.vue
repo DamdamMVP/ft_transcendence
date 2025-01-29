@@ -4,20 +4,24 @@
       <div class="chat-window__user-info">
         <span class="chat-window__username">{{ friend.username }}</span>
       </div>
-      <button @click="$emit('close')" class="chat-window__close-btn">
+      <button @click="closeChat" class="chat-window__close-btn">
         <span class="material-icons">{{ $t('chat.close') }}</span>
       </button>
     </div>
 
-    <div class="chat-window__messages">
-      <!-- Ici nous simulerons quelques messages pour l'exemple -->
-      <div class="message message--received">
-        <p>Hello!</p>
-        <span class="message__time">10:00</span>
-      </div>
-      <div class="message message--sent">
-        <p>Hi there!</p>
-        <span class="message__time">10:01</span>
+    <div class="chat-window__messages" ref="messagesContainer">
+      <div
+        v-for="(message, index) in messages"
+        :key="index"
+        :class="[
+          'message',
+          message.sender === currentUser.username
+            ? 'message--sent'
+            : 'message--received',
+        ]"
+      >
+        <p>{{ message.message }}</p>
+        <span class="message__time">{{ formatTime(message.timestamp) }}</span>
       </div>
     </div>
 
@@ -36,7 +40,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
+import { usePrivateChat } from '../../composables/usePrivateChat'
+import { useAuthStore } from '../../stores/authStore'
 
 const props = defineProps({
   friend: {
@@ -49,19 +55,98 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['close', 'send-message'])
+const emit = defineEmits(['close'])
 const messageText = ref('')
+const messages = ref([])
+const messagesContainer = ref(null)
+const {
+  connectToChat,
+  disconnectFromChat,
+  sendMessage: sendWebSocketMessage,
+} = usePrivateChat()
+const authStore = useAuthStore()
+
+// Obtenir l'utilisateur actuel directement depuis le store
+const currentUser = computed(() => authStore.user)
+
+const closeChat = () => {
+  if (currentUser.value && props.friend) {
+    disconnectFromChat(currentUser.value.username, props.friend.username)
+  }
+  emit('close')
+}
+
+const formatTime = (timestamp) => {
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+const scrollToBottom = async () => {
+  await nextTick()
+  if (messagesContainer.value) {
+    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+  }
+}
 
 const sendMessage = () => {
-  if (messageText.value.trim()) {
-    emit('send-message', {
-      text: messageText.value,
-      timestamp: new Date(),
-      to: props.friend.id,
-    })
+  if (!messageText.value.trim() || !currentUser.value || !props.friend) return
+
+  const success = sendWebSocketMessage(
+    currentUser.value.username,
+    props.friend.username,
+    messageText.value
+  )
+
+  if (success) {
     messageText.value = ''
   }
 }
+
+// Initialiser la connexion WebSocket
+let ws = null
+
+onMounted(() => {
+  if (props.isOpen && props.friend && currentUser.value) {
+    ws = connectToChat(currentUser.value.username, props.friend.username)
+
+    if (ws) {
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data)
+          // Ne traiter que les messages qui contiennent un message de chat
+          if (data.message !== undefined) {
+            messages.value.push({
+              message: data.message,
+              sender: data.sender,
+              timestamp: data.timestamp,
+            })
+            scrollToBottom()
+          }
+        } catch (error) {
+          console.error('Error processing message:', error)
+        }
+      }
+    }
+  }
+})
+
+onUnmounted(() => {
+  if (ws && currentUser.value && props.friend) {
+    disconnectFromChat(currentUser.value.username, props.friend.username)
+  }
+})
+
+watch(
+  () => props.isOpen,
+  (newValue) => {
+    if (newValue && props.friend && currentUser.value && !ws) {
+      ws = connectToChat(currentUser.value.username, props.friend.username)
+    } else if (!newValue && ws && currentUser.value && props.friend) {
+      disconnectFromChat(currentUser.value.username, props.friend.username)
+      ws = null
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -88,63 +173,35 @@ const sendMessage = () => {
   border-radius: 8px 8px 0 0;
 }
 
-.chat-window__user-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chat-window__avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-}
-
-.chat-window__username {
-  font-weight: 500;
-  color: white;
-}
-
-.chat-window__close-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: white;
-}
-
-.chat-window__close-btn:hover {
-  opacity: 0.8;
-}
-
 .chat-window__messages {
-  flex: 1;
-  padding: 16px;
+  flex-grow: 1;
   overflow-y: auto;
+  padding: 15px;
+  max-height: 300px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 300px;
-  background-color: var(--background-color);
+  gap: 10px;
 }
 
 .message {
   max-width: 70%;
   padding: 8px 12px;
-  border-radius: 16px;
+  border-radius: 12px;
   position: relative;
-}
-
-.message--received {
-  align-self: flex-start;
-  background-color: var(--secondary-color);
-  color: var(--text-color);
 }
 
 .message--sent {
   align-self: flex-end;
   background-color: var(--primary-color);
   color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message--received {
+  align-self: flex-start;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border-bottom-left-radius: 4px;
 }
 
 .message__time {
@@ -155,32 +212,32 @@ const sendMessage = () => {
 }
 
 .chat-window__input {
-  padding: 10px;
+  padding: 15px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
   border-top: 1px solid var(--secondary-color);
-  background-color: var(--background-color);
 }
 
 .chat-window__input input {
-  flex: 1;
-  padding: 8px;
+  flex-grow: 1;
+  padding: 8px 12px;
   border: 1px solid var(--secondary-color);
-  border-radius: 4px;
+  border-radius: 20px;
   background-color: var(--background-color);
   color: var(--text-color);
 }
 
+.chat-window__close-btn,
 .chat-window__send-btn {
-  background-color: var(--primary-color);
+  background: none;
   border: none;
-  border-radius: 4px;
-  color: white;
   cursor: pointer;
-  padding: 8px;
+  color: var(--text-color);
+  padding: 4px;
 }
 
+.chat-window__close-btn:hover,
 .chat-window__send-btn:hover {
-  background-color: var(--primary-hover-color);
+  color: var(--primary-color);
 }
 </style>
