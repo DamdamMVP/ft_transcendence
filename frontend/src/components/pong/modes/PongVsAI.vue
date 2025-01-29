@@ -7,45 +7,21 @@
         :width="canvasWidth"
         :height="canvasHeight"
       ></canvas>
-      
+
       <div class="score-board">
         <div class="player">
           <h3>Joueur</h3>
           <p class="score">{{ playerScore }}</p>
-          <p class="controls">Contrôles: Z / S</p>
+          <p class="controls">Contrôles: F / S</p>
         </div>
         <div class="player">
           <h3>IA</h3>
           <p class="score">{{ aiScore }}</p>
-          <p class="controls">Difficulté: {{ difficulty }}</p>
         </div>
       </div>
 
       <div v-if="!isPlaying" class="game-overlay">
         <div class="start-menu">
-          <div class="difficulty-select">
-            <h3>Sélectionnez la difficulté</h3>
-            <div class="difficulty-buttons">
-              <button 
-                @click="setDifficulty('Facile')" 
-                :class="['difficulty-button', { active: difficulty === 'Facile' }]"
-              >
-                Facile
-              </button>
-              <button 
-                @click="setDifficulty('Moyen')" 
-                :class="['difficulty-button', { active: difficulty === 'Moyen' }]"
-              >
-                Moyen
-              </button>
-              <button 
-                @click="setDifficulty('Difficile')" 
-                :class="['difficulty-button', { active: difficulty === 'Difficile' }]"
-              >
-                Difficile
-              </button>
-            </div>
-          </div>
           <button @click="startGame" class="start-button">
             Commencer la partie
           </button>
@@ -57,10 +33,8 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useAuthStore } from '../../../stores/authStore'
 import { useTheme } from '../../../composables/useTheme'
 
-const authStore = useAuthStore()
 const { currentTheme } = useTheme()
 const gameCanvas = ref(null)
 const canvasWidth = 800
@@ -68,65 +42,244 @@ const canvasHeight = 400
 const playerScore = ref(0)
 const aiScore = ref(0)
 const isPlaying = ref(false)
-const difficulty = ref('Moyen')
+
+const WINNING_SCORE = 5
+const SPEED_INCREASE = 0.2
+const INITIAL_BALL_SPEED = 5
+const BALL_SPEED_INCREASE = 1.1 // 10% plus rapide à chaque rebond
+const MAX_BALL_SPEED = 10 // Vitesse maximale de la balle
 
 const gameState = ref({
   player: {
-    y: canvasHeight / 2,
-    height: 60,
+    x: 20,
+    y: canvasHeight / 2 - 40,
     width: 10,
-    speed: 5,
+    height: 80,
+    speed: 6,
     upPressed: false,
-    downPressed: false
+    downPressed: false,
   },
   ai: {
-    y: canvasHeight / 2,
-    height: 60,
+    x: canvasWidth - 30,
+    y: canvasHeight / 2 - 40,
     width: 10,
-    speed: 5
+    height: 80,
+    baseSpeed: 3,
+    targetY: canvasHeight / 2,
   },
   ball: {
     x: canvasWidth / 2,
     y: canvasHeight / 2,
-    radius: 5,
-    speed: 5,
-    dx: 5,
-    dy: 0
-  }
+    radius: 8,
+    speedX: INITIAL_BALL_SPEED,
+    speedY: INITIAL_BALL_SPEED,
+  },
 })
 
-const setDifficulty = (level) => {
-  difficulty.value = level
+const paddleBounce = (who) => {
   const state = gameState.value
-  switch(level) {
-    case 'Facile':
-      state.ai.speed = 3
-      state.ball.speed = 4
-      break
-    case 'Moyen':
-      state.ai.speed = 5
-      state.ball.speed = 5
-      break
-    case 'Difficile':
-      state.ai.speed = 7
-      state.ball.speed = 6
-      break
+
+  // Augmente la vitesse de la balle
+  let currentSpeed = Math.sqrt(
+    state.ball.speedX * state.ball.speedX +
+      state.ball.speedY * state.ball.speedY
+  )
+
+  // Applique l'augmentation de vitesse avec une limite
+  currentSpeed = Math.min(currentSpeed * BALL_SPEED_INCREASE, MAX_BALL_SPEED)
+
+  let paddle
+  if (who === 'player') {
+    paddle = state.player
+  } else {
+    paddle = state.ai
   }
+
+  const paddleCenter = paddle.y + paddle.height / 2
+  const distFromCenter = (state.ball.y - paddleCenter) / (paddle.height / 2)
+  const maxBounceAngle = 60 * (Math.PI / 180)
+  const bounceAngle = distFromCenter * maxBounceAngle
+
+  if (who === 'player') {
+    state.ball.speedX = Math.abs(currentSpeed * Math.cos(bounceAngle))
+    state.ball.speedY = currentSpeed * Math.sin(bounceAngle)
+  } else {
+    state.ball.speedX = -Math.abs(currentSpeed * Math.cos(bounceAngle))
+    state.ball.speedY = currentSpeed * Math.sin(bounceAngle)
+  }
+}
+
+const updateAITarget = () => {
+  const state = gameState.value
+  state.ai.targetY = state.ball.y - state.ai.height / 2
+  state.ai.targetY = Math.min(
+    Math.max(state.ai.targetY, 0),
+    canvasHeight - state.ai.height
+  )
+}
+
+const updateGame = () => {
+  const state = gameState.value
+
+  if (playerScore.value >= WINNING_SCORE || aiScore.value >= WINNING_SCORE) {
+    isPlaying.value = false
+    return
+  }
+
+  // Update player
+  if (state.player.upPressed && state.player.y > 0) {
+    state.player.y -= state.player.speed
+  }
+  if (
+    state.player.downPressed &&
+    state.player.y + state.player.height < canvasHeight
+  ) {
+    state.player.y += state.player.speed
+  }
+
+  // Update AI target
+  updateAITarget()
+
+  // Mouvement constant de l'IA vers sa cible
+  const aiDiff = state.ai.targetY - state.ai.y
+  const aiCurrentSpeed =
+    state.ai.baseSpeed * (1 + playerScore.value * SPEED_INCREASE)
+
+  if (aiDiff > 0) {
+    state.ai.y += aiCurrentSpeed
+  } else if (aiDiff < 0) {
+    state.ai.y -= aiCurrentSpeed
+  }
+
+  if (state.ai.y < 0) state.ai.y = 0
+  if (state.ai.y + state.ai.height > canvasHeight) {
+    state.ai.y = canvasHeight - state.ai.height
+  }
+
+  // Calculer la prochaine position de la balle
+  const nextX = state.ball.x + state.ball.speedX
+  const nextY = state.ball.y + state.ball.speedY
+
+  // Vérifier les collisions avec les raquettes avant de déplacer la balle
+  let collision = false
+
+  // Collision avec la raquette du joueur
+  if (
+    nextX - state.ball.radius <= state.player.x + state.player.width &&
+    nextX - state.ball.radius >= state.player.x &&
+    state.ball.y >= state.player.y &&
+    state.ball.y <= state.player.y + state.player.height &&
+    state.ball.speedX < 0
+  ) {
+    paddleBounce('player')
+    collision = true
+  }
+
+  // Collision avec la raquette de l'IA
+  if (
+    nextX + state.ball.radius >= state.ai.x &&
+    nextX + state.ball.radius <= state.ai.x + state.ai.width &&
+    state.ball.y >= state.ai.y &&
+    state.ball.y <= state.ai.y + state.ai.height &&
+    state.ball.speedX > 0
+  ) {
+    paddleBounce('ai')
+    collision = true
+  }
+
+  // Si pas de collision, mettre à jour la position de la balle
+  if (!collision) {
+    state.ball.x = nextX
+    state.ball.y = nextY
+
+    // Collision avec les murs
+    if (
+      state.ball.y - state.ball.radius < 0 ||
+      state.ball.y + state.ball.radius > canvasHeight
+    ) {
+      state.ball.speedY = -state.ball.speedY
+    }
+
+    // Score points
+    if (state.ball.x - state.ball.radius < 0) {
+      aiScore.value++
+      if (aiScore.value < WINNING_SCORE) {
+        resetBall()
+      }
+    } else if (state.ball.x + state.ball.radius > canvasWidth) {
+      playerScore.value++
+      if (playerScore.value < WINNING_SCORE) {
+        resetBall()
+      }
+    }
+  }
+}
+
+const drawGame = () => {
+  const ctx = gameCanvas.value.getContext('2d')
+  const state = gameState.value
+
+  // Clear canvas
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--background-color'
+  )
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+
+  // Draw border
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--primary-color'
+  )
+  ctx.lineWidth = 2
+  ctx.strokeRect(0, 0, canvasWidth, canvasHeight)
+
+  // Draw paddles
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--primary-color'
+  )
+
+  // Player paddle
+  ctx.fillRect(
+    state.player.x,
+    state.player.y,
+    state.player.width,
+    state.player.height
+  )
+
+  // AI paddle
+  ctx.fillRect(state.ai.x, state.ai.y, state.ai.width, state.ai.height)
+
+  // Draw ball
+  ctx.beginPath()
+  ctx.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2)
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--accent-color'
+  )
+  ctx.fill()
+  ctx.closePath()
+}
+
+const gameLoop = () => {
+  if (!isPlaying.value) return
+  updateGame()
+  drawGame()
+  requestAnimationFrame(gameLoop)
 }
 
 const handleKeyDown = (e) => {
   const key = e.key.toLowerCase()
-  if (key === 'z') gameState.value.player.upPressed = true
+  if (key === 'f') gameState.value.player.upPressed = true
   if (key === 's') gameState.value.player.downPressed = true
 }
 
 const handleKeyUp = (e) => {
   const key = e.key.toLowerCase()
-  if (key === 'z') gameState.value.player.upPressed = false
+  if (key === 'f') gameState.value.player.upPressed = false
   if (key === 's') gameState.value.player.downPressed = false
 }
 
 const startGame = () => {
+  playerScore.value = 0
+  aiScore.value = 0
   isPlaying.value = true
   resetBall()
   gameLoop()
@@ -136,132 +289,9 @@ const resetBall = () => {
   const state = gameState.value
   state.ball.x = canvasWidth / 2
   state.ball.y = canvasHeight / 2
-  state.ball.dx = state.ball.speed * (Math.random() > 0.5 ? 1 : -1)
-  state.ball.dy = state.ball.speed * (Math.random() * 2 - 1)
-}
-
-const updateAI = () => {
-  const state = gameState.value
-  const ballY = state.ball.y
-  const aiY = state.ai.y + state.ai.height / 2
-  const diffY = ballY - aiY
-  
-  // Add some prediction based on ball direction
-  const predictedY = ballY + state.ball.dy * 
-    (state.ball.dx > 0 ? (canvasWidth - state.ball.x) / state.ball.dx : 0)
-  
-  // Add some randomness based on difficulty
-  const randomFactor = difficulty.value === 'Facile' ? 0.3 : 
-                      difficulty.value === 'Moyen' ? 0.15 : 0.05
-  
-  const targetY = predictedY + (Math.random() - 0.5) * canvasHeight * randomFactor
-  
-  if (Math.abs(targetY - aiY) > state.ai.speed) {
-    if (targetY < aiY) {
-      state.ai.y -= state.ai.speed
-    } else {
-      state.ai.y += state.ai.speed
-    }
-  }
-  
-  // Keep AI paddle within bounds
-  if (state.ai.y < 0) state.ai.y = 0
-  if (state.ai.y + state.ai.height > canvasHeight) {
-    state.ai.y = canvasHeight - state.ai.height
-  }
-}
-
-const updateGame = () => {
-  const state = gameState.value
-
-  // Update player paddle
-  if (state.player.upPressed && state.player.y > 0) {
-    state.player.y -= state.player.speed
-  }
-  if (state.player.downPressed && state.player.y < canvasHeight - state.player.height) {
-    state.player.y += state.player.speed
-  }
-
-  // Update AI
-  updateAI()
-
-  // Update ball
-  state.ball.x += state.ball.dx
-  state.ball.y += state.ball.dy
-
-  // Ball collision with top and bottom
-  if (state.ball.y + state.ball.radius > canvasHeight || state.ball.y - state.ball.radius < 0) {
-    state.ball.dy = -state.ball.dy
-  }
-
-  // Ball collision with paddles
-  if (state.ball.dx < 0) {
-    // Player paddle
-    if (state.ball.y > state.player.y && 
-        state.ball.y < state.player.y + state.player.height &&
-        state.ball.x - state.ball.radius < state.player.width) {
-      state.ball.dx = -state.ball.dx
-    }
-  } else {
-    // AI paddle
-    if (state.ball.y > state.ai.y && 
-        state.ball.y < state.ai.y + state.ai.height &&
-        state.ball.x + state.ball.radius > canvasWidth - state.ai.width) {
-      state.ball.dx = -state.ball.dx
-    }
-  }
-
-  // Score points
-  if (state.ball.x < 0) {
-    aiScore.value++
-    resetBall()
-  } else if (state.ball.x > canvasWidth) {
-    playerScore.value++
-    resetBall()
-  }
-}
-
-const drawGame = () => {
-  const ctx = gameCanvas.value.getContext('2d')
-  
-  // Clear canvas
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-color')
-  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-  
-  // Draw border
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
-  ctx.lineWidth = 2
-  ctx.strokeRect(0, 0, canvasWidth, canvasHeight)
-  
-  // Draw paddles
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
-  const state = gameState.value
-  
-  // Player paddle
-  ctx.fillRect(0, state.player.y, state.player.width, state.player.height)
-  
-  // AI paddle
-  ctx.fillRect(
-    canvasWidth - state.ai.width,
-    state.ai.y,
-    state.ai.width,
-    state.ai.height
-  )
-  
-  // Draw ball
-  ctx.beginPath()
-  ctx.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2)
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color')
-  ctx.fill()
-  ctx.closePath()
-}
-
-const gameLoop = () => {
-  if (!isPlaying.value) return
-  
-  updateGame()
-  drawGame()
-  requestAnimationFrame(gameLoop)
+  // Reset la vitesse à la valeur initiale
+  state.ball.speedX = INITIAL_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1)
+  state.ball.speedY = INITIAL_BALL_SPEED * (Math.random() * 2 - 1)
 }
 
 onMounted(() => {
@@ -346,37 +376,6 @@ canvas {
   padding: 20px;
   border-radius: 8px;
   border: 2px solid var(--primary-color);
-}
-
-.difficulty-select {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.difficulty-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.difficulty-button {
-  padding: 10px 20px;
-  background: var(--background-color);
-  border: 2px solid var(--primary-color);
-  color: var(--text-color);
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.difficulty-button:hover {
-  background: var(--primary-hover-color);
-  color: var(--text-color);
-}
-
-.difficulty-button.active {
-  background: var(--primary-color);
-  color: var(--text-color);
 }
 
 .start-button {
