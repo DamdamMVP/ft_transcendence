@@ -568,7 +568,7 @@ def fortytwo_login(request):
     Initiate the 42 OAuth flow
     """
     client_id = settings.FORTYTWO_CLIENT_ID
-    redirect_uri = 'http://localhost:8000/users/fortytwo/callback/'
+    redirect_uri = 'https://localhost:8443/users/fortytwo/callback/'
     auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code'
     return redirect(auth_url)
 
@@ -589,7 +589,7 @@ def fortytwo_callback(request):
         'client_id': settings.FORTYTWO_CLIENT_ID,
         'client_secret': settings.FORTYTWO_CLIENT_SECRET,
         'code': code,
-        'redirect_uri': 'http://localhost:8000/users/fortytwo/callback/'
+        'redirect_uri': 'https://localhost:8443/users/fortytwo/callback/'
     }
     
     response = requests.post(token_url, data=data)
@@ -627,7 +627,7 @@ def fortytwo_callback(request):
     refresh = RefreshToken.for_user(user)
     access_token = str(refresh.access_token)
 
-    response = redirect('http://localhost:5173')  # Redirect to frontend
+    response = redirect('/users/login')  # Redirect to frontend
     response.set_cookie(
         'access_token',
         access_token,
