@@ -5,7 +5,7 @@
     "connect": "Connect",
     "settings": "Settings",
     "pong": "Pong",
-    "tic-tac-toe": "Tic-Tac-Toe",
+    "catch": "Catch",
     "profil": "Profile",
     "disconnect": "Disconnect"
   },
@@ -49,7 +49,7 @@
   },
   "navbarProfil": {
     "Pong": "Pong",
-    "Tic-Tac-Toe": "Tic-Tac-Toe",
+    "Catch": "Catch",
     "Settings": "Settings"
   },
   "settings": {

@@ -5,7 +5,7 @@
     "connect": "Kevreañ",
     "settings": "Arventennoù",
     "pong": "Pong",
-    "tic-tac-toe": "Tic-Tac-Toe",
+    "catch": "Catch",
     "profil": "Profil",
     "disconnect": "Digevreañ"
   },
@@ -44,7 +44,7 @@
   },
   "navbarProfil": {
     "Pong": "Pong",
-    "Tic-Tac-Toe": "Tic-Tac-Toe",
+    "Catch": "Catch",
     "Settings": "Arventennoù"
   },
   "settings": {
