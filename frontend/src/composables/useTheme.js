@@ -42,7 +42,7 @@ const themes = {
   },
 }
 
-const currentTheme = ref(localStorage.getItem('theme') || 'light')
+const currentTheme = ref(localStorage.getItem('theme') || 'dark')
 
 export function useTheme() {
   const setTheme = (themeName) => {

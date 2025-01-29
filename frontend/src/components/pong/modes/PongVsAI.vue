@@ -58,8 +58,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '../../../stores/authStore'
+import { useTheme } from '../../../composables/useTheme'
 
 const authStore = useAuthStore()
+const { currentTheme } = useTheme()
 const gameCanvas = ref(null)
 const canvasWidth = 800
 const canvasHeight = 400
@@ -223,11 +225,16 @@ const drawGame = () => {
   const ctx = gameCanvas.value.getContext('2d')
   
   // Clear canvas
-  ctx.fillStyle = '#000000'
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-color')
   ctx.fillRect(0, 0, canvasWidth, canvasHeight)
   
+  // Draw border
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
+  ctx.lineWidth = 2
+  ctx.strokeRect(0, 0, canvasWidth, canvasHeight)
+  
   // Draw paddles
-  ctx.fillStyle = '#FFFFFF'
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
   const state = gameState.value
   
   // Player paddle
@@ -244,6 +251,7 @@ const drawGame = () => {
   // Draw ball
   ctx.beginPath()
   ctx.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2)
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color')
   ctx.fill()
   ctx.closePath()
 }
@@ -274,9 +282,9 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  background: #1a1a1a;
+  background: var(--background-color);
   min-height: 100vh;
-  color: white;
+  color: var(--text-color);
 }
 
 .game-container {
@@ -285,8 +293,8 @@ onUnmounted(() => {
 }
 
 canvas {
-  border: 2px solid #4CAF50;
-  background: #000;
+  border: 2px solid var(--primary-color);
+  background: var(--background-color);
 }
 
 .score-board {
@@ -299,7 +307,8 @@ canvas {
 .player {
   text-align: center;
   padding: 10px;
-  background: #2a2a2a;
+  background: var(--background-color);
+  border: 1px solid var(--primary-color);
   border-radius: 8px;
   min-width: 150px;
 }
@@ -307,12 +316,13 @@ canvas {
 .score {
   font-size: 24px;
   font-weight: bold;
-  color: #4CAF50;
+  color: var(--success-color);
 }
 
 .controls {
   font-size: 14px;
   opacity: 0.8;
+  color: var(--text-color);
 }
 
 .game-overlay {
@@ -332,6 +342,10 @@ canvas {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  background: var(--background-color);
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid var(--primary-color);
 }
 
 .difficulty-select {
@@ -347,27 +361,29 @@ canvas {
 
 .difficulty-button {
   padding: 10px 20px;
-  background: #2a2a2a;
-  border: 2px solid #4CAF50;
-  color: white;
+  background: var(--background-color);
+  border: 2px solid var(--primary-color);
+  color: var(--text-color);
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .difficulty-button:hover {
-  background: #3a3a3a;
+  background: var(--primary-hover-color);
+  color: var(--text-color);
 }
 
 .difficulty-button.active {
-  background: #4CAF50;
+  background: var(--primary-color);
+  color: var(--text-color);
 }
 
 .start-button {
   padding: 15px 30px;
   font-size: 18px;
-  background: #4CAF50;
-  color: white;
+  background: var(--primary-color);
+  color: var(--text-color);
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -375,7 +391,7 @@ canvas {
 }
 
 .start-button:hover {
-  background: #45a049;
+  background: var(--primary-hover-color);
   transform: translateY(-2px);
 }
 </style>
