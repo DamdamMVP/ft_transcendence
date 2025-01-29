@@ -8,7 +8,7 @@
         :height="canvasHeight"
         @mousemove="handleMouseMove"
       ></canvas>
-      
+
       <div class="score-board">
         <div class="player">
           <h3>Joueur 1</h3>
@@ -51,7 +51,7 @@ const gameState = ref({
     speed: 5,
     score: 0,
     upPressed: false,
-    downPressed: false
+    downPressed: false,
   },
   player2: {
     y: canvasHeight / 2,
@@ -60,7 +60,7 @@ const gameState = ref({
     speed: 5,
     score: 0,
     upPressed: false,
-    downPressed: false
+    downPressed: false,
   },
   ball: {
     x: canvasWidth / 2,
@@ -68,8 +68,8 @@ const gameState = ref({
     radius: 5,
     speed: 5,
     dx: 5,
-    dy: 0
-  }
+    dy: 0,
+  },
 })
 
 const handleKeyDown = (e) => {
@@ -113,13 +113,19 @@ const updateGame = () => {
   if (state.player1.upPressed && state.player1.y > 0) {
     state.player1.y -= state.player1.speed
   }
-  if (state.player1.downPressed && state.player1.y < canvasHeight - state.player1.height) {
+  if (
+    state.player1.downPressed &&
+    state.player1.y < canvasHeight - state.player1.height
+  ) {
     state.player1.y += state.player1.speed
   }
   if (state.player2.upPressed && state.player2.y > 0) {
     state.player2.y -= state.player2.speed
   }
-  if (state.player2.downPressed && state.player2.y < canvasHeight - state.player2.height) {
+  if (
+    state.player2.downPressed &&
+    state.player2.y < canvasHeight - state.player2.height
+  ) {
     state.player2.y += state.player2.speed
   }
 
@@ -128,23 +134,30 @@ const updateGame = () => {
   state.ball.y += state.ball.dy
 
   // Ball collision with top and bottom
-  if (state.ball.y + state.ball.radius > canvasHeight || state.ball.y - state.ball.radius < 0) {
+  if (
+    state.ball.y + state.ball.radius > canvasHeight ||
+    state.ball.y - state.ball.radius < 0
+  ) {
     state.ball.dy = -state.ball.dy
   }
 
   // Ball collision with paddles
   if (state.ball.dx < 0) {
     // Player 1 paddle
-    if (state.ball.y > state.player1.y && 
-        state.ball.y < state.player1.y + state.player1.height &&
-        state.ball.x - state.ball.radius < state.player1.width) {
+    if (
+      state.ball.y > state.player1.y &&
+      state.ball.y < state.player1.y + state.player1.height &&
+      state.ball.x - state.ball.radius < state.player1.width
+    ) {
       state.ball.dx = -state.ball.dx
     }
   } else {
     // Player 2 paddle
-    if (state.ball.y > state.player2.y && 
-        state.ball.y < state.player2.y + state.player2.height &&
-        state.ball.x + state.ball.radius > canvasWidth - state.player2.width) {
+    if (
+      state.ball.y > state.player2.y &&
+      state.ball.y < state.player2.y + state.player2.height &&
+      state.ball.x + state.ball.radius > canvasWidth - state.player2.width
+    ) {
       state.ball.dx = -state.ball.dx
     }
   }
@@ -163,18 +176,18 @@ const updateGame = () => {
 
 const drawGame = () => {
   const ctx = gameCanvas.value.getContext('2d')
-  
+
   // Clear canvas
   ctx.fillStyle = '#000000'
   ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-  
+
   // Draw paddles
   ctx.fillStyle = '#FFFFFF'
   const state = gameState.value
-  
+
   // Player 1 paddle
   ctx.fillRect(0, state.player1.y, state.player1.width, state.player1.height)
-  
+
   // Player 2 paddle
   ctx.fillRect(
     canvasWidth - state.player2.width,
@@ -182,7 +195,7 @@ const drawGame = () => {
     state.player2.width,
     state.player2.height
   )
-  
+
   // Draw ball
   ctx.beginPath()
   ctx.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2)
@@ -192,7 +205,7 @@ const drawGame = () => {
 
 const gameLoop = () => {
   if (!isPlaying.value) return
-  
+
   updateGame()
   drawGame()
   requestAnimationFrame(gameLoop)
@@ -227,7 +240,7 @@ onUnmounted(() => {
 }
 
 canvas {
-  border: 2px solid #4CAF50;
+  border: 2px solid #4caf50;
   background: #000;
 }
 
@@ -249,7 +262,7 @@ canvas {
 .score {
   font-size: 24px;
   font-weight: bold;
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .controls {
@@ -272,7 +285,7 @@ canvas {
 .start-button {
   padding: 15px 30px;
   font-size: 18px;
-  background: #4CAF50;
+  background: #4caf50;
   color: white;
   border: none;
   border-radius: 5px;
