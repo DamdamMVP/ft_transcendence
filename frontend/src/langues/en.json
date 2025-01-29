@@ -22,7 +22,8 @@
     "placeholders": {
       "email": "Enter your email",
       "password": "Enter your password"
-    }
+    },
+    "connectWith": "Login with"
   },
   "signup": {
     "username": "Username",

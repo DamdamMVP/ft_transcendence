@@ -22,7 +22,8 @@
     "placeholders": {
       "email": "Lakait ho postel",
       "password": "Lakait ho ker-tremen"
-    }
+    },
+    "connectWith": "Kevreañ gant"
   },
   "signup": {
     "username": "Anv-implijer",

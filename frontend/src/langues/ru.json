@@ -22,7 +22,8 @@
     "placeholders": {
       "email": "Введите вашу почту",
       "password": "Введите ваш пароль"
-    }
+    },
+    "connectWith": "Войти через"
   },
   "signup": {
     "username": "Имя пользователя",

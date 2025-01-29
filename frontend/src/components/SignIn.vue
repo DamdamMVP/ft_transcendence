@@ -110,7 +110,7 @@ const forgotPassword = () => {
         @click="handle42SignIn"
         :disabled="isLoading"
       >
-        Connect with 42
+        {{ $t('login.connectWith') }} <img src="@/assets/42_logo.png" alt="42 Logo" />
       </button>
     </div>
 
@@ -211,6 +211,15 @@ const forgotPassword = () => {
   cursor: pointer;
   font-weight: bold;
   transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.fortytwo-button img {
+  width: 20px;
+  height: 20px;
 }
 
 .fortytwo-button {
