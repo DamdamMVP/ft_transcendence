@@ -11,6 +11,7 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_HOSTNAME=${HOSTNAME}
     depends_on:
       - backend
 
@@ -32,6 +33,8 @@ services:
       - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+      - HOSTNAME=${HOSTNAME}
+
     volumes:
       - ./backend/media:/app/media
     depends_on:

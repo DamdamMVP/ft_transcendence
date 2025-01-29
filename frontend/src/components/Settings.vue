@@ -247,6 +247,7 @@ const deleteAccount = () => {
   authStore.logout()
   router.push('/')
 }
+}
 </script>
 
 <template>
