@@ -15,6 +15,55 @@ from django.contrib.auth.models import AnonymousUser
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.http import JsonResponse
+import jwt
+from datetime import datetime, timezone
+
+# class TokenRefreshMiddleware(MiddlewareMixin):
+#     def process_request(self, request):
+#         refresh_token = request.COOKIES.get('refresh_token')
+#         if not refresh_token:
+#             return None
+
+#         try:
+#             access_token = request.COOKIES.get('access_token')
+#             print("midleware alalala")
+#             if access_token:
+#                 try:
+#                     payload = jwt.decode(
+#                         access_token, 
+#                         settings.SECRET_KEY, 
+#                         algorithms=['HS256']
+#                     )
+#                     print('jai trouve un token')
+#                     exp = datetime.fromtimestamp(payload['exp'], tz=timezone.utc)
+#                     if exp > datetime.now(timezone.utc):
+#                         print("token not expired")
+#                         return None
+#                 except:
+#                     print("token expired")
+#                     pass
+
+#             # Rafraîchir le token
+#             refresh = request.COOKIES.get('refresh_token')
+#             access_token = str(refresh.access_token)
+
+#             response = JsonResponse({'status': 'token refreshed'})
+#             response.set_cookie(
+#                 key='access_token',
+#                 value=access_token,
+#                 max_age=90,
+#                 httponly=True,
+#                 secure=True,
+#                 samesite='None'
+#             )
+#             print("cookie refreshed")
+#             return response
+
+#         except Exception as e:
+#             return None
 
 
 class CookieJWTAuthentication(JWTAuthentication):
@@ -23,14 +72,38 @@ class CookieJWTAuthentication(JWTAuthentication):
         access_token = request.COOKIES.get('access_token')
 
         if not access_token:
-            return None
+            print("acces token not found supposed to call the refresh")
+            refresh_token = request.COOKIES.get('refresh_token')
+            refresh = RefreshToken(refresh_token)
+                # Générer un nouveau access token
+            access_token = str(refresh.access_token)
+
+            response = JsonResponse({'status': 'token refreshed'})
+            response.set_cookie(
+                key='access_token',
+                value=access_token,
+                max_age=90,
+                httponly=True,
+                secure=True,
+                samesite='None'
+            )
+            try:
+                validated_token = self.get_validated_token(access_token)
+                user = self.get_user(validated_token)
+                print("Authentication success midleware after trying to refresh")
+                return (user, validated_token)
+            except AuthenticationFailed:
+                print("Authentication failed midleware after trying to refresh")
+                return None
 
         # Validate the token
         try:
             validated_token = self.get_validated_token(access_token)
             user = self.get_user(validated_token)
+            print("Authentication success midleware")
             return (user, validated_token)
         except AuthenticationFailed:
+            print("Authentication failed midleware")
             return None
 
 

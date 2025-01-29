@@ -92,9 +92,9 @@ CHANNEL_LAYERS = {
 
 
 MIDDLEWARE = [
+    # 'djangoapp.Midleware.TokenRefreshMiddleware',  # Use our middleware                  
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'djangoapp.Midleware.TokenAuthMiddlewareHTTP',  # Use our middleware                  
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
