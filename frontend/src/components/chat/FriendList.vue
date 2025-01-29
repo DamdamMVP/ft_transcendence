@@ -16,21 +16,29 @@
     </div>
 
     <!-- Panel de la friend list -->
-    <div v-if="isExpanded && !activeChatFriend" class="friend-list">
+    <div
+      v-if="isExpanded && !activeChatFriend"
+      class="friend-list"
+      :class="{ 'friend-list--expanded': isExpanded }"
+    >
       <div class="friend-list__header" @click="toggleExpand">
-        <h3>{{ $t('friendList.title') }}</h3>
-        <span class="friend-list__online-count"
-          >{{ onlineFriendsCount }} {{ $t('friendList.online') }}</span
-        >
+        <div class="friend-list__title">
+          {{ $t('friendList.title') }}
+          <span class="friend-list__count">({{ onlineFriendsCount }})</span>
+        </div>
       </div>
 
-      <div class="friend-list__content">
+      <div v-if="isExpanded" class="friend-list__content">
         <div class="friend-list__search">
           <input
             type="text"
             v-model="searchQuery"
             :placeholder="$t('friendList.search')"
           />
+        </div>
+
+        <div class="friend-list__channels">
+          <GeneralChannel @chat="startChat" />
         </div>
 
         <div class="friend-list__friends">
@@ -80,6 +88,7 @@ import { useFriendStore } from '../../stores/friendStore'
 import { useUserStatus } from '../../composables/useUserStatus'
 import AddFriendIcon from '../icons/AddFriendIcon.vue'
 import FriendItem from './FriendItem.vue'
+import GeneralChannel from './GeneralChannel.vue'
 import Notification from '../Notification.vue'
 import ChatWindow from './ChatWindow.vue'
 
@@ -96,15 +105,17 @@ const notification = ref({
   message: '',
   type: 'error',
 })
+const isAddingFriend = ref(false)
 
 const onlineFriendsCount = computed(() => {
-  return friendStore.friends.filter((friend) => onlineUsers.value.has(friend.id)).length
+  return friendStore.friends.filter((friend) =>
+    onlineUsers.value.has(friend.id)
+  ).length
 })
 
 const filteredFriends = computed(() => {
-  return friendStore.friends.filter(
-    (friend) =>
-      friend.username.toLowerCase().includes(searchQuery.value.toLowerCase())
+  return friendStore.friends.filter((friend) =>
+    friend.username.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
@@ -132,8 +143,13 @@ const toggleExpand = () => {
 }
 
 const startChat = (friend) => {
-  // TODO: Implémenter la logique de chat
-  activeChatFriend.value = friend
+  // Si c'est le canal général
+  if (friend.isChannel) {
+    activeChatFriend.value = friend
+  } else {
+    // Si c'est un ami normal
+    activeChatFriend.value = friend
+  }
 }
 
 const closeChat = () => {
@@ -253,9 +269,33 @@ const showNotification = (message, type = 'error') => {
   border-radius: 8px 8px 0 0;
 }
 
-.friend-list__header h3 {
-  margin: 0;
+.friend-list__title {
   font-size: 1rem;
+  margin: 0;
+}
+
+.friend-list__count {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  margin-left: 5px;
+}
+
+.friend-list__actions {
+  display: flex;
+  align-items: center;
+}
+
+.friend-list__add-btn {
+  background-color: var(--primary-color);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.friend-list__add-btn:hover {
+  background-color: var(--primary-hover-color);
 }
 
 .friend-list__content {
@@ -286,22 +326,13 @@ const showNotification = (message, type = 'error') => {
   padding-top: 10px;
 }
 
-.friend-list__add-btn {
-  background-color: var(--primary-color);
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  padding: 8px;
-}
-
-.friend-list__add-btn:hover {
-  background-color: var(--primary-hover-color);
-}
-
 .friend-list__add-icon {
   width: 20px;
   height: 20px;
   color: white;
+}
+
+.friend-list__channels {
+  padding: 0px;
 }
 </style>

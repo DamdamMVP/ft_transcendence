@@ -2,7 +2,7 @@
   <div v-if="isOpen" class="chat-window">
     <div class="chat-window__header">
       <div class="chat-window__user-info">
-        <span class="chat-window__username">{{ friend.username }}</span>
+        <span class="chat-window__username">{{ displayName }}</span>
       </div>
       <button @click="closeChat" class="chat-window__close-btn">
         <span class="material-icons">{{ $t('chat.close') }}</span>
@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { usePrivateChat } from '../../composables/usePrivateChat'
 import { useAuthStore } from '../../stores/authStore'
 
@@ -59,19 +59,25 @@ const emit = defineEmits(['close'])
 const messageText = ref('')
 const messages = ref([])
 const messagesContainer = ref(null)
-const {
-  connectToChat,
-  disconnectFromChat,
-  sendMessage: sendWebSocketMessage,
-} = usePrivateChat()
+const { connectToChat, disconnectFromChat, sendMessage: sendWebSocketMessage } = usePrivateChat()
 const authStore = useAuthStore()
 
 // Obtenir l'utilisateur actuel directement depuis le store
 const currentUser = computed(() => authStore.user)
 
+// Détermine si c'est le canal général
+const isGeneralChannel = computed(() => props.friend.isChannel)
+
+// Obtient le nom d'affichage approprié
+const displayName = computed(() => isGeneralChannel.value ? '#general' : props.friend.username)
+
 const closeChat = () => {
   if (currentUser.value && props.friend) {
-    disconnectFromChat(currentUser.value.username, props.friend.username)
+    if (isGeneralChannel.value) {
+      disconnectFromChat('general', 'general')
+    } else {
+      disconnectFromChat(currentUser.value.username, props.friend.username)
+    }
   }
   emit('close')
 }
@@ -91,11 +97,16 @@ const scrollToBottom = async () => {
 const sendMessage = () => {
   if (!messageText.value.trim() || !currentUser.value || !props.friend) return
 
-  const success = sendWebSocketMessage(
-    currentUser.value.username,
-    props.friend.username,
-    messageText.value
-  )
+  let success
+  if (isGeneralChannel.value) {
+    success = sendWebSocketMessage('general', 'general', messageText.value)
+  } else {
+    success = sendWebSocketMessage(
+      currentUser.value.username,
+      props.friend.username,
+      messageText.value
+    )
+  }
 
   if (success) {
     messageText.value = ''
@@ -107,13 +118,16 @@ let ws = null
 
 onMounted(() => {
   if (props.isOpen && props.friend && currentUser.value) {
-    ws = connectToChat(currentUser.value.username, props.friend.username)
+    if (isGeneralChannel.value) {
+      ws = connectToChat('general', 'general')
+    } else {
+      ws = connectToChat(currentUser.value.username, props.friend.username)
+    }
 
     if (ws) {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data)
-          // Ne traiter que les messages qui contiennent un message de chat
           if (data.message !== undefined) {
             messages.value.push({
               message: data.message,
@@ -132,21 +146,30 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (ws && currentUser.value && props.friend) {
-    disconnectFromChat(currentUser.value.username, props.friend.username)
+    if (isGeneralChannel.value) {
+      disconnectFromChat('general', 'general')
+    } else {
+      disconnectFromChat(currentUser.value.username, props.friend.username)
+    }
   }
 })
 
-watch(
-  () => props.isOpen,
-  (newValue) => {
-    if (newValue && props.friend && currentUser.value && !ws) {
+watch(() => props.isOpen, (newValue) => {
+  if (newValue && props.friend && currentUser.value && !ws) {
+    if (isGeneralChannel.value) {
+      ws = connectToChat('general', 'general')
+    } else {
       ws = connectToChat(currentUser.value.username, props.friend.username)
-    } else if (!newValue && ws && currentUser.value && props.friend) {
-      disconnectFromChat(currentUser.value.username, props.friend.username)
-      ws = null
     }
+  } else if (!newValue && ws && currentUser.value && props.friend) {
+    if (isGeneralChannel.value) {
+      disconnectFromChat('general', 'general')
+    } else {
+      disconnectFromChat(currentUser.value.username, props.friend.username)
+    }
+    ws = null
   }
-)
+})
 </script>
 
 <style scoped>

@@ -184,7 +184,7 @@ class TokenAuthMiddlewareHTTP(MiddlewareMixin):
                 httponly=True,
                 secure=True,  # True in production
                 samesite='None',
-                max_age=900  # 15 minutes, matching ACCESS_TOKEN_LIFETIME
+                max_age=90000  # 15 minutes, matching ACCESS_TOKEN_LIFETIME
             )
         
         return response

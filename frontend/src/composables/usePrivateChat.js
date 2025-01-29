@@ -10,6 +10,35 @@ export function usePrivateChat() {
   }
 
   const connectToChat = (currentUser, otherUser) => {
+    // Si c'est le canal général
+    if (currentUser === 'general' && otherUser === 'general') {
+      // Vérifie si une connexion existe déjà
+      if (chatConnections.value.has('general')) {
+        return chatConnections.value.get('general')
+      }
+
+      // Crée une nouvelle connexion WebSocket pour le canal général
+      const ws = new WebSocket('ws/chat/general/')
+
+      ws.onopen = () => {
+        console.log('Connected to general channel')
+      }
+
+      ws.onclose = () => {
+        console.log('Disconnected from general channel')
+        chatConnections.value.delete('general')
+      }
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error)
+      }
+
+      // Stocke la connexion
+      chatConnections.value.set('general', ws)
+      return ws
+    }
+
+    // Pour les chats privés
     const roomName = getChatRoomName(currentUser, otherUser)
 
     // Vérifie si une connexion existe déjà
@@ -39,9 +68,19 @@ export function usePrivateChat() {
   }
 
   const disconnectFromChat = (currentUser, otherUser) => {
+    // Si c'est le canal général
+    if (currentUser === 'general' && otherUser === 'general') {
+      const connection = chatConnections.value.get('general')
+      if (connection) {
+        connection.close()
+        chatConnections.value.delete('general')
+      }
+      return
+    }
+
+    // Pour les chats privés
     const roomName = getChatRoomName(currentUser, otherUser)
     const connection = chatConnections.value.get(roomName)
-
     if (connection) {
       connection.close()
       chatConnections.value.delete(roomName)
@@ -49,6 +88,22 @@ export function usePrivateChat() {
   }
 
   const sendMessage = (currentUser, otherUser, message) => {
+    // Si c'est le canal général
+    if (currentUser === 'general' && otherUser === 'general') {
+      const connection = chatConnections.value.get('general')
+      if (connection && connection.readyState === WebSocket.OPEN) {
+        connection.send(
+          JSON.stringify({
+            message: message,
+            timestamp: new Date().toISOString(),
+          })
+        )
+        return true
+      }
+      return false
+    }
+
+    // Pour les chats privés
     const roomName = getChatRoomName(currentUser, otherUser)
     const connection = chatConnections.value.get(roomName)
 
