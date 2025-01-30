@@ -65,7 +65,7 @@ onUnmounted(() => {
 })
 
 const profilePhotoUrl = computed(
-  () => `http://localhost:8000${authStore.user.profile_picture}`
+  () => `${import.meta.env.VITE_API_BASE_URL}${authStore.user.profile_picture}`
 )
 </script>
 
