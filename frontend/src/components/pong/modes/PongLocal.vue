@@ -65,6 +65,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '../../../stores/authStore'
+import axios from 'axios'
 
 const authStore = useAuthStore()
 const username = ref(authStore.user?.username || '')
@@ -555,14 +556,35 @@ function startGame() {
   gameLoop()
 }
 
+
 function endGame() {
   cancelAnimationFrame(animationId)
   if (player1Score.value >= WINNING_SCORE) {
-    winnerMessage.value = (username.value || $t('pong.game.player1')) + ' ' + $t('pong.game.wins')
+    winnerMessage.value = (username.value || $t('pong.game.player1')) + ' ' + ' wins'
   } else {
-    winnerMessage.value = player2Name.value + ' ' + $t('pong.game.wins')
+    winnerMessage.value = player2Name.value + ' wins'
   }
   gamePhase.value = 'over'
+  saveGameHistory()
+}
+const guestUsername = ref(player2Name)
+const saveGameHistory = async () =>{
+	try {
+		const gameHistory = {
+			user: authStore.user.id,
+			guest_name: guestUsername.value,
+			user_score: player1Score.value,
+			guest_score: player2Score.value,
+			played_at: new Date().toISOString(),
+			game_name: 'pong',
+		}
+		await axios.post('/users/histories/add', gameHistory, {
+			withCredentials: true,
+		})
+		console.log('history saved')
+	} catch (error) {
+		console.error('Error saving game history:', error)
+	}
 }
 
 function restartGame() {
@@ -580,7 +602,7 @@ function resetGameState() {
       y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
       width: 10,
       height: INITIAL_PADDLE_HEIGHT,
-      speed: 3,
+      speed: 4.5,
       upPressed: false,
       downPressed: false,
     },
@@ -589,7 +611,7 @@ function resetGameState() {
       y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
       width: 10,
       height: INITIAL_PADDLE_HEIGHT,
-      speed: 3,
+      speed: 4.5,
       upPressed: false,
       downPressed: false,
     },

@@ -268,9 +268,9 @@ export default {
         await axios.post('/users/histories/add', historyData, {
             withCredentials: true,
         })
-        console.log('Historique sauvegardé avec succès')
+        console.log('history saved')
       } catch (error) {
-        console.error('Erreur lors de la sauvegarde de l\'historique:', error)
+        console.error('Error saving game history:', error)
       }
     },
     startGame() {

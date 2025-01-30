@@ -52,6 +52,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '../../../stores/authStore'
+import axios from 'axios'
 
 const authStore = useAuthStore()
 const username = ref(authStore.user?.username || '')
@@ -106,7 +107,7 @@ const gameState = ref({
     y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
     width: 10,
     height: INITIAL_PADDLE_HEIGHT,
-    speed: 3,
+    speed: 5,
     upPressed: false,
     downPressed: false,
   },
@@ -591,6 +592,25 @@ function startGame() {
   gameLoop()
 }
 
+const saveGameHistory = async () =>{
+	try {
+		const gameHistory = {
+			user: authStore.user.id,
+			guest_name: "AI",
+			user_score: playerScore.value,
+			guest_score: aiScore.value,
+			played_at: new Date().toISOString(),
+			game_name: 'pong',
+		}
+		await axios.post('/users/histories/add', gameHistory, {
+			withCredentials: true,
+		})
+		console.log('history saved')
+	} catch (error) {
+		console.error('Error saving game history:', error)
+	}
+}
+
 function endGame() {
   cancelAnimationFrame(animationId)
   if (playerScore.value >= WINNING_SCORE) {
@@ -598,8 +618,10 @@ function endGame() {
   } else {
     winnerMessage.value = 'AI wins'
   }
+  saveGameHistory()
   gamePhase.value = 'over'
 }
+
 
 function restartGame() {
   gamePhase.value = 'menu'
