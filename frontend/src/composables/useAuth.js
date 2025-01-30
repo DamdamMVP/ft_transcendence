@@ -39,6 +39,14 @@ export function useAuth() {
         user.value = response.data.user
         isAuthenticated.value = true
 
+        // Vérifier le statut 2FA
+        try {
+          const twoFAResponse = await axios.get('/users/2fa/status')
+          console.log('Statut 2FA:', twoFAResponse.data.enabled ? 'Activé' : 'Désactivé')
+        } catch (error) {
+          console.warn('Impossible de récupérer le statut 2FA:', error)
+        }
+
         return { success: true, data: response.data }
       }
     } catch (err) {
