@@ -16,6 +16,13 @@
         <span class="material-icons">{{ $t('friendList.icons.chat') }}</span>
       </button>
       <button
+        @click="goToProfile(friend)"
+        class="friend-item__action-btn"
+        :title="$t('friendList.profile')"
+      >
+        <span class="material-icons">{{ $t('friendList.icons.profile') }}</span>
+      </button>
+      <button
         @click="$emit('block', friend)"
         class="friend-item__action-btn"
         :title="$t('friendList.block')"
@@ -36,6 +43,9 @@
 <script setup>
 import { useUserStatus } from '@/composables/useUserStatus'
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const props = defineProps({
   friend: {
@@ -49,6 +59,10 @@ const { onlineUsers } = useUserStatus()
 const isOnline = computed(() => {
   return onlineUsers.value.has(props.friend.id)
 })
+
+const goToProfile = (friend) => {
+  router.push(`/${friend.id}/profil`)
+}
 
 defineEmits(['chat', 'block', 'delete'])
 </script>

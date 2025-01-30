@@ -86,11 +86,13 @@
     "block": "Bloquer",
     "unblock": "Débloquer",
     "chat": "Discuter",
+    "profile": "Voir le profil",
     "delete": "Supprimer",
     "icons": {
       "chat": "chat",
-      "block": "bloquer",
-      "delete": "supprimer"
+      "block": "blocker",
+      "delete": "supprimer",
+      "profile": "profile"
     }
   },
   "chat": {

@@ -85,8 +85,10 @@
     "icons": {
       "chat": "flapañ",
       "block": "stankañ",
-      "delete": "dilemel"
-    }
+      "delete": "dilemel",
+      "profile": "profil"
+    },
+    "profile": "Ver perfil"
   },
   "chat": {
     "typemessage": "Skrivit ho kemennadenn...",
