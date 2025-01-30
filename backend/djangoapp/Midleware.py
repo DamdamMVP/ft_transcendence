@@ -70,41 +70,47 @@ class CookieJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
         # Get access token from cookies
         access_token = request.COOKIES.get('access_token')
-
-        if not access_token:
-            print("acces token not found supposed to call the refresh")
-            refresh_token = request.COOKIES.get('refresh_token')
-            refresh = RefreshToken(refresh_token)
-                # Générer un nouveau access token
-            access_token = str(refresh.access_token)
-
-            response = JsonResponse({'status': 'token refreshed'})
-            response.set_cookie(
-                key='access_token',
-                value=access_token,
-                max_age=90,
-                httponly=True,
-                secure=True,
-                samesite='None'
-            )
+        if access_token:
             try:
-                validated_token = self.get_validated_token(access_token)
-                user = self.get_user(validated_token)
-                print("Authentication success midleware after trying to refresh")
-                return (user, validated_token)
-            except AuthenticationFailed:
-                print("Authentication failed midleware after trying to refresh")
-                return None
-
-        # Validate the token
+                payload = jwt.decode(
+                    access_token, 
+                    settings.SECRET_KEY, 
+                    algorithms=['HS256']
+                )
+                print('jai trouve un token')
+                exp = datetime.fromtimestamp(payload['exp'], tz=timezone.utc)
+                if exp > datetime.now(timezone.utc):
+                    print("token not expired")
+                    validated_token = self.get_validated_token(access_token)
+                    user = self.get_user(validated_token)
+                    return (user, validated_token)
+            except:
+                print("token expired")
+                pass
+        
+        print("acces token not found or not valid, supposed to call the refresh")
+        refresh_token = request.COOKIES.get('refresh_token')
+        refresh = RefreshToken(refresh_token)
+            # Générer un nouveau access token
+        access_token = str(refresh.access_token)
+        response = JsonResponse({'status': 'token refreshed'})
+        response.set_cookie(
+            key='access_token',
+            value=access_token,
+            max_age=900,
+            httponly=True,
+            secure=True,
+            samesite='None'
+        )
         try:
             validated_token = self.get_validated_token(access_token)
             user = self.get_user(validated_token)
-            print("Authentication success midleware")
+            print("Authentication success midleware after trying to refresh")
             return (user, validated_token)
         except AuthenticationFailed:
-            print("Authentication failed midleware")
+            print("Authentication failed midleware after trying to refresh")
             return None
+
 
 
 User = get_user_model()
