@@ -85,6 +85,15 @@ const router = createRouter({
       path: '/:pathMatch(.*)*',
       redirect: '/404',
     },
+    {
+      path: '/404',
+      name: 'not-found',
+      component: NotFoundView
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404'
+    }
   ],
 })
 
