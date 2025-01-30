@@ -41,27 +41,6 @@ const fetchHistory = async () => {
   }
 }
 
-const createTestMatch = async () => {
-  try {
-    const testMatch = {
-      user: authStore.user.id,
-      guest_name: 'Bot_' + Math.floor(Math.random() * 1000),
-      user_score: Math.floor(Math.random() * 10),
-      guest_score: Math.floor(Math.random() * 10),
-      played_at: new Date().toISOString(),
-      game_name: route.params.game?.toLowerCase() || 'pong',
-    }
-
-    await axios.post('/users/histories/add', testMatch, {
-      withCredentials: true,
-    })
-
-    await fetchHistory()
-  } catch (err) {
-    error.value = 'Erreur lors de la création du match test'
-  }
-}
-
 // Recharger l'historique quand le jeu change
 watch(
   () => route.params.game,
@@ -79,9 +58,6 @@ onMounted(() => {
   <div class="history-container">
     <div class="header">
       <h2>{{ t('history.title') }} - {{ route.params.game }}</h2>
-      <button @click="createTestMatch" class="test-button">
-        {{ t('history.addTest') }}
-      </button>
     </div>
 
     <div v-if="loading" class="loading">
@@ -116,7 +92,9 @@ onMounted(() => {
                 ? t('history.loose')
                 : t('history.draw')
           }}</span>
-          <span class="score-text">: {{ match.user_score }} - {{ match.guest_score }}</span>
+          <span class="score-text"
+            >: {{ match.user_score }} - {{ match.guest_score }}</span
+          >
         </p>
         <p class="match-date">
           {{ new Date(match.played_at).toLocaleDateString() }}
