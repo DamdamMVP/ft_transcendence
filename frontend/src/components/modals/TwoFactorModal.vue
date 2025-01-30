@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="modal-overlay" @click="closeModal">
+  <div v-if="show" class="modal-overlay">
     <div class="modal-content" @click.stop>
       <button class="close-icon" @click="closeModal" :disabled="isLoading">×</button>
       <h2>{{ isVerificationMode ? t('security.verify2FA') : t('security.setup2FA') }}</h2>
