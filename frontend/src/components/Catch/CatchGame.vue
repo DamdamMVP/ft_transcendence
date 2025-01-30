@@ -1,45 +1,83 @@
 <template>
-  <div class="game-container" tabindex="0" ref="gameContainer" @keydown="handleKeyPress" @keyup="handleKeyUp">
+  <div
+    class="game-container"
+    tabindex="0"
+    ref="gameContainer"
+    @keydown="handleKeyPress"
+    @keyup="handleKeyUp"
+  >
     <div class="game-wrapper">
       <div class="player-column">
         <div class="player-name">{{ playerUsername }}</div>
-		        <div v-if="gameStarted || gameOver" class="player-score">Score: {{ mouseScore }}</div>
+        <div v-if="gameStarted || gameOver" class="player-score">
+          {{ $t('catch.score') }}: {{ mouseScore }}
+        </div>
       </div>
-      <div class="game-board" :class="{ 'blurred': !gameStarted || gameOver }"
-           :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
-        <img :src="jerryImage" class="mouse" :style="mouseStyle">
-        <img :src="tomImage" class="cat" :style="catStyle">
+      <div
+        class="game-board"
+        :class="{ blurred: !gameStarted || gameOver }"
+        :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }"
+      >
+        <img :src="jerryImage" class="mouse" :style="mouseStyle" />
+        <img :src="tomImage" class="cat" :style="catStyle" />
         <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
-        <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
-        <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
-        <div v-if="isPaused" class="pause-message">Capture ! 🎯</div>
+        <div
+          class="wall vertical"
+          :style="{
+            left: '240px',
+            top: '150px',
+            height: '240px',
+            width: '8px',
+          }"
+        ></div>
+        <div
+          class="wall vertical"
+          :style="{
+            left: '720px',
+            top: '150px',
+            height: '240px',
+            width: '8px',
+          }"
+        ></div>
+        <div v-if="isPaused" class="pause-message">
+          {{ $t('catch.capture') }} 🎯
+        </div>
         <div v-if="!gameStarted || gameOver" class="overlay"></div>
         <div v-if="!gameStarted || gameOver" class="start-message">
           <div v-if="gameOver">
-            <div class="game-over-text">Partie terminée!</div>
+            <div class="game-over-text">{{ $t('catch.gameOver') }}</div>
             <div class="game-over-text">{{ winner }}</div>
           </div>
-          <button @click="startCountdown" class="start-btn">Nouvelle Partie</button>
+          <button @click="startCountdown" class="start-btn">
+            {{ $t('catch.newGame') }}
+          </button>
           <div v-if="!gameStarted && !gameOver" class="controls-info">
-            <p>Souris: WSAD</p>
-            <p>Chat: Pavé numérique 8456</p>
+            <p>{{ $t('catch.mouseControls') }}: WSAD</p>
+            <p>{{ $t('catch.catControls') }}: {{ $t('catch.numpad') }} 8456</p>
           </div>
         </div>
         <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
       </div>
       <div class="player-column">
         <div class="player-name">{{ guestUsername }}</div>
-        <div v-if="gameStarted || gameOver" class="player-score">Score: {{ catScore }}</div>
+        <div v-if="gameStarted || gameOver" class="player-score">
+          {{ $t('catch.score') }}: {{ catScore }}
+        </div>
       </div>
     </div>
     <div v-if="gameStarted" class="timer-container">
-      <div class="timer">{{ gameOver ? "Tempsécoulé" : `Temps: ${timeLeft}s` }}</div>
+      <div class="timer">
+        {{
+          gameOver
+            ? $t('catch.timeElapsed')
+            : $t('catch.timeRemaining', { time: timeLeft })
+        }}
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-
 import jerry from '../../assets/jerry.png'
 import tom from '../../assets/tom.png'
 import { useRoute } from 'vue-router'
@@ -49,21 +87,21 @@ import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 import eventBus from '../../utils/eventBus'
 
-
 export default {
-	setup() {
+  setup() {
     const authStore = useAuthStore()
-    return { authStore }
+    const { t } = useI18n()
+    return { authStore, t }
   },
   name: 'CatAndMouseGame',
   props: {
     playerUsername: {
       type: String,
-      default: 'Joueur'
+      default: 'Joueur',
     },
     guestUsername: {
       type: String,
-      default: 'Invité'
+      default: 'Invité',
     },
   },
   data() {
@@ -91,30 +129,30 @@ export default {
       isOvertime: false,
       walls: [
         { x: 240, y: 150, width: 8, height: 240 },
-        { x: 720, y: 150, width: 8, height: 240 }
-      ]
+        { x: 720, y: 150, width: 8, height: 240 },
+      ],
     }
   },
   computed: {
     mouseStyle() {
       return {
         left: this.mousePos.x + 'px',
-        top: this.mousePos.y + 'px'
+        top: this.mousePos.y + 'px',
       }
     },
     catStyle() {
       return {
         left: this.catPos.x + 'px',
-        top: this.catPos.y + 'px'
+        top: this.catPos.y + 'px',
       }
     },
     cheeseStyle() {
       if (!this.cheesePos) return {}
       return {
         left: this.cheesePos.x + 'px',
-        top: this.cheesePos.y + 'px'
+        top: this.cheesePos.y + 'px',
       }
-    }
+    },
   },
   methods: {
     handleKeyPress(event) {
@@ -126,17 +164,25 @@ export default {
     checkWallCollision(pos) {
       const playerSize = 20
       for (const wall of this.walls) {
-        if (pos.x < wall.x + wall.width &&
-            pos.x + playerSize > wall.x &&
-            pos.y < wall.y + wall.height &&
-            pos.y + playerSize > wall.y) {
+        if (
+          pos.x < wall.x + wall.width &&
+          pos.x + playerSize > wall.x &&
+          pos.y < wall.y + wall.height &&
+          pos.y + playerSize > wall.y
+        ) {
           return true
         }
       }
       return false
     },
     updatePositions() {
-      if (this.gameOver || this.isPaused || !this.gameStarted || this.countdown != null) return
+      if (
+        this.gameOver ||
+        this.isPaused ||
+        !this.gameStarted ||
+        this.countdown != null
+      )
+        return
 
       let newMouseX = this.mousePos.x
       let newMouseY = this.mousePos.y
@@ -148,7 +194,10 @@ export default {
         mouseMove.y = -this.moveSpeed
       }
       if (this.pressedKeys.has('s')) {
-        newMouseY = Math.min(this.boardHeight - spriteSize, this.mousePos.y + this.moveSpeed)
+        newMouseY = Math.min(
+          this.boardHeight - spriteSize,
+          this.mousePos.y + this.moveSpeed
+        )
         mouseMove.y = this.moveSpeed
       }
       if (this.pressedKeys.has('a')) {
@@ -156,7 +205,10 @@ export default {
         mouseMove.x = -this.moveSpeed
       }
       if (this.pressedKeys.has('d')) {
-        newMouseX = Math.min(this.boardWidth - spriteSize, this.mousePos.x + this.moveSpeed)
+        newMouseX = Math.min(
+          this.boardWidth - spriteSize,
+          this.mousePos.x + this.moveSpeed
+        )
         mouseMove.x = this.moveSpeed
       }
 
@@ -169,7 +221,10 @@ export default {
         catMove.y = -this.moveSpeed
       }
       if (this.pressedKeys.has('5')) {
-        newCatY = Math.min(this.boardHeight - spriteSize, this.catPos.y + this.moveSpeed)
+        newCatY = Math.min(
+          this.boardHeight - spriteSize,
+          this.catPos.y + this.moveSpeed
+        )
         catMove.y = this.moveSpeed
       }
       if (this.pressedKeys.has('4')) {
@@ -177,7 +232,10 @@ export default {
         catMove.x = -this.moveSpeed
       }
       if (this.pressedKeys.has('6')) {
-        newCatX = Math.min(this.boardWidth - spriteSize, this.catPos.x + this.moveSpeed)
+        newCatX = Math.min(
+          this.boardWidth - spriteSize,
+          this.catPos.x + this.moveSpeed
+        )
         catMove.x = this.moveSpeed
       }
 
@@ -185,8 +243,20 @@ export default {
         this.mousePos = { x: newMouseX, y: newMouseY }
       } else {
         this.mousePos = {
-          x: Math.max(spriteSize, Math.min(this.mousePos.x - mouseMove.x * 3.5, this.boardWidth - spriteSize)),
-          y: Math.max(spriteSize, Math.min(this.mousePos.y - mouseMove.y * 3.5, this.boardHeight - spriteSize))
+          x: Math.max(
+            spriteSize,
+            Math.min(
+              this.mousePos.x - mouseMove.x * 3.5,
+              this.boardWidth - spriteSize
+            )
+          ),
+          y: Math.max(
+            spriteSize,
+            Math.min(
+              this.mousePos.y - mouseMove.y * 3.5,
+              this.boardHeight - spriteSize
+            )
+          ),
         }
       }
 
@@ -194,8 +264,20 @@ export default {
         this.catPos = { x: newCatX, y: newCatY }
       } else {
         this.catPos = {
-          x: Math.max(spriteSize, Math.min(this.catPos.x - catMove.x * 3.5, this.boardWidth - spriteSize)),
-          y: Math.max(spriteSize, Math.min(this.catPos.y - catMove.y * 3.5, this.boardHeight - spriteSize))
+          x: Math.max(
+            spriteSize,
+            Math.min(
+              this.catPos.x - catMove.x * 3.5,
+              this.boardWidth - spriteSize
+            )
+          ),
+          y: Math.max(
+            spriteSize,
+            Math.min(
+              this.catPos.y - catMove.y * 3.5,
+              this.boardHeight - spriteSize
+            )
+          ),
         }
       }
 
@@ -225,10 +307,10 @@ export default {
       do {
         newPos = {
           x: margin + Math.random() * (this.boardWidth - 2 * margin),
-          y: margin + Math.random() * (this.boardHeight - 2 * margin)
+          y: margin + Math.random() * (this.boardHeight - 2 * margin),
         }
       } while (this.checkWallCollision(newPos))
-      
+
       this.cheesePos = newPos
     },
     checkCheeseCollection() {
@@ -257,16 +339,16 @@ export default {
     async saveGameHistory() {
       try {
         const historyData = {
-		  user: this.authStore.user.id,
+          user: this.authStore.user.id,
           guest_name: this.guestUsername,
           user_score: this.mouseScore,
           guest_score: this.catScore,
-		  played_at: new Date().toISOString(),
+          played_at: new Date().toISOString(),
           game_name: 'catch',
         }
 
         await axios.post('/users/histories/add', historyData, {
-            withCredentials: true,
+          withCredentials: true,
         })
         console.log('history saved')
       } catch (error) {
@@ -280,7 +362,12 @@ export default {
       this.$refs.gameContainer.focus()
     },
     updateTimer() {
-      if (this.timeLeft > 0 && !this.isPaused && this.gameStarted && this.countdown == null) {
+      if (
+        this.timeLeft > 0 &&
+        !this.isPaused &&
+        this.gameStarted &&
+        this.countdown == null
+      ) {
         this.timeLeft--
       } else if (this.timeLeft <= 0 && !this.isPaused && this.gameStarted) {
         if (this.mouseScore === this.catScore) {
@@ -302,7 +389,7 @@ export default {
         clearInterval(this.timer)
         this.timer = null
       }
-      
+
       if (winner === 'cat') {
         this.winner = `${this.guestUsername} gagne!`
       } else {
@@ -336,10 +423,9 @@ export default {
           })
         }
       }, 1000)
-    }
+    },
   },
-  mounted() {
-  },
+  mounted() {},
   beforeDestroy() {
     if (this.gameLoop) {
       clearInterval(this.gameLoop)
@@ -349,7 +435,7 @@ export default {
     }
     window.removeEventListener('keydown', this.handleKeyPress)
     window.removeEventListener('keyup', this.handleKeyUp)
-  }
+  },
 }
 </script>
 
@@ -418,7 +504,8 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.player-score, .timer {
+.player-score,
+.timer {
   font-size: 18px;
   color: #2c3e50;
   font-weight: bold;
@@ -427,8 +514,11 @@ export default {
 .game-board {
   position: relative;
   background-color: #f2ddc3;
-  background-image: 
-    linear-gradient(90deg, rgba(139, 69, 19, 0.02) 50%, transparent 50%),
+  background-image: linear-gradient(
+      90deg,
+      rgba(139, 69, 19, 0.02) 50%,
+      transparent 50%
+    ),
     linear-gradient(90deg, rgba(139, 69, 19, 0.03) 50%, transparent 50%),
     linear-gradient(90deg, transparent 50%, rgba(139, 69, 19, 0.04) 50%),
     linear-gradient(90deg, transparent 50%, rgba(139, 69, 19, 0.05) 50%);
@@ -444,7 +534,8 @@ export default {
   filter: blur(5px);
 }
 
-.mouse, .cat {
+.mouse,
+.cat {
   position: absolute;
   width: 30px;
   height: 30px;
@@ -531,14 +622,16 @@ export default {
 .wall.vertical {
   width: 15px;
   background-color: #c0392b;
-  background-image: 
-    linear-gradient(0deg, rgba(255,255,255,0.1) 0%, 
-                         rgba(255,255,255,0.2) 10%,
-                         rgba(255,255,255,0.1) 20%,
-                         rgba(255,255,255,0.05) 100%);
-  box-shadow: 
-    2px 0 5px rgba(0,0,0,0.1),
-    inset -1px 0 3px rgba(0,0,0,0.2);
+  background-image: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 10%,
+    rgba(255, 255, 255, 0.1) 20%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  box-shadow:
+    2px 0 5px rgba(0, 0, 0, 0.1),
+    inset -1px 0 3px rgba(0, 0, 0, 0.2);
 }
 
 .pause-message {

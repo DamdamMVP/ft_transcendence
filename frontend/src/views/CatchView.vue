@@ -1,19 +1,19 @@
 <template>
   <div class="Catch-view">
-    <h1>Attrape-moi si tu peux</h1>
+    <h1>{{ $t('catch.title') }}</h1>
     <div v-if="!guestUsername" class="guest-form">
-      <h2>Entrez le pseudo du deuxième joueur</h2>
+      <h2>{{ $t('catch.enterGuestName') }}</h2>
       <input 
         v-model="guestInput" 
         @keyup.enter="setGuestUsername"
-        placeholder="Pseudo du joueur 2"
+        :placeholder="$t('catch.player2Placeholder')"
         class="guest-input"
       />
-      <button @click="setGuestUsername" class="submit-btn">Commencer</button>
+      <button @click="setGuestUsername" class="submit-btn">{{ $t('catch.start') }}</button>
     </div>
     <CatchGame 
       v-else
-      :player-username="authStore.user?.username || 'Joueur 1'"
+      :player-username="authStore.user?.username || $t('catch.player1Default')"
       :guest-username="guestUsername"
     />
   </div>
@@ -23,6 +23,7 @@
 import CatchGame from '@/components/Catch/CatchGame.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useTheme } from '@/composables/useTheme'
+import { useI18n } from 'vue-i18n'
 
 export default {
   name: 'CatchView',
@@ -32,7 +33,8 @@ export default {
   setup() {
     const authStore = useAuthStore()
     const { currentTheme } = useTheme()
-    return { authStore, currentTheme }
+    const { t } = useI18n()
+    return { authStore, currentTheme, t }
   },
   data() {
     return {
