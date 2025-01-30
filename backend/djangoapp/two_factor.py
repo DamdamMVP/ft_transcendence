@@ -88,6 +88,9 @@ def verify_2fa(request):
             if not device.confirmed:
                 device.confirmed = True
                 device.save()
+                # Mettre à jour le champ has_2fa
+                user.has_2fa = True
+                user.save()
                 logger.info(f"2FA confirmed for user {user.username}")
             return Response({'success': True, 'message': '2FA verification successful'})
         
@@ -105,11 +108,34 @@ def verify_2fa(request):
 @permission_classes([IsAuthenticated])
 def disable_2fa(request):
     user = request.user
-    device = get_user_totp_device(user)
+    devices = devices_for_user(user)
     
-    if device:
+    for device in devices:
         device.delete()
-        return Response({'success': True, 'message': '2FA has been disabled'})
+    
+    # Mettre à jour le champ has_2fa
+    user.has_2fa = False
+    user.save()
+    
+    return Response({'success': True, 'message': '2FA has been disabled'})
     
     return Response({'error': '2FA is not enabled'}, status=400)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_2fa_status(request):
+    try:
+        user = request.user
+        device = get_user_totp_device(user)
+        
+        return Response({
+            'enabled': user.has_2fa and device and device.confirmed,
+            'is_configured': bool(device)
+        })
+    except Exception as e:
+        logger.error(f"Error in get_2fa_status: {str(e)}")
+        return Response({
+            'error': 'An error occurred while checking 2FA status',
+            'detail': str(e)
+        }, status=500)
 

@@ -45,7 +45,7 @@ const verificationCode = ref('')
 // Vérifier le statut de la 2FA
 const check2FAStatus = async () => {
   try {
-    const response = await axios.get('/auth/2fa/status', { withCredentials: true })
+    const response = await axios.get('/users/2fa/status', { withCredentials: true })
     has2FAEnabled.value = response.data.enabled
   } catch (error) {
     console.error('Erreur lors de la vérification du statut 2FA:', error)
@@ -55,7 +55,7 @@ const check2FAStatus = async () => {
 // Activer la 2FA
 const setup2FA = async () => {
   try {
-    const response = await axios.post('/auth/2fa/setup', {}, { withCredentials: true })
+    const response = await axios.post('/users/2fa/setup', {}, { withCredentials: true })
     if (response.data.qr_code) {
       qrCode.value = response.data.qr_code
       showQRModal.value = true
@@ -71,7 +71,7 @@ const setup2FA = async () => {
 // Désactiver la 2FA
 const disable2FA = async () => {
   try {
-    await axios.post('/auth/2fa/disable', {}, { withCredentials: true })
+    await axios.post('/users/2fa/disable', {}, { withCredentials: true })
     has2FAEnabled.value = false
     emit('showNotification', {
       message: 'La 2FA a été désactivée',
@@ -89,11 +89,11 @@ const disable2FA = async () => {
 const verifyCode = async () => {
   try {
     const response = await axios.post(
-      '/auth/2fa/verify',
-      { code: verificationCode.value },
+      '/users/2fa/verify',
+      { token: verificationCode.value }, // Changé de 'code' à 'token'
       { withCredentials: true }
     )
-    if (response.data.verified) {
+    if (response.data.success) { // Changé de 'verified' à 'success' pour matcher la réponse du backend
       has2FAEnabled.value = true
       closeModal()
       emit('showNotification', {
