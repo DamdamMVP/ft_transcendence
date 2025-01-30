@@ -22,6 +22,7 @@ class User(AbstractUser):  # Replaces Django's default user model
     language = models.CharField(max_length=20, default="fr")
     theme = models.CharField(max_length=20, default="dark")
     friends = models.ManyToManyField('self', symmetrical=False, blank=True)
+    has_2fa = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username

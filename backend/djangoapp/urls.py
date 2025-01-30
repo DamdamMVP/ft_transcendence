@@ -28,6 +28,7 @@ urlpatterns = [
     path('2fa/setup', two_factor.setup_2fa, name='setup-2fa'),
     path('2fa/verify', two_factor.verify_2fa, name='verify-2fa'),
     path('2fa/disable', two_factor.disable_2fa, name='disable-2fa'),
+    path('2fa/status', two_factor.get_2fa_status, name='get-2fa-status'),
 
     path('login', views.login),
     path('logout', views.logout),
