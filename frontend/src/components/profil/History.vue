@@ -27,8 +27,9 @@ const fetchHistory = async () => {
   try {
     loading.value = true
     error.value = null
+    const userId = route.params.id_user
     const response = await axios.get(
-      `/users/histories/user/${authStore.user.id}`,
+      `/users/histories/user/${userId}`,
       { withCredentials: true }
     )
     userHistory.value = response.data

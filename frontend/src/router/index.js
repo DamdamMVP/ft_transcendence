@@ -21,7 +21,7 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/profil',
+      path: '/:id_user/profil',
       component: ProfilView,
       meta: { requiresAuth: true },
       children: [

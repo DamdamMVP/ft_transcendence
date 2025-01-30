@@ -4,11 +4,13 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
 import eventBus from '../../utils/eventBus'
+import { useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const { t } = useI18n()
 const userHistory = ref([])
 const loading = ref(true)
+const route = useRoute()
 
 // Statistiques globales
 const stats = computed(() => {
@@ -36,10 +38,10 @@ const stats = computed(() => {
 const fetchHistory = async () => {
   try {
     loading.value = true
-    const response = await axios.get(
-      `/users/histories/user/${authStore.user.id}`,
-      { withCredentials: true }
-    )
+    const userId = route.params.id_user
+    const response = await axios.get(`/users/histories/user/${userId}`, {
+      withCredentials: true,
+    })
     userHistory.value = response.data
   } catch (err) {
     console.error('Erreur lors de la récupération des stats:', err)

@@ -1,6 +1,7 @@
 <script setup>
 import { defineProps } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 
 const props = defineProps({
   items: {
@@ -10,6 +11,7 @@ const props = defineProps({
 })
 
 const { t } = useI18n()
+const route = useRoute()
 </script>
 
 <template>
@@ -17,7 +19,7 @@ const { t } = useI18n()
     <ul class="navbar-list">
       <li v-for="(item, index) in items" :key="index" class="navbar-item">
         <router-link
-          :to="`/profil/${item.toLowerCase().replace(/ /g, '-')}`"
+          :to="`/${route.params.id_user}/profil/${item.toLowerCase().replace(/ /g, '-')}`"
           class="navbar-link"
           active-class="navbar-link-selected"
         >
