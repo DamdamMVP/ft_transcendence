@@ -119,11 +119,9 @@
 	)
   })
   
-  // Charger la liste d'amis au montage du composant et quand l'authentification change
-  onMounted(async () => {
-	if (authStore.isAuthenticated) {
-	  await friendStore.loadFriends()
-	}
+  // Le watch s'occupe déjà de charger la liste quand l'authentification change
+  onMounted(() => {
+	// Autres initialisations si nécessaire
   })
   
   // Surveiller les changements d'authentification

@@ -12,10 +12,15 @@ export function useUserStatus() {
   const fetchOnlineUsers = async () => {
     try {
       const response = await axios.get('/users/list_online')
-      onlineUsers.value = new Set(response.data)
+      // S'assurer que response.data est un tableau, sinon utiliser un tableau vide
+      const users = Array.isArray(response.data) ? response.data : 
+                   (response.data?.users || [])
+      onlineUsers.value = new Set(users)
       console.log('Online users:', Array.from(onlineUsers.value))
     } catch (error) {
       console.error('Error fetching online users:', error)
+      // En cas d'erreur, initialiser avec un ensemble vide
+      onlineUsers.value = new Set()
     }
   }
 
