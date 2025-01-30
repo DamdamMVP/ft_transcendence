@@ -21,6 +21,9 @@ const router = useRouter()
       <router-link to="/pong" class="nav-link">
         {{ $t('navbar.pong') }}
       </router-link>
+      <router-link to="/catch" class="nav-link">
+        {{ $t('navbar.catch') }}
+      </router-link>
       <router-link to="/profil/pong" class="nav-link">
         {{ $t('navbar.profil') }}
       </router-link>
