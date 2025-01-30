@@ -1,6 +1,7 @@
 <template>
   <div v-if="show" class="modal-overlay" @click="closeModal">
     <div class="modal-content" @click.stop>
+      <button class="close-icon" @click="closeModal" :disabled="isLoading">×</button>
       <h2>{{ isVerificationMode ? t('security.verify2FA') : t('security.setup2FA') }}</h2>
       
       <!-- Alert pour les messages d'erreur/succès -->
@@ -188,6 +189,7 @@ onBeforeUnmount(() => {
   max-width: 400px;
   width: 90%;
   text-align: center;
+  position: relative;
 }
 
 .input-group {
@@ -279,5 +281,32 @@ onBeforeUnmount(() => {
   to {
     transform: rotate(360deg);
   }
+}
+
+.close-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #ff0000;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.close-icon:hover {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.close-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>
