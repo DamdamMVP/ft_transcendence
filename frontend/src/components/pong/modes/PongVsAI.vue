@@ -1,6 +1,7 @@
 <template>
   <div class="pong-mode">
     <h2>Mode VS IA</h2>
+
     <div class="game-container">
       <canvas
         ref="gameCanvas"
@@ -8,6 +9,7 @@
         :height="canvasHeight"
       ></canvas>
 
+      <!-- Scoreboard -->
       <div class="score-board">
         <div class="player">
           <h3>Joueur</h3>
@@ -20,11 +22,28 @@
         </div>
       </div>
 
-      <div v-if="!isPlaying" class="game-overlay">
-        <div class="start-menu">
-          <button @click="startGame" class="start-button">
+      <!-- Overlays -->
+      <div v-if="gamePhase === 'menu'" class="game-overlay">
+        <div class="overlay-content">
+          <button @click="startCountdown" class="overlay-button">
             Commencer la partie
           </button>
+        </div>
+      </div>
+
+      <div v-if="gamePhase === 'countdown'" class="game-overlay">
+        <div class="overlay-content">
+          <h2>Début dans {{ countdownValue }}...</h2>
+        </div>
+      </div>
+
+      <div v-if="gamePhase === 'over'" class="game-overlay">
+        <div class="overlay-content">
+          <h2>Partie terminée</h2>
+          <p>
+            <strong>{{ winnerMessage }}</strong>
+          </p>
+          <button @click="restartGame" class="overlay-button">Rejouer</button>
         </div>
       </div>
     </div>
@@ -33,72 +52,270 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useTheme } from '../../../composables/useTheme'
 
-const { currentTheme } = useTheme()
-const gameCanvas = ref(null)
+/* ---------------------------------------------------------------------
+   CONSTANTES
+--------------------------------------------------------------------- */
 const canvasWidth = 800
 const canvasHeight = 400
+const WINNING_SCORE = 5
+
+// Balle
+const INITIAL_BALL_SPEED = 4
+const BALL_SPEED_INCREASE = 1.1
+const MAX_BALL_SPEED = 10
+
+// IA
+const AI_UPDATE_INTERVAL = 1000 // vision 1 fois/s
+
+// Bonus
+const BONUS_SPAWN_INTERVAL = 4000 // toutes les 4s
+const BONUS_COLORS = ['red', 'green', 'blue']
+const BONUS_BAR_WIDTH = 10
+const BONUS_BAR_HEIGHT = 60
+
+const INITIAL_PADDLE_HEIGHT = 80 // Hauteur initiale des raquettes
+
+/* ---------------------------------------------------------------------
+   ÉTATS
+--------------------------------------------------------------------- */
+const gameCanvas = ref(null)
 const playerScore = ref(0)
 const aiScore = ref(0)
-const isPlaying = ref(false)
 
-const WINNING_SCORE = 5
-const SPEED_INCREASE = 0.2
-const INITIAL_BALL_SPEED = 5
-const BALL_SPEED_INCREASE = 1.1 // 10% plus rapide à chaque rebond
-const MAX_BALL_SPEED = 10 // Vitesse maximale de la balle
+// Phases : 'menu' | 'countdown' | 'playing' | 'over'
+const gamePhase = ref('menu')
+const countdownValue = ref(3)
+const winnerMessage = ref('')
 
+// Quel joueur a touché la balle en dernier ?
+let lastPaddleTouched = null
+
+// Compte à rebours de début de manche
+const roundStartCountdown = ref(0)
+
+/**
+ * État principal
+ */
 const gameState = ref({
   player: {
     x: 20,
-    y: canvasHeight / 2 - 40,
+    y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
     width: 10,
-    height: 80,
-    speed: 6,
+    height: INITIAL_PADDLE_HEIGHT,
+    speed: 3,
     upPressed: false,
     downPressed: false,
   },
   ai: {
     x: canvasWidth - 30,
-    y: canvasHeight / 2 - 40,
+    y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
     width: 10,
-    height: 80,
+    height: INITIAL_PADDLE_HEIGHT,
     baseSpeed: 2,
-    targetY: canvasHeight / 2,
+    lastUpdateTime: 0,
     upPressed: false,
     downPressed: false,
-    lastUpdateTime: 0,
-    updateInterval: 1000, // 1 seconde entre chaque mise à jour
-    predictedBallY: canvasHeight / 2,
+    targetY: canvasHeight / 2,
   },
   ball: {
     x: canvasWidth / 2,
     y: canvasHeight / 2,
     radius: 8,
-    speedX: INITIAL_BALL_SPEED,
-    speedY: INITIAL_BALL_SPEED,
+    speedX: 0,
+    speedY: 0,
   },
+  bonusBars: [], // <-- Liste de barres multiples
+  lastBonusSpawnTime: Date.now(), // Pour gérer le spawn toutes les 4s
 })
 
-const paddleBounce = (who) => {
+/* ---------------------------------------------------------------------
+   FONCTIONS UTILITAIRES
+--------------------------------------------------------------------- */
+
+/** y aléatoire évitant la zone centrale */
+function getRandomYNotCenter(barHeight) {
+  const forbiddenMargin = 60
+  const forbiddenMin = canvasHeight / 2 - forbiddenMargin
+  const forbiddenMax = canvasHeight / 2 + forbiddenMargin
+
+  let y = 0
+  do {
+    y = Math.random() * (canvasHeight - barHeight)
+  } while (y >= forbiddenMin && y + barHeight <= forbiddenMax)
+
+  return y
+}
+
+/** Calcule la position finale Y de la balle pour l'IA */
+function predictBallPositionMultiBounceNoError() {
+  const state = gameState.value
+  const aiX = state.ai.x
+  const { x, y, speedX, speedY, radius } = state.ball
+
+  if (speedX <= 0) {
+    return canvasHeight / 2
+  }
+
+  let futureX = x
+  let futureY = y
+  let vx = speedX
+  let vy = speedY
+  while (futureX + radius < aiX) {
+    futureX += vx
+    futureY += vy
+    if (futureY - radius < 0) {
+      futureY = radius
+      vy = -vy
+    }
+    if (futureY + radius > canvasHeight) {
+      futureY = canvasHeight - radius
+      vy = -vy
+    }
+  }
+  return futureY
+}
+
+/* ---------------------------------------------------------------------
+   GESTION BONUS MULTIPLES
+--------------------------------------------------------------------- */
+/**
+ * Vérifie si deux barres se chevauchent
+ */
+function doBarsOverlap(bar1, bar2) {
+  return !(
+    bar1.x + bar1.width < bar2.x ||
+    bar2.x + bar2.width < bar1.x ||
+    bar1.y + bar1.height < bar2.y ||
+    bar2.y + bar2.height < bar1.y
+  )
+}
+
+/**
+ * Créé une nouvelle barre dans la liste bonusBars
+ */
+function spawnBonusBar() {
   const state = gameState.value
 
-  // Augmente la vitesse de la balle
-  let currentSpeed = Math.sqrt(
-    state.ball.speedX * state.ball.speedX +
-      state.ball.speedY * state.ball.speedY
-  )
+  // Limite le nombre maximum de bonus à 3 sur l'écran
+  if (state.bonusBars.length >= 4) return
 
-  // Applique l'augmentation de vitesse avec une limite
-  currentSpeed = Math.min(currentSpeed * BALL_SPEED_INCREASE, MAX_BALL_SPEED)
+  // Essaie de placer un nouveau bonus jusqu'à 10 tentatives
+  for (let attempts = 0; attempts < 10; attempts++) {
+    const colorIndex = Math.floor(Math.random() * BONUS_COLORS.length)
+    const color = BONUS_COLORS[colorIndex]
 
-  let paddle
-  if (who === 'player') {
-    paddle = state.player
-  } else {
-    paddle = state.ai
+    const newBar = {
+      color,
+      width: BONUS_BAR_WIDTH,
+      height: BONUS_BAR_HEIGHT,
+      x: canvasWidth / 2 - BONUS_BAR_WIDTH / 2,
+      y: getRandomYNotCenter(BONUS_BAR_HEIGHT),
+    }
+
+    // Vérifie s'il y a chevauchement avec les barres existantes
+    let hasOverlap = false
+    for (const existingBar of state.bonusBars) {
+      if (doBarsOverlap(newBar, existingBar)) {
+        hasOverlap = true
+        break
+      }
+    }
+
+    // Si pas de chevauchement, on ajoute la nouvelle barre
+    if (!hasOverlap) {
+      state.bonusBars.push(newBar)
+      return
+    }
   }
+}
+
+/**
+ * Applique l'effet du bonus sur le dernier joueur ayant touché la balle
+ */
+function applyBonusEffect(color) {
+  const state = gameState.value
+
+  switch (color) {
+    case 'red':
+      // Rétrécit la raquette
+      if (lastPaddleTouched) {
+        state[lastPaddleTouched].height -= 15
+        if (state[lastPaddleTouched].height < 40) {
+          state[lastPaddleTouched].height = 40
+        }
+      }
+      break
+    case 'green':
+      // Agrandit la raquette
+      if (lastPaddleTouched) {
+        state[lastPaddleTouched].height += 15
+        if (state[lastPaddleTouched].height > 120) {
+          state[lastPaddleTouched].height = 120
+        }
+      }
+      break
+    case 'blue':
+      // Inverse la direction de la balle
+      // Si personne n'a touché la balle, on inverse quand même
+      state.ball.speedX = -state.ball.speedX
+      state.ball.speedY = -state.ball.speedY
+      break
+  }
+}
+
+/* ---------------------------------------------------------------------
+   IA
+--------------------------------------------------------------------- */
+function updateAI() {
+  const state = gameState.value
+  const now = Date.now()
+
+  if (now - state.ai.lastUpdateTime >= AI_UPDATE_INTERVAL) {
+    state.ai.lastUpdateTime = now
+    const predY = predictBallPositionMultiBounceNoError()
+    state.ai.targetY = predY
+  }
+
+  const margin = 5
+  const aiCenter = state.ai.y + state.ai.height / 2
+
+  if (aiCenter < state.ai.targetY - margin) {
+    state.ai.downPressed = true
+    state.ai.upPressed = false
+  } else if (aiCenter > state.ai.targetY + margin) {
+    state.ai.downPressed = false
+    state.ai.upPressed = true
+  } else {
+    state.ai.downPressed = false
+    state.ai.upPressed = false
+  }
+
+  if (state.ai.upPressed && state.ai.y > 0) {
+    state.ai.y -= state.ai.baseSpeed
+  }
+  if (state.ai.downPressed && state.ai.y + state.ai.height < canvasHeight) {
+    state.ai.y += state.ai.baseSpeed
+  }
+
+  if (state.ai.y < 0) {
+    state.ai.y = 0
+  }
+  if (state.ai.y + state.ai.height > canvasHeight) {
+    state.ai.y = canvasHeight - state.ai.height
+  }
+}
+
+/* ---------------------------------------------------------------------
+   BALLE & COLLISIONS
+--------------------------------------------------------------------- */
+function paddleBounce(who) {
+  lastPaddleTouched = who
+  const state = gameState.value
+  const paddle = state[who]
+
+  let currentSpeed = Math.sqrt(state.ball.speedX ** 2 + state.ball.speedY ** 2)
+  currentSpeed = Math.min(currentSpeed * BALL_SPEED_INCREASE, MAX_BALL_SPEED)
 
   const paddleCenter = paddle.y + paddle.height / 2
   const distFromCenter = (state.ball.y - paddleCenter) / (paddle.height / 2)
@@ -107,77 +324,75 @@ const paddleBounce = (who) => {
 
   if (who === 'player') {
     state.ball.speedX = Math.abs(currentSpeed * Math.cos(bounceAngle))
-    state.ball.speedY = currentSpeed * Math.sin(bounceAngle)
   } else {
     state.ball.speedX = -Math.abs(currentSpeed * Math.cos(bounceAngle))
-    state.ball.speedY = currentSpeed * Math.sin(bounceAngle)
   }
+  state.ball.speedY = currentSpeed * Math.sin(bounceAngle)
 }
 
-const predictBallPosition = () => {
+function resetPaddles() {
   const state = gameState.value
-  
-  // Si la balle s'éloigne de l'IA, rester au centre
-  if (state.ball.speedX <= 0) {
-    return canvasHeight / 2
-  }
-  
-  let futureX = state.ball.x
-  let futureY = state.ball.y
-  let speedX = state.ball.speedX
-  let speedY = state.ball.speedY
-  
-  // Prédire la trajectoire jusqu'à la raquette de l'IA
-  while (futureX < state.ai.x) {
-    futureX += speedX
-    futureY += speedY
-    
-    // Rebonds sur les murs
-    if (futureY < 0 || futureY > canvasHeight) {
-      speedY = -speedY
-    }
-  }
-  
-  return futureY
+  // Centre les deux raquettes
+  state.player.y = canvasHeight / 2 - state.player.height / 2
+  state.ai.y = canvasHeight / 2 - state.ai.height / 2
 }
 
-const updateAI = () => {
+function resetPaddleSizes() {
   const state = gameState.value
-  const currentTime = Date.now()
-  
-  // Ne mettre à jour que toutes les secondes
-  if (currentTime - state.ai.lastUpdateTime >= state.ai.updateInterval) {
-    state.ai.lastUpdateTime = currentTime
-    
-    // Prédire où la balle va arriver
-    state.ai.predictedBallY = predictBallPosition()
-    
-    // Simuler des entrées clavier basées sur la prédiction
-    const paddleCenter = state.ai.y + state.ai.height / 2
-    const moveThreshold = 20 // Zone de tolérance
-    
-    if (paddleCenter < state.ai.predictedBallY - moveThreshold) {
-      state.ai.upPressed = false
-      state.ai.downPressed = true
-    } else if (paddleCenter > state.ai.predictedBallY + moveThreshold) {
-      state.ai.upPressed = true
-      state.ai.downPressed = false
-    } else {
-      state.ai.upPressed = false
-      state.ai.downPressed = false
-    }
-  }
+  // Remet les raquettes à leur taille initiale
+  state.player.height = INITIAL_PADDLE_HEIGHT
+  state.ai.height = INITIAL_PADDLE_HEIGHT
 }
 
-const updateGame = () => {
+function resetBonuses() {
+  const state = gameState.value
+  // Vide la liste des bonus
+  state.bonusBars = []
+  // Réinitialise le timer de spawn
+  state.lastBonusSpawnTime = Date.now()
+}
+
+function resetBall() {
+  const state = gameState.value
+  
+  // Reset positions
+  state.ball.x = canvasWidth / 2
+  state.ball.y = canvasHeight / 2
+  resetPaddles()
+  
+  // Reset tailles et bonus
+  resetPaddleSizes()
+  resetBonuses()
+  
+  // Arrête la balle pendant le compte à rebours
+  state.ball.speedX = 0
+  state.ball.speedY = 0
+  
+  // Lance le compte à rebours de 1 seconde
+  roundStartCountdown.value = 1
+  setTimeout(() => {
+    // Après 1 seconde, lance la balle dans une direction aléatoire
+    const goingRight = Math.random() > 0.5
+    state.ball.speedX = INITIAL_BALL_SPEED * (goingRight ? 1 : -1)
+    state.ball.speedY = INITIAL_BALL_SPEED * (Math.random() * 2 - 1)
+    lastPaddleTouched = goingRight ? 'player' : 'ai'
+    roundStartCountdown.value = 0
+  }, 1000)
+}
+
+/* ---------------------------------------------------------------------
+   BOUCLE DE MISE À JOUR
+--------------------------------------------------------------------- */
+function updateGame() {
   const state = gameState.value
 
+  // Vérif victoire
   if (playerScore.value >= WINNING_SCORE || aiScore.value >= WINNING_SCORE) {
-    isPlaying.value = false
+    endGame()
     return
   }
 
-  // Update player
+  // Joueur
   if (state.player.upPressed && state.player.y > 0) {
     state.player.y -= state.player.speed
   }
@@ -188,27 +403,43 @@ const updateGame = () => {
     state.player.y += state.player.speed
   }
 
-  // Update AI
+  // IA
   updateAI()
-  
-  // Appliquer les mouvements de l'IA basés sur les touches simulées
-  const aiCurrentSpeed = state.ai.baseSpeed * (1 + playerScore.value * SPEED_INCREASE)
-  
-  if (state.ai.upPressed && state.ai.y > 0) {
-    state.ai.y -= aiCurrentSpeed
-  }
-  if (state.ai.downPressed && state.ai.y + state.ai.height < canvasHeight) {
-    state.ai.y += aiCurrentSpeed
+
+  // BONUS : spawn toutes les 4s (même si d'autres sont encore présentes)
+  const now = Date.now()
+  if (now - state.lastBonusSpawnTime > BONUS_SPAWN_INTERVAL) {
+    spawnBonusBar()
+    state.lastBonusSpawnTime = now
   }
 
-  // Calculer la prochaine position de la balle
-  const nextX = state.ball.x + state.ball.speedX
-  const nextY = state.ball.y + state.ball.speedY
+  // Vérifier collisions balle / bonusBars
+  // (On parcourt le tableau à l'envers pour pouvoir splice)
+  for (let i = state.bonusBars.length - 1; i >= 0; i--) {
+    const bar = state.bonusBars[i]
+    // Collision en X ?
+    if (
+      state.ball.x + state.ball.radius >= bar.x &&
+      state.ball.x - state.ball.radius <= bar.x + bar.width
+    ) {
+      // Collision en Y ?
+      if (
+        state.ball.y + state.ball.radius >= bar.y &&
+        state.ball.y - state.ball.radius <= bar.y + bar.height
+      ) {
+        // Appliquer effet
+        applyBonusEffect(bar.color)
+        // Retirer la barre
+        state.bonusBars.splice(i, 1)
+      }
+    }
+  }
 
-  // Vérifier les collisions avec les raquettes avant de déplacer la balle
-  let collision = false
+  // Mise à jour de la balle
+  let nextX = state.ball.x + state.ball.speedX
+  let nextY = state.ball.y + state.ball.speedY
 
-  // Collision avec la raquette du joueur
+  // Collision raquette gauche (player)
   if (
     nextX - state.ball.radius <= state.player.x + state.player.width &&
     nextX - state.ball.radius >= state.player.x &&
@@ -217,10 +448,11 @@ const updateGame = () => {
     state.ball.speedX < 0
   ) {
     paddleBounce('player')
-    collision = true
+    nextX = state.ball.x + state.ball.speedX
+    nextY = state.ball.y + state.ball.speedY
   }
 
-  // Collision avec la raquette de l'IA
+  // Collision raquette droite (IA)
   if (
     nextX + state.ball.radius >= state.ai.x &&
     nextX + state.ball.radius <= state.ai.x + state.ai.width &&
@@ -229,60 +461,61 @@ const updateGame = () => {
     state.ball.speedX > 0
   ) {
     paddleBounce('ai')
-    collision = true
+    nextX = state.ball.x + state.ball.speedX
+    nextY = state.ball.y + state.ball.speedY
   }
 
-  // Si pas de collision, mettre à jour la position de la balle
-  if (!collision) {
-    state.ball.x = nextX
-    state.ball.y = nextY
+  // Position
+  state.ball.x = nextX
+  state.ball.y = nextY
 
-    // Collision avec les murs
-    if (
-      state.ball.y - state.ball.radius < 0 ||
-      state.ball.y + state.ball.radius > canvasHeight
-    ) {
-      state.ball.speedY = -state.ball.speedY
+  // Rebonds haut/bas
+  if (state.ball.y - state.ball.radius < 0) {
+    state.ball.y = state.ball.radius
+    state.ball.speedY = -state.ball.speedY
+  } else if (state.ball.y + state.ball.radius > canvasHeight) {
+    state.ball.y = canvasHeight - state.ball.radius
+    state.ball.speedY = -state.ball.speedY
+  }
+
+  // Sortie à gauche => IA marque
+  if (state.ball.x - state.ball.radius < 0) {
+    aiScore.value++
+    if (aiScore.value < WINNING_SCORE) {
+      resetBall()
     }
+  }
 
-    // Score points
-    if (state.ball.x - state.ball.radius < 0) {
-      aiScore.value++
-      if (aiScore.value < WINNING_SCORE) {
-        resetBall()
-      }
-    } else if (state.ball.x + state.ball.radius > canvasWidth) {
-      playerScore.value++
-      if (playerScore.value < WINNING_SCORE) {
-        resetBall()
-      }
+  // Sortie à droite => Joueur marque
+  if (state.ball.x + state.ball.radius > canvasWidth) {
+    playerScore.value++
+    if (playerScore.value < WINNING_SCORE) {
+      resetBall()
     }
   }
 }
 
-const drawGame = () => {
+function drawGame() {
   const ctx = gameCanvas.value.getContext('2d')
   const state = gameState.value
 
-  // Clear canvas
+  // Fond
   ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
     '--background-color'
   )
   ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
-  // Draw border
+  // Bordure
   ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue(
     '--primary-color'
   )
   ctx.lineWidth = 2
   ctx.strokeRect(0, 0, canvasWidth, canvasHeight)
 
-  // Draw paddles
+  // Raquette Joueur
   ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
     '--primary-color'
   )
-
-  // Player paddle
   ctx.fillRect(
     state.player.x,
     state.player.y,
@@ -290,10 +523,10 @@ const drawGame = () => {
     state.player.height
   )
 
-  // AI paddle
+  // Raquette IA
   ctx.fillRect(state.ai.x, state.ai.y, state.ai.width, state.ai.height)
 
-  // Draw ball
+  // Balle
   ctx.beginPath()
   ctx.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2)
   ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
@@ -301,53 +534,136 @@ const drawGame = () => {
   )
   ctx.fill()
   ctx.closePath()
+
+  // Dessin de TOUTES les barres bonus
+  state.bonusBars.forEach((bar) => {
+    ctx.fillStyle = bar.color
+    ctx.fillRect(bar.x, bar.y, bar.width, bar.height)
+  })
+
+  // Affiche le compte à rebours de début de manche si actif
+  if (roundStartCountdown.value > 0) {
+    ctx.fillStyle = 'white'
+    ctx.font = '48px Arial'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(roundStartCountdown.value.toString(), canvasWidth / 2, canvasHeight / 2)
+  }
 }
 
-const gameLoop = () => {
-  if (!isPlaying.value) return
+let animationId = null
+function gameLoop() {
+  if (gamePhase.value !== 'playing') return
   updateGame()
   drawGame()
-  requestAnimationFrame(gameLoop)
+  animationId = requestAnimationFrame(gameLoop)
 }
 
-const handleKeyDown = (e) => {
+/* ---------------------------------------------------------------------
+   PHASES
+--------------------------------------------------------------------- */
+function startCountdown() {
+  countdownValue.value = 3
+  gamePhase.value = 'countdown'
+  const interval = setInterval(() => {
+    countdownValue.value--
+    if (countdownValue.value <= 0) {
+      clearInterval(interval)
+      startGame()
+    }
+  }, 1000)
+}
+
+function startGame() {
+  playerScore.value = 0
+  aiScore.value = 0
+  resetGameState()
+  resetPaddles()
+  resetBall()
+  gamePhase.value = 'playing'
+  gameLoop()
+}
+
+function endGame() {
+  cancelAnimationFrame(animationId)
+  if (playerScore.value >= WINNING_SCORE) {
+    winnerMessage.value = 'Le joueur remporte la partie !'
+  } else {
+    winnerMessage.value = 'L’IA remporte la partie...'
+  }
+  gamePhase.value = 'over'
+}
+
+function restartGame() {
+  gamePhase.value = 'menu'
+}
+
+/**
+ * Reset l'état du jeu
+ */
+function resetGameState() {
+  gameState.value = {
+    player: {
+      x: 20,
+      y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
+      width: 10,
+      height: INITIAL_PADDLE_HEIGHT,
+      speed: 3,
+      upPressed: false,
+      downPressed: false,
+    },
+    ai: {
+      x: canvasWidth - 30,
+      y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
+      width: 10,
+      height: INITIAL_PADDLE_HEIGHT,
+      baseSpeed: 2,
+      lastUpdateTime: 0,
+      upPressed: false,
+      downPressed: false,
+      targetY: canvasHeight / 2,
+    },
+    ball: {
+      x: canvasWidth / 2,
+      y: canvasHeight / 2,
+      radius: 8,
+      speedX: 0,
+      speedY: 0,
+    },
+    bonusBars: [],
+    lastBonusSpawnTime: Date.now(),
+  }
+  lastPaddleTouched = null
+}
+
+/* ---------------------------------------------------------------------
+   CONTRÔLES JOUEUR
+--------------------------------------------------------------------- */
+function handleKeyDown(e) {
   const key = e.key.toLowerCase()
   if (key === 'f') gameState.value.player.upPressed = true
   if (key === 's') gameState.value.player.downPressed = true
 }
 
-const handleKeyUp = (e) => {
+function handleKeyUp(e) {
   const key = e.key.toLowerCase()
   if (key === 'f') gameState.value.player.upPressed = false
   if (key === 's') gameState.value.player.downPressed = false
 }
 
-const startGame = () => {
-  playerScore.value = 0
-  aiScore.value = 0
-  isPlaying.value = true
-  resetBall()
-  gameLoop()
-}
-
-const resetBall = () => {
-  const state = gameState.value
-  state.ball.x = canvasWidth / 2
-  state.ball.y = canvasHeight / 2
-  // Reset la vitesse à la valeur initiale
-  state.ball.speedX = INITIAL_BALL_SPEED * (Math.random() > 0.5 ? 1 : -1)
-  state.ball.speedY = INITIAL_BALL_SPEED * (Math.random() * 2 - 1)
-}
-
+/* ---------------------------------------------------------------------
+   LIFECYCLE
+--------------------------------------------------------------------- */
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('keyup', handleKeyUp)
+  drawGame() // initial
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('keyup', handleKeyUp)
-  isPlaying.value = false
+  cancelAnimationFrame(animationId)
 })
 </script>
 
@@ -377,6 +693,7 @@ canvas {
   justify-content: space-between;
   width: 100%;
   margin-top: 20px;
+  gap: 20px;
 }
 
 .player {
@@ -400,30 +717,28 @@ canvas {
   color: var(--text-color);
 }
 
+/* Overlays (menu, countdown, over) */
 .game-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.7);
 }
 
-.start-menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
+.overlay-content {
   background: var(--background-color);
-  padding: 20px;
+  padding: 30px;
   border-radius: 8px;
   border: 2px solid var(--primary-color);
+  text-align: center;
 }
 
-.start-button {
+.overlay-button {
   padding: 15px 30px;
   font-size: 18px;
   background: var(--primary-color);
@@ -432,9 +747,10 @@ canvas {
   border-radius: 5px;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 10px;
 }
 
-.start-button:hover {
+.overlay-button:hover {
   background: var(--primary-hover-color);
   transform: translateY(-2px);
 }
