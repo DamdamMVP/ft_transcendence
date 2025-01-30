@@ -89,7 +89,7 @@ def refresh_token(request):
             value=access_token,
             httponly=True,
             secure=True,
-            samesite='Strict',
+            samesite='None',
             max_age=60 * 60 * 3  # 3 heures en secondes
         )
         return response
@@ -595,14 +595,14 @@ def fortytwo_callback(request):
         access_token,
         max_age=3600,
         httponly=True,
-        samesite='Lax'
+        samesite='None'
     )
     response.set_cookie(
         'refresh_token',
         str(refresh),
         max_age=3600 * 24 * 7,
         httponly=True,
-        samesite='Lax'
+        samesite='None'
     )
     
     return response
