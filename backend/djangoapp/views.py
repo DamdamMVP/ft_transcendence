@@ -18,6 +18,33 @@ from .models import UserStatus
 def online_users(request):
     online_users = UserStatus.objects.filter(is_online=True).values_list('user_id', flat=True)
     return Response(list(online_users), status=200)
+import requests
+from django.conf import settings
+from django.urls import reverse
+
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from .models import UserStatus
+import secrets
+import string
+import json
+import urllib.parse
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def online_users(request):
+    online_users = UserStatus.objects.filter(is_online=True).values("user__id", "user__username")
+    return Response({"online_users": list(online_users)}, status=200)
+
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from .models import UserStatus
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def online_users(request):
+    online_users = UserStatus.objects.filter(is_online=True).values("user__id", "user__username")
+    return Response({"online_users": list(online_users)}, status=200)
 
 
 @api_view(['POST'])
@@ -50,7 +77,7 @@ def login(request):
             httponly=True,
             secure=True,
             samesite='None',
-            max_age=900
+            max_age=900 
         )
         response.set_cookie(
             key='refresh_token',
@@ -89,7 +116,7 @@ def refresh_token(request):
             value=access_token,
             httponly=True,
             secure=True,
-            samesite='None',
+            samesite='Strict',
             max_age=60 * 60 * 3  # 3 heures en secondes
         )
         return response
@@ -595,14 +622,14 @@ def fortytwo_callback(request):
         access_token,
         max_age=3600,
         httponly=True,
-        samesite='None'
+        samesite='Lax'
     )
     response.set_cookie(
         'refresh_token',
         str(refresh),
         max_age=3600 * 24 * 7,
         httponly=True,
-        samesite='None'
+        samesite='Lax'
     )
     
     return response
