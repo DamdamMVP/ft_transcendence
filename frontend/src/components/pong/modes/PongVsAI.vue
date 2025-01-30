@@ -71,6 +71,10 @@ const MAX_BALL_SPEED = 10
 
 // IA
 const AI_UPDATE_INTERVAL = 1000 // vision 1 fois/s
+const IDLE_MOVEMENT_CHANCE = 0.07// Chance de démarrer un mouvement inutile
+const IDLE_MOVEMENT_DURATION = 650 // Durée moyenne du mouvement en ms
+
+
 
 // Bonus
 const BONUS_SPAWN_INTERVAL = 4000 // toutes les 4s
@@ -121,6 +125,7 @@ const gameState = ref({
     upPressed: false,
     downPressed: false,
     targetY: canvasHeight / 2,
+	idleMovement: null,
   },
   ball: {
     x: canvasWidth / 2,
@@ -271,37 +276,61 @@ function applyBonusEffect(color) {
 /* ---------------------------------------------------------------------
    IA
 --------------------------------------------------------------------- */
+
 function updateAI() {
   const state = gameState.value
   const now = Date.now()
 
+  // Gestion des mouvements d'attente
+  if (!state.ai.idleMovement && state.ball.speedX < 0 && Math.random() < IDLE_MOVEMENT_CHANCE) {
+    // Démarre un mouvement aléatoire quand la balle s'éloigne
+    state.ai.idleMovement = {
+      direction: Math.random() > 0.5 ? 'up' : 'down',
+      duration: IDLE_MOVEMENT_DURATION + (Math.random() - 0.5) * 200, // +/- 200ms
+      startTime: now
+    }
+  }
+
+  // Mise à jour normale de l'IA
   if (now - state.ai.lastUpdateTime >= AI_UPDATE_INTERVAL) {
     state.ai.lastUpdateTime = now
     const predY = predictBallPositionMultiBounceNoError()
     state.ai.targetY = predY
   }
 
-  const margin = 5
-  const aiCenter = state.ai.y + state.ai.height / 2
-
-  if (aiCenter < state.ai.targetY - margin) {
-    state.ai.downPressed = true
-    state.ai.upPressed = false
-  } else if (aiCenter > state.ai.targetY + margin) {
-    state.ai.downPressed = false
-    state.ai.upPressed = true
+  // Si on a un mouvement d'attente en cours et que la balle s'éloigne
+  if (state.ai.idleMovement && state.ball.speedX < 0) {
+    if (now - state.ai.idleMovement.startTime > state.ai.idleMovement.duration) {
+      // Fin du mouvement d'attente
+      state.ai.idleMovement = null
+    } else {
+      // Applique le mouvement d'attente
+      state.ai.upPressed = state.ai.idleMovement.direction === 'up'
+      state.ai.downPressed = state.ai.idleMovement.direction === 'down'
+    }
   } else {
-    state.ai.downPressed = false
-    state.ai.upPressed = false
+    // Comportement normal
+    const margin = 5
+    const aiCenter = state.ai.y + state.ai.height / 2
+    if (aiCenter < state.ai.targetY - margin) {
+      state.ai.downPressed = true
+      state.ai.upPressed = false
+    } else if (aiCenter > state.ai.targetY + margin) {
+      state.ai.downPressed = false
+      state.ai.upPressed = true
+    } else {
+      state.ai.downPressed = false
+      state.ai.upPressed = false
+    }
   }
 
+  // Applique les mouvements
   if (state.ai.upPressed && state.ai.y > 0) {
     state.ai.y -= state.ai.baseSpeed
   }
   if (state.ai.downPressed && state.ai.y + state.ai.height < canvasHeight) {
     state.ai.y += state.ai.baseSpeed
   }
-
   if (state.ai.y < 0) {
     state.ai.y = 0
   }
@@ -309,7 +338,6 @@ function updateAI() {
     state.ai.y = canvasHeight - state.ai.height
   }
 }
-
 /* ---------------------------------------------------------------------
    BALLE & COLLISIONS
 --------------------------------------------------------------------- */
@@ -651,6 +679,7 @@ function resetGameState() {
       upPressed: false,
       downPressed: false,
       targetY: canvasHeight / 2,
+	  idleMovement: null,
     },
     ball: {
       x: canvasWidth / 2,
