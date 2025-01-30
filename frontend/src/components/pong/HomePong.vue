@@ -41,7 +41,7 @@ const selectMode = (mode) => {
   justify-content: center;
   padding: 2rem;
   min-height: 65vh;
-  background: #1a1a1a;
+  background: var(--background-color);
   color: white;
   width: 100%;
 }
