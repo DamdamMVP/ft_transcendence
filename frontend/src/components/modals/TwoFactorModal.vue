@@ -21,7 +21,7 @@
           <input
             type="text"
             v-model="verificationCode"
-            placeholder="______"
+            placeholder=""
             class="verification-input"
             maxlength="6"
             pattern="\d*"
@@ -138,7 +138,7 @@ const verifyCode = async () => {
       }
     } else {
       const response = await axios.post('/users/2fa/verify', {
-        code: verificationCode.value
+        token: verificationCode.value
       })
       
       if (response.status === 200) {
@@ -215,6 +215,9 @@ onBeforeUnmount(() => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .verify-btn:disabled {
