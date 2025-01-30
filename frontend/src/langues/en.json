@@ -127,6 +127,22 @@
       "countdown": "Ready..."
     }
   },
+  "catch": {
+    "title": "Catch me if you can",
+    "enterGuestName": "Enter second player's username",
+    "player2Placeholder": "Player 2 username",
+    "player1Default": "Player 1",
+    "start": "Start",
+    "score": "Score",
+    "capture": "Capture",
+    "gameOver": "Game Over",
+    "newGame": "New Game",
+    "mouseControls": "Mouse",
+    "catControls": "Cat",
+    "numpad": "Numpad",
+    "timeElapsed": "Time Elapsed",
+    "timeRemaining": "Time: {time}s"
+  },
   "error": {
     "pageNotFound": "Page Not Found",
     "pageNotFoundDesc": "The page you are looking for doesn't exist or has been moved.",

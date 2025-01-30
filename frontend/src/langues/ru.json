@@ -117,6 +117,22 @@
       "countdown": "Приготовьтесь..."
     }
   },
+  "catch": {
+    "title": "Поймай меня, если сможешь",
+    "enterGuestName": "Введите имя второго игрока",
+    "player2Placeholder": "Имя игрока 2",
+    "player1Default": "Игрок 1",
+    "start": "Начать",
+    "score": "Счет",
+    "capture": "Поймать",
+    "gameOver": "Игра окончена",
+    "newGame": "Новая игра",
+    "mouseControls": "Мышь",
+    "catControls": "Кот",
+    "numpad": "Цифровая клавиатура",
+    "timeElapsed": "Время истекло",
+    "timeRemaining": "Время: {time}с"
+  },
   "chat": {
     "typemessage": "Введите сообщение...",
     "send": "Отправить",

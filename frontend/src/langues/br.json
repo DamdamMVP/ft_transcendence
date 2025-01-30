@@ -122,6 +122,22 @@
       "countdown": "Prest..."
     }
   },
+  "catch": {
+    "title": "Tap ac'hanon mar gellez",
+    "enterGuestName": "Ebarzhit anv an eil c'hoarier",
+    "player2Placeholder": "Anv c'hoarier 2",
+    "player1Default": "C'hoarier 1",
+    "start": "Kregiñ",
+    "score": "Skor",
+    "capture": "Tapout",
+    "gameOver": "Echu eo ar c'hoari",
+    "newGame": "C'hoari nevez",
+    "mouseControls": "Logodenn",
+    "catControls": "Kazh",
+    "numpad": "Klavier niverel",
+    "timeElapsed": "Amzer echu",
+    "timeRemaining": "Amzer: {time}s"
+  },
   "error": {
     "pageNotFound": "Pajenn Nann Kavet",
     "pageNotFoundDesc": "Ar bajenn a glaskit n'eus ket anezhi pe zo bet dilec'hiet.",
