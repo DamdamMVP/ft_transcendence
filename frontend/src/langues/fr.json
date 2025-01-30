@@ -76,7 +76,12 @@
     "deleteAccountConfirm": "Oui, supprimer mon compte",
     "cancel": "Annuler",
     "accountDeleted": "Compte supprimé avec succès",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "enable2FA": "Activer la 2FA",
+    "disable2FA": "Désactiver la 2FA",
+    "enterVerificationCode": "Entrez le code à 6 chiffres",
+    "verify": "Vérifier",
+    "scanQRCode": "Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy, etc.)"
   },
   "friendList": {
     "title": "Mes amis",

@@ -71,7 +71,12 @@
     "deleteAccountConfirm": "Ya, dilemel ma c'hont",
     "cancel": "Nullañ",
     "accountDeleted": "Kont dilemet gant berzh",
-    "logout": "Digevreañ"
+    "logout": "Digevreañ",
+    "enable2FA": "Gweredekaat 2FA",
+    "disable2FA": "Diweredekaat 2FA",
+    "enterVerificationCode": "Ebarzhit ar c'hod 6 sifr",
+    "verify": "Gwiriañ",
+    "scanQRCode": "Skanit ar c'hod QR-mañ gant ho meziant dilesa (Google Authenticator, Authy, h.a.)"
   },
   "friendList": {
     "title": "Ma mignoned",
