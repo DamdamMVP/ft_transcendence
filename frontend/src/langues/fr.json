@@ -163,5 +163,22 @@
     "pageNotFound": "Page Non Trouvée",
     "pageNotFoundDesc": "La page que vous recherchez n'existe pas ou a été déplacée.",
     "backToHome": "Retour à l'Accueil"
+  },
+  "security": {
+    "setup2FA": "Configuration de l'authentification à deux facteurs",
+    "verify2FA": "Vérification de l'authentification à deux facteurs",
+    "scanQRCode": "Scannez ce QR code avec votre application d'authentification",
+    "enter2FACode": "Entrez le code à 6 chiffres de votre application d'authentification",
+    "enterCode": "Code à 6 chiffres",
+    "verify": "Vérifier",
+    "codeFormat": "Le code doit contenir 6 chiffres",
+    "setupSuccess": "2FA configuré avec succès",
+    "verifySuccess": "Code vérifié avec succès",
+    "invalidCode": "Code invalide"
+  },
+  "errors": {
+    "networkError": "Erreur de connexion au serveur",
+    "unknownError": "Une erreur inattendue s'est produite",
+    "invalidCode": "Code invalide"
   }
 }

@@ -162,5 +162,22 @@
     "pageNotFound": "Page Not Found",
     "pageNotFoundDesc": "The page you are looking for doesn't exist or has been moved.",
     "backToHome": "Back to Home"
+  },
+	"security": {
+    "setup2FA": "Two-Factor Authentication Setup",
+    "verify2FA": "Two-Factor Authentication Verification",
+    "scanQRCode": "Scan this QR code with your authentication app",
+    "enter2FACode": "Enter the 6-digit code from your authentication app",
+    "enterCode": "6-digit code",
+    "verify": "Verify",
+    "codeFormat": "Code must be 6 digits",
+    "setupSuccess": "2FA setup successful",
+    "verifySuccess": "Code verified successfully",
+    "invalidCode": "Invalid code"
+  },
+  "errors": {
+    "networkError": "Server connection error",
+    "unknownError": "An unexpected error occurred",
+    "invalidCode": "Invalid code"
   }
 }

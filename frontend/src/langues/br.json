@@ -154,5 +154,22 @@
     "pageNotFound": "Pajenn Nann Kavet",
     "pageNotFoundDesc": "Ar bajenn a glaskit n'eus ket anezhi pe zo bet dilec'hiet.",
     "backToHome": "Distro d'ar Gêr"
+  },
+  "security": {
+    "setup2FA": "Kefluniañ an dilesa daou-elfenn",
+    "verify2FA": "Gwiriañ an dilesa daou-elfenn",
+    "scanQRCode": "Skannit ar c'hod QR-mañ gant ho arload dilesa",
+    "enter2FACode": "Ebarzhit ar c'hod 6 sifr eus ho arload dilesa",
+    "enterCode": "Kod 6 sifr",
+    "verify": "Gwiriañ",
+    "codeFormat": "Ar c'hod a rank bezañ 6 sifr",
+    "setupSuccess": "Dilesa daou-elfenn staliet gant berzh",
+    "verifySuccess": "Kod gwiriet gant berzh",
+    "invalidCode": "Kod direizh"
+  },
+  "errors": {
+    "networkError": "Fazi kevreañ d'ar servijer",
+    "unknownError": "Ur fazi dic'hortoz zo c'hoarvezet",
+    "invalidCode": "Kod direizh"
   }
 }
