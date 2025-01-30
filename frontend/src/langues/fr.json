@@ -182,5 +182,26 @@
     "unknownError": "Une erreur inattendue s'est produite",
     "invalidCode": "Code invalide",
     "invalidCredentials": "Identifiants invalides"
+},
+"error": {
+  "pageNotFound": "Page Non Trouvée",
+  "pageNotFoundDesc": "La page que vous recherchez n'existe pas ou a été déplacée.",
+  "backToHome": "Retour à l'Accueil"
+},
+  "catch": {
+    "title": "Attrape-moi si tu peux",
+    "enterGuestName": "Entrez le pseudo du deuxième joueur",
+    "player2Placeholder": "Pseudo du joueur 2",
+    "player1Default": "Joueur 1",
+    "start": "Commencer",
+    "score": "Score",
+    "capture": "Capture",
+    "gameOver": "Partie terminée",
+    "newGame": "Nouvelle Partie",
+    "mouseControls": "Souris",
+    "catControls": "Chat",
+    "numpad": "Pavé numérique",
+    "timeElapsed": "Temps écoulé",
+    "timeRemaining": "Temps: {time}s"
   }
 }
