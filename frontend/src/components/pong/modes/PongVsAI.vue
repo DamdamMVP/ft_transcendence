@@ -354,20 +354,20 @@ function resetBonuses() {
 
 function resetBall() {
   const state = gameState.value
-  
+
   // Reset positions
   state.ball.x = canvasWidth / 2
   state.ball.y = canvasHeight / 2
   resetPaddles()
-  
+
   // Reset tailles et bonus
   resetPaddleSizes()
   resetBonuses()
-  
+
   // Arrête la balle pendant le compte à rebours
   state.ball.speedX = 0
   state.ball.speedY = 0
-  
+
   // Lance le compte à rebours de 1 seconde
   roundStartCountdown.value = 1
   setTimeout(() => {
@@ -547,7 +547,11 @@ function drawGame() {
     ctx.font = '48px Arial'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText(roundStartCountdown.value.toString(), canvasWidth / 2, canvasHeight / 2)
+    ctx.fillText(
+      roundStartCountdown.value.toString(),
+      canvasWidth / 2,
+      canvasHeight / 2
+    )
   }
 }
 
@@ -674,7 +678,7 @@ onUnmounted(() => {
   align-items: center;
   padding: 20px;
   background: var(--background-color);
-  min-height: 100vh;
+  min-height: 65vh;
   color: var(--text-color);
 }
 

@@ -1,72 +1,76 @@
 <template>
-  <div class="tournament-mode">
-    <h2>Mode Tournoi</h2>
-    
-    <div v-if="!currentMatch" class="tournament-bracket">
-      <div class="players-setup" v-if="!tournamentStarted">
-        <h3>Configuration des joueurs</h3>
-        <div class="players-list">
-          <div v-for="(player, index) in players" :key="index" class="player-input">
-            <input 
-              v-model="players[index]" 
-              :placeholder="'Joueur ' + (index + 1)"
-              type="text"
-            >
-          </div>
+  <div class="pong-mode">
+    <h2>Mode Tournoi (4 joueurs)</h2>
+
+    <div v-if="currentPhase === 'bracket'" class="tournament-bracket">
+      <h3>Tournoi en cours</h3>
+      <div class="bracket-round">
+        <h4>Demi-finales</h4>
+        <div class="match">
+          <p>{{ matches[0].player1 }} vs {{ matches[0].player2 }}</p>
+          <button v-if="!matches[0].winner" @click="startMatch(0)">Commencer le match</button>
+          <p v-else>Vainqueur: {{ matches[0].winner }}</p>
         </div>
-        <button 
-          @click="startTournament" 
-          :disabled="!allPlayersReady"
-          class="start-button"
-        >
-          Commencer le tournoi
-        </button>
+        <div class="match">
+          <p>{{ matches[1].player1 }} vs {{ matches[1].player2 }}</p>
+          <button v-if="!matches[1].winner" @click="startMatch(1)">Commencer le match</button>
+          <p v-else>Vainqueur: {{ matches[1].winner }}</p>
+        </div>
       </div>
-
-      <div v-else class="bracket-display">
-        <div class="semi-finals">
-          <div class="match" @click="startMatch(0, 1)">
-            <div class="player">{{ players[0] }}</div>
-            <div class="vs">VS</div>
-            <div class="player">{{ players[1] }}</div>
-          </div>
-          <div class="match" @click="startMatch(2, 3)">
-            <div class="player">{{ players[2] }}</div>
-            <div class="vs">VS</div>
-            <div class="player">{{ players[3] }}</div>
-          </div>
-        </div>
-
-        <div class="finals" v-if="finalists.length === 2">
-          <div class="match final-match" @click="startFinalMatch">
-            <div class="player">{{ finalists[0] }}</div>
-            <div class="vs">VS</div>
-            <div class="player">{{ finalists[1] }}</div>
-          </div>
-        </div>
-
-        <div v-if="winner" class="winner-display">
-          <h3>🏆 Vainqueur du tournoi 🏆</h3>
-          <div class="winner-name">{{ winner }}</div>
+      
+      <div class="bracket-round" v-if="matches[0].winner && matches[1].winner">
+        <h4>Finale</h4>
+        <div class="match">
+          <p>{{ matches[0].winner }} vs {{ matches[1].winner }}</p>
+          <button @click="startFinal">Commencer la finale</button>
         </div>
       </div>
     </div>
 
-    <div v-else class="game-container">
+    <div v-if="currentPhase === 'game'" class="game-container">
       <canvas
         ref="gameCanvas"
         :width="canvasWidth"
         :height="canvasHeight"
       ></canvas>
-      
-      <div class="match-info">
-        <div class="player-info">
+
+      <!-- Scoreboard -->
+      <div class="score-board">
+        <div class="player">
           <h3>{{ currentMatch.player1 }}</h3>
-          <p class="score">{{ player1Score }}</p>
+          <p class="score">{{ playerScore }}</p>
+          <p class="controls">Contrôles: F / S</p>
         </div>
-        <div class="player-info">
+        <div class="player">
           <h3>{{ currentMatch.player2 }}</h3>
-          <p class="score">{{ player2Score }}</p>
+          <p class="score">{{ aiScore }}</p>
+          <p class="controls">Contrôles: ↑ / ↓</p>
+        </div>
+      </div>
+
+      <!-- Game Overlays -->
+      <div v-if="gamePhase === 'menu'" class="game-overlay">
+        <div class="overlay-content">
+          <h3>{{ currentMatch.player1 }} vs {{ currentMatch.player2 }}</h3>
+          <button @click="startCountdown" class="overlay-button">
+            Commencer le match
+          </button>
+        </div>
+      </div>
+
+      <div v-if="gamePhase === 'countdown'" class="game-overlay">
+        <div class="overlay-content">
+          <h2>Début dans {{ countdownValue }}...</h2>
+        </div>
+      </div>
+
+      <div v-if="gamePhase === 'over'" class="game-overlay">
+        <div class="overlay-content">
+          <h2>Match terminé</h2>
+          <p>
+            <strong>{{ winnerMessage }}</strong>
+          </p>
+          <button @click="returnToBracket" class="overlay-button">Retour au tournoi</button>
         </div>
       </div>
     </div>
@@ -74,199 +78,631 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useAuthStore } from '../../../stores/authStore'
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const authStore = useAuthStore()
-const gameCanvas = ref(null)
+/* ---------------------------------------------------------------------
+   CONSTANTES
+--------------------------------------------------------------------- */
 const canvasWidth = 800
 const canvasHeight = 400
+const WINNING_SCORE = 5
 
-const players = ref(['', '', '', ''])
-const tournamentStarted = ref(false)
+// Balle
+const INITIAL_BALL_SPEED = 4
+const BALL_SPEED_INCREASE = 1.1
+const MAX_BALL_SPEED = 10
+
+// Bonus
+const BONUS_SPAWN_INTERVAL = 4000
+const BONUS_COLORS = ['red', 'green', 'blue']
+const BONUS_BAR_WIDTH = 10
+const BONUS_BAR_HEIGHT = 60
+
+const INITIAL_PADDLE_HEIGHT = 80
+
+/* ---------------------------------------------------------------------
+   ÉTATS DU TOURNOI
+--------------------------------------------------------------------- */
+const currentPhase = ref('bracket') // 'bracket' ou 'game'
+const matches = ref([
+  { player1: 'Joueur 1', player2: 'Joueur 2', winner: null },
+  { player1: 'Joueur 3', player2: 'Joueur 4', winner: null }
+])
 const currentMatch = ref(null)
-const finalists = ref([])
-const winner = ref(null)
-const player1Score = ref(0)
-const player2Score = ref(0)
+const currentMatchIndex = ref(null)
+const isFinal = ref(false)
 
-const allPlayersReady = computed(() => {
-  return players.value.every(player => player.trim() !== '')
+/* ---------------------------------------------------------------------
+   ÉTATS DU JEU
+--------------------------------------------------------------------- */
+const gameCanvas = ref(null)
+const playerScore = ref(0)
+const aiScore = ref(0)
+
+const gamePhase = ref('menu')
+const countdownValue = ref(3)
+const winnerMessage = ref('')
+
+let lastPaddleTouched = null
+const roundStartCountdown = ref(0)
+
+const gameState = ref({
+  player: {
+    x: 20,
+    y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
+    width: 10,
+    height: INITIAL_PADDLE_HEIGHT,
+    speed: 3,
+    upPressed: false,
+    downPressed: false,
+  },
+  ai: {
+    x: canvasWidth - 30,
+    y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
+    width: 10,
+    height: INITIAL_PADDLE_HEIGHT,
+    speed: 3,
+    upPressed: false,
+    downPressed: false,
+  },
+  ball: {
+    x: canvasWidth / 2,
+    y: canvasHeight / 2,
+    radius: 8,
+    speedX: 0,
+    speedY: 0,
+  },
+  bonusBars: [],
+  lastBonusSpawnTime: Date.now(),
 })
 
-const startTournament = () => {
-  tournamentStarted.value = true
+/* ---------------------------------------------------------------------
+   FONCTIONS DU TOURNOI
+--------------------------------------------------------------------- */
+function startMatch(matchIndex) {
+  currentMatchIndex.value = matchIndex
+  currentMatch.value = matches.value[matchIndex]
+  currentPhase.value = 'game'
+  gamePhase.value = 'menu'
+  resetGame()
 }
 
-const startMatch = (player1Index, player2Index) => {
+function startFinal() {
+  isFinal.value = true
   currentMatch.value = {
-    player1: players.value[player1Index],
-    player2: players.value[player2Index],
-    player1Index,
-    player2Index,
-    isFinal: false
+    player1: matches.value[0].winner,
+    player2: matches.value[1].winner
   }
+  currentPhase.value = 'game'
+  gamePhase.value = 'menu'
+  resetGame()
 }
 
-const startFinalMatch = () => {
-  currentMatch.value = {
-    player1: finalists.value[0],
-    player2: finalists.value[1],
-    isFinal: true
+function returnToBracket() {
+  if (!isFinal.value) {
+    matches.value[currentMatchIndex.value].winner = 
+      playerScore.value >= WINNING_SCORE ? currentMatch.value.player1 : currentMatch.value.player2
   }
-}
-
-const endMatch = (winnerName) => {
-  if (currentMatch.value.isFinal) {
-    winner.value = winnerName
-  } else {
-    finalists.value.push(winnerName)
-  }
+  currentPhase.value = 'bracket'
   currentMatch.value = null
+  currentMatchIndex.value = null
 }
+
+/* ---------------------------------------------------------------------
+   FONCTIONS UTILITAIRES
+--------------------------------------------------------------------- */
+function getRandomYNotCenter(barHeight) {
+  const forbiddenMargin = 60
+  const forbiddenMin = canvasHeight / 2 - forbiddenMargin
+  const forbiddenMax = canvasHeight / 2 + forbiddenMargin
+
+  let y = 0
+  do {
+    y = Math.random() * (canvasHeight - barHeight)
+  } while (y >= forbiddenMin && y + barHeight <= forbiddenMax)
+
+  return y
+}
+
+/* ---------------------------------------------------------------------
+   GESTION BONUS
+--------------------------------------------------------------------- */
+function doBarsOverlap(bar1, bar2) {
+  return !(
+    bar1.x + bar1.width < bar2.x ||
+    bar2.x + bar2.width < bar1.x ||
+    bar1.y + bar1.height < bar2.y ||
+    bar2.y + bar2.height < bar1.y
+  )
+}
+
+function spawnBonusBar() {
+  const state = gameState.value
+
+  if (state.bonusBars.length >= 4) return
+
+  for (let attempts = 0; attempts < 10; attempts++) {
+    const colorIndex = Math.floor(Math.random() * BONUS_COLORS.length)
+    const color = BONUS_COLORS[colorIndex]
+
+    const newBar = {
+      color,
+      width: BONUS_BAR_WIDTH,
+      height: BONUS_BAR_HEIGHT,
+      x: canvasWidth / 2 - BONUS_BAR_WIDTH / 2,
+      y: getRandomYNotCenter(BONUS_BAR_HEIGHT),
+    }
+
+    let hasOverlap = false
+    for (const existingBar of state.bonusBars) {
+      if (doBarsOverlap(newBar, existingBar)) {
+        hasOverlap = true
+        break
+      }
+    }
+
+    if (!hasOverlap) {
+      state.bonusBars.push(newBar)
+      return
+    }
+  }
+}
+
+function applyBonusEffect(color) {
+  const state = gameState.value
+
+  switch (color) {
+    case 'red':
+      if (lastPaddleTouched) {
+        state[lastPaddleTouched].height -= 15
+        if (state[lastPaddleTouched].height < 40) {
+          state[lastPaddleTouched].height = 40
+        }
+      }
+      break
+    case 'green':
+      if (lastPaddleTouched) {
+        state[lastPaddleTouched].height += 15
+        if (state[lastPaddleTouched].height > 120) {
+          state[lastPaddleTouched].height = 120
+        }
+      }
+      break
+    case 'blue':
+      state.ball.speedX = -state.ball.speedX
+      state.ball.speedY = -state.ball.speedY
+      break
+  }
+}
+
+/* ---------------------------------------------------------------------
+   COLLISIONS & RESET
+--------------------------------------------------------------------- */
+function paddleBounce(who) {
+  lastPaddleTouched = who
+  const state = gameState.value
+  const paddle = state[who]
+
+  let currentSpeed = Math.sqrt(state.ball.speedX ** 2 + state.ball.speedY ** 2)
+  currentSpeed = Math.min(currentSpeed * BALL_SPEED_INCREASE, MAX_BALL_SPEED)
+
+  const paddleCenter = paddle.y + paddle.height / 2
+  const distFromCenter = (state.ball.y - paddleCenter) / (paddle.height / 2)
+  const maxBounceAngle = 60 * (Math.PI / 180)
+  const bounceAngle = distFromCenter * maxBounceAngle
+
+  if (who === 'player') {
+    state.ball.speedX = Math.abs(currentSpeed * Math.cos(bounceAngle))
+  } else {
+    state.ball.speedX = -Math.abs(currentSpeed * Math.cos(bounceAngle))
+  }
+  state.ball.speedY = currentSpeed * Math.sin(bounceAngle)
+}
+
+function resetPaddles() {
+  const state = gameState.value
+  state.player.y = canvasHeight / 2 - state.player.height / 2
+  state.ai.y = canvasHeight / 2 - state.ai.height / 2
+}
+
+function resetPaddleSizes() {
+  const state = gameState.value
+  state.player.height = INITIAL_PADDLE_HEIGHT
+  state.ai.height = INITIAL_PADDLE_HEIGHT
+}
+
+function resetBonuses() {
+  const state = gameState.value
+  state.bonusBars = []
+  state.lastBonusSpawnTime = Date.now()
+}
+
+function resetBall() {
+  const state = gameState.value
+  
+  state.ball.x = canvasWidth / 2
+  state.ball.y = canvasHeight / 2
+  resetPaddles()
+  
+  resetPaddleSizes()
+  resetBonuses()
+  
+  state.ball.speedX = 0
+  state.ball.speedY = 0
+  
+  roundStartCountdown.value = 1
+  setTimeout(() => {
+    const goingRight = Math.random() > 0.5
+    state.ball.speedX = INITIAL_BALL_SPEED * (goingRight ? 1 : -1)
+    state.ball.speedY = INITIAL_BALL_SPEED * (Math.random() * 2 - 1)
+    lastPaddleTouched = goingRight ? 'player' : 'ai'
+    roundStartCountdown.value = 0
+  }, 1000)
+}
+
+/* ---------------------------------------------------------------------
+   BOUCLE DE JEU
+--------------------------------------------------------------------- */
+function updateGame() {
+  const state = gameState.value
+
+  if (playerScore.value >= WINNING_SCORE || aiScore.value >= WINNING_SCORE) {
+    endGame()
+    return
+  }
+
+  // Joueur 1
+  if (state.player.upPressed && state.player.y > 0) {
+    state.player.y -= state.player.speed
+  }
+  if (state.player.downPressed && state.player.y + state.player.height < canvasHeight) {
+    state.player.y += state.player.speed
+  }
+
+  // Joueur 2
+  updatePlayer2()
+
+  // Spawn des bonus
+  const now = Date.now()
+  if (now - state.lastBonusSpawnTime > BONUS_SPAWN_INTERVAL) {
+    spawnBonusBar()
+    state.lastBonusSpawnTime = now
+  }
+
+  // Collisions avec les bonus
+  for (let i = state.bonusBars.length - 1; i >= 0; i--) {
+    const bar = state.bonusBars[i]
+    if (
+      state.ball.x + state.ball.radius >= bar.x &&
+      state.ball.x - state.ball.radius <= bar.x + bar.width &&
+      state.ball.y + state.ball.radius >= bar.y &&
+      state.ball.y - state.ball.radius <= bar.y + bar.height
+    ) {
+      applyBonusEffect(bar.color)
+      state.bonusBars.splice(i, 1)
+    }
+  }
+
+  // Mise à jour de la balle
+  let nextX = state.ball.x + state.ball.speedX
+  let nextY = state.ball.y + state.ball.speedY
+
+  // Collision raquette gauche
+  if (
+    nextX - state.ball.radius <= state.player.x + state.player.width &&
+    nextX - state.ball.radius >= state.player.x &&
+    state.ball.y >= state.player.y &&
+    state.ball.y <= state.player.y + state.player.height &&
+    state.ball.speedX < 0
+  ) {
+    paddleBounce('player')
+    nextX = state.ball.x + state.ball.speedX
+    nextY = state.ball.y + state.ball.speedY
+  }
+
+  // Collision raquette droite
+  if (
+    nextX + state.ball.radius >= state.ai.x &&
+    nextX + state.ball.radius <= state.ai.x + state.ai.width &&
+    state.ball.y >= state.ai.y &&
+    state.ball.y <= state.ai.y + state.ai.height &&
+    state.ball.speedX > 0
+  ) {
+    paddleBounce('ai')
+    nextX = state.ball.x + state.ball.speedX
+    nextY = state.ball.y + state.ball.speedY
+  }
+
+  // Position
+  state.ball.x = nextX
+  state.ball.y = nextY
+
+  // Rebonds haut/bas
+  if (state.ball.y - state.ball.radius < 0) {
+    state.ball.y = state.ball.radius
+    state.ball.speedY = -state.ball.speedY
+  } else if (state.ball.y + state.ball.radius > canvasHeight) {
+    state.ball.y = canvasHeight - state.ball.radius
+    state.ball.speedY = -state.ball.speedY
+  }
+
+  // Points
+  if (state.ball.x - state.ball.radius < 0) {
+    aiScore.value++
+    if (aiScore.value < WINNING_SCORE) {
+      resetBall()
+    }
+  }
+  if (state.ball.x + state.ball.radius > canvasWidth) {
+    playerScore.value++
+    if (playerScore.value < WINNING_SCORE) {
+      resetBall()
+    }
+  }
+}
+
+function drawGame() {
+  const ctx = gameCanvas.value.getContext('2d')
+  const state = gameState.value
+
+  // Fond
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--background-color'
+  )
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight)
+
+  // Bordure
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--primary-color'
+  )
+  ctx.lineWidth = 2
+  ctx.strokeRect(0, 0, canvasWidth, canvasHeight)
+
+  // Raquettes
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--primary-color'
+  )
+  ctx.fillRect(
+    state.player.x,
+    state.player.y,
+    state.player.width,
+    state.player.height
+  )
+  ctx.fillRect(state.ai.x, state.ai.y, state.ai.width, state.ai.height)
+
+  // Balle
+  ctx.beginPath()
+  ctx.arc(state.ball.x, state.ball.y, state.ball.radius, 0, Math.PI * 2)
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--accent-color'
+  )
+  ctx.fill()
+  ctx.closePath()
+
+  // Bonus
+  state.bonusBars.forEach((bar) => {
+    ctx.fillStyle = bar.color
+    ctx.fillRect(bar.x, bar.y, bar.width, bar.height)
+  })
+
+  // Compte à rebours
+  if (roundStartCountdown.value > 0) {
+    ctx.fillStyle = 'white'
+    ctx.font = '48px Arial'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(roundStartCountdown.value.toString(), canvasWidth / 2, canvasHeight / 2)
+  }
+}
+
+let animationId = null
+function gameLoop() {
+  if (gamePhase.value !== 'playing') return
+  updateGame()
+  drawGame()
+  animationId = requestAnimationFrame(gameLoop)
+}
+
+/* ---------------------------------------------------------------------
+   PHASES DE JEU
+--------------------------------------------------------------------- */
+function startCountdown() {
+  countdownValue.value = 3
+  gamePhase.value = 'countdown'
+  const interval = setInterval(() => {
+    countdownValue.value--
+    if (countdownValue.value <= 0) {
+      clearInterval(interval)
+      startGame()
+    }
+  }, 1000)
+}
+
+function startGame() {
+  playerScore.value = 0
+  aiScore.value = 0
+  resetGameState()
+  resetPaddles()
+  resetBall()
+  gamePhase.value = 'playing'
+  gameLoop()
+}
+
+function endGame() {
+  cancelAnimationFrame(animationId)
+  const winner = playerScore.value >= WINNING_SCORE ? currentMatch.value.player1 : currentMatch.value.player2
+  winnerMessage.value = `${winner} remporte le match !`
+  gamePhase.value = 'over'
+}
+
+function resetGameState() {
+  gameState.value = {
+    player: {
+      x: 20,
+      y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
+      width: 10,
+      height: INITIAL_PADDLE_HEIGHT,
+      speed: 3,
+      upPressed: false,
+      downPressed: false,
+    },
+    ai: {
+      x: canvasWidth - 30,
+      y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
+      width: 10,
+      height: INITIAL_PADDLE_HEIGHT,
+      speed: 3,
+      upPressed: false,
+      downPressed: false,
+    },
+    ball: {
+      x: canvasWidth / 2,
+      y: canvasHeight / 2,
+      radius: 8,
+      speedX: 0,
+      speedY: 0,
+    },
+    bonusBars: [],
+    lastBonusSpawnTime: Date.now(),
+  }
+  lastPaddleTouched = null
+}
+
+/* ---------------------------------------------------------------------
+   LIFECYCLE
+--------------------------------------------------------------------- */
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('keyup', handleKeyUp)
+  drawGame()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('keyup', handleKeyUp)
+  cancelAnimationFrame(animationId)
+})
 </script>
 
 <style scoped>
-.tournament-mode {
-  padding: 20px;
-  background: #1a1a1a;
-  min-height: 100vh;
-  color: white;
-}
-
-h2 {
-  text-align: center;
-  color: #4CAF50;
-  margin-bottom: 30px;
-}
-
-.players-setup {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.players-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.pong-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
   gap: 20px;
-  margin-bottom: 30px;
 }
 
-.player-input input {
-  width: 100%;
-  padding: 10px;
-  background: #2a2a2a;
-  border: 2px solid #4CAF50;
-  border-radius: 5px;
-  color: white;
-}
-
-.start-button {
-  width: 100%;
-  padding: 15px;
-  background: #4CAF50;
-  border: none;
-  border-radius: 5px;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.start-button:hover:not(:disabled) {
-  background: #45a049;
-  transform: translateY(-2px);
-}
-
-.start-button:disabled {
-  background: #666;
-  cursor: not-allowed;
-}
-
-.bracket-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 40px;
-}
-
-.semi-finals {
-  display: flex;
-  gap: 60px;
-}
-
-.match {
-  background: #2a2a2a;
-  border: 2px solid #4CAF50;
-  border-radius: 10px;
-  padding: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 200px;
-}
-
-.match:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-}
-
-.final-match {
-  border-color: #ffd700;
-}
-
-.vs {
-  text-align: center;
-  color: #4CAF50;
-  margin: 10px 0;
-  font-weight: bold;
-}
-
-.player {
-  text-align: center;
-  padding: 5px;
-}
-
-.winner-display {
-  text-align: center;
-  margin-top: 30px;
-}
-
-.winner-name {
-  font-size: 24px;
-  color: #ffd700;
-  margin-top: 10px;
-}
-
-.game-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-canvas {
-  border: 2px solid #4CAF50;
-  background: #000;
-  margin-bottom: 20px;
-}
-
-.match-info {
+.game-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   max-width: 800px;
-}
-
-.player-info {
-  text-align: center;
-  background: #2a2a2a;
-  padding: 10px 20px;
-  border-radius: 5px;
-  min-width: 150px;
+  padding: 0 20px;
 }
 
 .score {
-  font-size: 24px;
-  color: #4CAF50;
-  margin: 5px 0;
+  font-size: 2em;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.game-canvas {
+  border: 2px solid var(--primary-color);
+  background-color: var(--background-color);
+}
+
+.menu-screen,
+.countdown-screen,
+.game-over-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  gap: 20px;
+}
+
+.menu-title {
+  font-size: 3em;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+.countdown-value {
+  font-size: 5em;
+  color: var(--primary-color);
+}
+
+.winner-message {
+  font-size: 2em;
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 1.2em;
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: var(--accent-color);
+}
+
+.controls-info {
+  text-align: center;
+  color: var(--text-color);
+  margin-top: 10px;
+}
+
+/* Styles spécifiques au tournoi */
+.tournament-bracket {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.tournament-round {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.tournament-match {
+  background-color: var(--background-color);
+  border: 2px solid var(--primary-color);
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.tournament-match.active {
+  border-color: var(--accent-color);
+}
+
+.tournament-player {
+  padding: 5px;
+  color: var(--text-color);
+}
+
+.tournament-player.winner {
+  color: var(--accent-color);
+  font-weight: bold;
 }
 </style>

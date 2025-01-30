@@ -6,12 +6,12 @@
         <h2>Tournament Mode</h2>
         <p>4 joueurs en local</p>
       </button>
-      
+
       <button @click="selectMode('ai')" class="mode-button">
         <h2>VS AI</h2>
         <p>1 vs 1 contre l'IA</p>
       </button>
-      
+
       <button @click="selectMode('local')" class="mode-button">
         <h2>Local VS</h2>
         <p>1 vs 1 en local</p>
@@ -39,7 +39,7 @@ const selectMode = (mode) => {
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  min-height: 100vh;
+  min-height: 65vh;
   background: #1a1a1a;
   color: white;
 }
@@ -47,7 +47,7 @@ const selectMode = (mode) => {
 h1 {
   font-size: 3rem;
   margin-bottom: 2rem;
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .game-modes {
@@ -60,7 +60,7 @@ h1 {
 
 .mode-button {
   background: #2a2a2a;
-  border: 2px solid #4CAF50;
+  border: 2px solid #4caf50;
   border-radius: 10px;
   padding: 2rem;
   color: white;
@@ -77,7 +77,7 @@ h1 {
 
 .mode-button h2 {
   margin: 0 0 1rem 0;
-  color: #4CAF50;
+  color: #4caf50;
 }
 
 .mode-button p {
