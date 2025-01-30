@@ -1,10 +1,13 @@
 import { ref } from 'vue'
 import axios from 'axios'
+import eventBus from '../utils/eventBus'
 
 export function useAuth() {
   const error = ref('')
   const user = ref(null)
   const isAuthenticated = ref(false)
+  const requires2FA = ref(false)
+  const tempAuthToken = ref(null)
 
   // Configuration d'axios pour inclure les cookies
   axios.defaults.withCredentials = true
@@ -35,23 +38,50 @@ export function useAuth() {
       })
 
       if (response.status === 200) {
-        // Stocker uniquement les informations de l'utilisateur
-        user.value = response.data.user
-        isAuthenticated.value = true
-
         // Vérifier le statut 2FA
         try {
           const twoFAResponse = await axios.get('/users/2fa/status')
           console.log('Statut 2FA:', twoFAResponse.data.enabled ? 'Activé' : 'Désactivé')
+          
+          if (twoFAResponse.data.enabled) {
+            requires2FA.value = true
+            tempAuthToken.value = response.data.token // Stocker temporairement le token
+            // Ouvrir le modal 2FA
+            eventBus.emit('show-2fa-verification')
+            return { success: false, requires2FA: true }
+          }
         } catch (error) {
           console.warn('Impossible de récupérer le statut 2FA:', error)
         }
 
+        // Si pas de 2FA ou erreur de vérification du statut, procéder à la connexion normale
+        user.value = response.data.user
+        isAuthenticated.value = true
         return { success: true, data: response.data }
       }
     } catch (err) {
       const errorMessage =
         err.response?.data?.error || 'Erreur lors de la connexion'
+      throw new Error(errorMessage)
+    }
+  }
+
+  const verify2FAAndComplete = async (code) => {
+    try {
+      const response = await axios.post('/users/2fa/verify', {
+        code,
+        token: tempAuthToken.value
+      })
+
+      if (response.status === 200) {
+        user.value = response.data.user
+        isAuthenticated.value = true
+        requires2FA.value = false
+        tempAuthToken.value = null
+        return { success: true, data: response.data }
+      }
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || 'Code 2FA invalide'
       throw new Error(errorMessage)
     }
   }
@@ -77,8 +107,10 @@ export function useAuth() {
     user,
     error,
     isAuthenticated,
-    signUp,
+    requires2FA,
     signIn,
+    signUp,
     signOut,
+    verify2FAAndComplete,
   }
 }

@@ -1,7 +1,9 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import SignIn from './SignIn.vue'
 import SignUp from './SignUp.vue'
+import TwoFactorModal from './modals/TwoFactorModal.vue'
+import eventBus from '../utils/eventBus'
 
 const isLogin = ref(true)
 
@@ -10,9 +12,28 @@ const toggleMode = () => {
 }
 
 const handleAuthSuccess = () => {
-  // Gérer le succès de l'authentification
-  console.log('Authentification réussie')
+  // La connexion sera gérée par le composant SignIn
+  console.log('Authentification en cours...')
 }
+
+// Écouteurs d'événements pour la 2FA
+const handle2FAVerified = () => {
+  console.log('2FA vérifié avec succès')
+}
+
+const handle2FACancelled = () => {
+  console.log('Vérification 2FA annulée')
+}
+
+onMounted(() => {
+  eventBus.on('2fa-verified', handle2FAVerified)
+  eventBus.on('2fa-cancelled', handle2FACancelled)
+})
+
+onBeforeUnmount(() => {
+  eventBus.off('2fa-verified', handle2FAVerified)
+  eventBus.off('2fa-cancelled', handle2FACancelled)
+})
 </script>
 
 <template>
@@ -34,6 +55,7 @@ const handleAuthSuccess = () => {
       />
     </div>
   </div>
+  <TwoFactorModal />
 </template>
 
 <style scoped>

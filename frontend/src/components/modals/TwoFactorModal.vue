@@ -1,18 +1,19 @@
 <template>
   <div v-if="show" class="modal-overlay" @click="closeModal">
     <div class="modal-content" @click.stop>
-      <h2>{{ t('security.setup2FA') }}</h2>
+      <h2>{{ isVerificationMode ? t('security.verify2FA') : t('security.setup2FA') }}</h2>
       
       <!-- Alert pour les messages d'erreur/succès -->
       <div v-if="alertMessage" :class="['alert', `alert-${alertType}`]">
         {{ alertMessage }}
       </div>
 
-      <div class="qr-container" v-if="qrCode">
+      <div class="qr-container" v-if="qrCode && !isVerificationMode">
         <img :src="`data:image/svg+xml;base64,${qrCode}`" alt="QR Code" />
+        <p class="instructions">{{ t('security.scanQRCode') }}</p>
       </div>
       
-      <p class="instructions">{{ t('security.scanQRCode') }}</p>
+      <p v-if="isVerificationMode" class="instructions">{{ t('security.enter2FACode') }}</p>
       
       <div class="verification-section" v-if="showVerification">
         <div class="input-group">
@@ -40,7 +41,7 @@
         </small>
       </div>
 
-      <button class="close-btn" @click="closeModal" :disabled="isLoading">
+      <button v-if="!isVerificationMode" class="close-btn" @click="closeModal" :disabled="isLoading">
         {{ t('common.close') }}
       </button>
     </div>
@@ -48,12 +49,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuth } from '../../composables/useAuth'
 import axios from 'axios'
 import eventBus from '../../utils/eventBus'
 
 const { t } = useI18n()
+const { verify2FAAndComplete } = useAuth()
 
 // State
 const show = ref(false)
@@ -62,7 +65,8 @@ const verificationCode = ref('')
 const showVerification = ref(true)
 const isLoading = ref(false)
 const alertMessage = ref('')
-const alertType = ref('info') // 'success', 'error', 'info'
+const alertType = ref('info')
+const isVerificationMode = ref(false)
 
 // Computed
 const isValidCode = computed(() => {
@@ -71,7 +75,6 @@ const isValidCode = computed(() => {
 
 // Input validation
 const validateInput = (event) => {
-  // Ne permet que les chiffres
   const value = event.target.value
   verificationCode.value = value.replace(/\D/g, '').slice(0, 6)
 }
@@ -93,49 +96,60 @@ const handleApiError = (error) => {
 }
 
 // Ouvrir le modal avec le QR code
-const openModal = async (qrCodeData) => {
-  try {
-    qrCode.value = qrCodeData
-    show.value = true
-    alertMessage.value = t('security.scanInstructions')
-    alertType.value = 'info'
-  } catch (error) {
-    handleApiError(error)
+const openModal = (qrCodeData) => {
+  qrCode.value = qrCodeData
+  show.value = true
+  isVerificationMode.value = false
+  alertMessage.value = t('security.scanInstructions')
+  alertType.value = 'info'
+}
+
+// Ouvrir le modal pour la vérification
+const openVerificationModal = () => {
+  show.value = true
+  isVerificationMode.value = true
+  qrCode.value = ''
+  verificationCode.value = ''
+  alertMessage.value = t('security.enter2FACode')
+  alertType.value = 'info'
+}
+
+const closeModal = () => {
+  if (!isLoading.value) {
+    show.value = false
+    verificationCode.value = ''
+    alertMessage.value = ''
+    if (isVerificationMode.value) {
+      eventBus.emit('2fa-cancelled')
+    }
   }
 }
 
-// Fermer le modal
-const closeModal = () => {
-  if (isLoading.value) return
-  
-  show.value = false
-  qrCode.value = ''
-  verificationCode.value = ''
-  alertMessage.value = ''
-}
-
-// Vérifier le code 2FA
 const verifyCode = async () => {
   if (!isValidCode.value || isLoading.value) return
   
   isLoading.value = true
-  alertMessage.value = ''
-  
   try {
-    const response = await axios.post(
-      '/users/2fa/verify',
-      { token: verificationCode.value }, // Changé de 'code' à 'token' pour matcher l'API
-      { 
-        withCredentials: true,
-        timeout: 10000 // 10 secondes timeout
+    if (isVerificationMode.value) {
+      // Mode vérification lors de la connexion
+      const result = await verify2FAAndComplete(verificationCode.value)
+      if (result.success) {
+        show.value = false
+        eventBus.emit('2fa-verified')
       }
-    )
-
-    if (response.data.success) {
-      alertMessage.value = t('security.setupSuccess')
-      alertType.value = 'success'
-      eventBus.emit('2fa-enabled')
-      setTimeout(closeModal, 2000)
+    } else {
+      // Mode configuration initiale
+      const response = await axios.post('/users/2fa/verify', {
+        code: verificationCode.value
+      })
+      
+      if (response.status === 200) {
+        alertMessage.value = t('security.setupSuccess')
+        alertType.value = 'success'
+        setTimeout(() => {
+          show.value = false
+        }, 2000)
+      }
     }
   } catch (error) {
     handleApiError(error)
@@ -144,13 +158,16 @@ const verifyCode = async () => {
   }
 }
 
-// Cleanup
-onBeforeUnmount(() => {
-  eventBus.off('show-2fa-qr', openModal)
+onMounted(() => {
+  eventBus.on('show-2fa-qr', openModal)
+  eventBus.on('show-2fa-verification', openVerificationModal)
 })
 
-// Event listeners
-eventBus.on('show-2fa-qr', openModal)
+onBeforeUnmount(() => {
+  eventBus.off('show-2fa-qr', openModal)
+  eventBus.off('show-2fa-verification', openVerificationModal)
+})
+
 </script>
 
 <style scoped>
@@ -160,7 +177,7 @@ eventBus.on('show-2fa-qr', openModal)
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -168,7 +185,7 @@ eventBus.on('show-2fa-qr', openModal)
 }
 
 .modal-content {
-  background-color: white;
+  background: white;
   padding: 2rem;
   border-radius: 8px;
   max-width: 400px;
@@ -176,85 +193,31 @@ eventBus.on('show-2fa-qr', openModal)
   text-align: center;
 }
 
-.alert {
-  padding: 0.75rem 1rem;
-  margin: 1rem 0;
-  border-radius: 4px;
-  font-size: 0.9rem;
-}
-
-.alert-success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-.alert-info {
-  background-color: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
-}
-
-.qr-container {
-  margin: 2rem auto;
-  max-width: 200px;
-}
-
-.qr-container img {
-  width: 100%;
-  height: auto;
-}
-
-.instructions {
-  margin-bottom: 1.5rem;
-  color: #666;
-}
-
-.verification-section {
-  margin-bottom: 1.5rem;
-}
-
 .input-group {
   display: flex;
-  gap: 10px;
+  gap: 0.5rem;
   justify-content: center;
-  margin-bottom: 0.5rem;
+  margin: 1rem 0;
 }
 
 .verification-input {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
   width: 120px;
+  padding: 0.5rem;
+  font-size: 1.2rem;
   text-align: center;
-  letter-spacing: 2px;
-}
-
-.verification-input:disabled {
-  background-color: #f5f5f5;
-}
-
-.input-help {
-  color: #666;
-  font-size: 0.8rem;
+  letter-spacing: 0.2rem;
+  border: 2px solid #ccc;
+  border-radius: 4px;
 }
 
 .verify-btn {
+  padding: 0.5rem 1rem;
   background-color: #4CAF50;
   color: white;
-  padding: 8px 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  min-width: 100px;
-  position: relative;
+  font-size: 1rem;
 }
 
 .verify-btn:disabled {
@@ -262,29 +225,50 @@ eventBus.on('show-2fa-qr', openModal)
   cursor: not-allowed;
 }
 
-.close-btn {
-  background-color: #f44336;
-  color: white;
-  padding: 8px 16px;
-  border: none;
+.instructions {
+  margin: 1.5rem 0;
+  color: #666;
+}
+
+.qr-container {
+  margin: 1rem 0;
+}
+
+.qr-container img {
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.input-help {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.alert {
+  margin: 1rem 0;
+  padding: 0.75rem;
   border-radius: 4px;
-  cursor: pointer;
-  margin-top: 1rem;
 }
 
-.close-btn:hover:not(:disabled) {
-  background-color: #d32f2f;
+.alert-error {
+  background-color: #ffebee;
+  color: #c62828;
 }
 
-.close-btn:disabled {
-  background-color: #ffcdd2;
-  cursor: not-allowed;
+.alert-success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.alert-info {
+  background-color: #e3f2fd;
+  color: #1565c0;
 }
 
 .loader {
   display: inline-block;
-  width: 12px;
-  height: 12px;
+  width: 1rem;
+  height: 1rem;
   border: 2px solid #ffffff;
   border-radius: 50%;
   border-top-color: transparent;
