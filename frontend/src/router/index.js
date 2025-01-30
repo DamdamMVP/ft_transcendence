@@ -9,6 +9,8 @@ import PongLocal from '../components/pong/modes/PongLocal.vue'
 import PongVsAI from '../components/pong/modes/PongVsAI.vue'
 import PongTournament from '../components/pong/modes/PongTournament.vue'
 import CatchView from '../views/CatchView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
+import { useAuthStore } from '../stores/authStore'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +23,7 @@ const router = createRouter({
     {
       path: '/profil',
       component: ProfilView,
+      meta: { requiresAuth: true },
       children: [
         {
           path: ':game',
@@ -33,6 +36,7 @@ const router = createRouter({
       path: '/settings',
       name: 'settings',
       component: SettingsView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/pong',
@@ -59,20 +63,49 @@ const router = createRouter({
           name: 'pong-tournament',
           component: PongTournament
         }
-      ],
-      meta: { requiresAuth: true }
+      ]
     },
     {
       path: '/Catch',
       name: 'Catch',
       component: CatchView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/auth-callback',
       name: 'AuthCallback',
       component: () => import('../views/AuthCallback.vue')
     },
+    {
+      path: '/404',
+      name: 'not-found',
+      component: NotFoundView
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404'
+    }
   ],
+})
+
+// Navigation guard
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  const isAuthenticated = authStore.isAuthenticated
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+
+  // Rediriger vers /pong si l'utilisateur est connecté et va sur la page d'accueil
+  if (to.path === '/' && isAuthenticated) {
+    next('/pong')
+    return
+  }
+
+  // Si la route nécessite une authentification et que l'utilisateur n'est pas connecté
+  if (requiresAuth && !isAuthenticated) {
+    next('/')
+  } else {
+    next()
+  }
 })
 
 export default router

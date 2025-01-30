@@ -121,5 +121,10 @@
       "wins": "a c'hounez ar bartiad!",
       "countdown": "Prest..."
     }
+  },
+  "error": {
+    "pageNotFound": "Pajenn Nann Kavet",
+    "pageNotFoundDesc": "Ar bajenn a glaskit n'eus ket anezhi pe zo bet dilec'hiet.",
+    "backToHome": "Distro d'ar Gêr"
   }
 }
