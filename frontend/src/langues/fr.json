@@ -90,9 +90,9 @@
     "delete": "Supprimer",
     "icons": {
       "chat": "chat",
-      "block": "blocker",
+      "block": "bloquer",
       "delete": "supprimer",
-      "profile": "profile"
+      "profile": "profil"
     }
   },
   "chat": {
