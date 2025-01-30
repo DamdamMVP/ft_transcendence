@@ -1,28 +1,34 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
-
+import { useFriendStore } from '../stores/friendStore'
 // Singleton pattern pour le WebSocket
 let socket = null
 const onlineUsers = ref(new Set())
 
 export function useUserStatus() {
-  const authStore = useAuthStore()
-
+	const authStore = useAuthStore()
   const fetchOnlineUsers = async () => {
     try {
-      const response = await axios.get('/users/list_online')
-      // S'assurer que response.data est un tableau, sinon utiliser un tableau vide
-      const users = Array.isArray(response.data) ? response.data : 
-                   (response.data?.users || [])
-      onlineUsers.value = new Set(users)
-      console.log('Online users:', Array.from(onlineUsers.value))
+        const response = await axios.get('/users/list_online')
+        // Extraire les IDs des utilisateurs de la réponse
+        const users = response.data.online_users.map(user => user.user__id)
+        onlineUsers.value = new Set(users)
+        
+        // Mettre à jour le statut des amis
+        const friendStore = useFriendStore()
+        friendStore.friends.forEach(friend => {
+            const isOnline = onlineUsers.value.has(friend.id)
+            friendStore.updateFriendStatus(friend.id, isOnline)
+        })
+        
+        console.log('Online users:', Array.from(onlineUsers.value))
     } catch (error) {
-      console.error('Error fetching online users:', error)
-      // En cas d'erreur, initialiser avec un ensemble vide
-      onlineUsers.value = new Set()
+        console.error('Error fetching online users:', error)
+        onlineUsers.value = new Set()
     }
-  }
+}
+
 
   const initializeWebSocket = () => {
     if (socket) {
@@ -44,16 +50,28 @@ export function useUserStatus() {
     }
 
     socket.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      console.log('WebSocket message received:', data)
-      if (data.type === 'user_status') {
-        if (data.is_online) {
-          onlineUsers.value.add(data.user_id)
-        } else {
-          onlineUsers.value.delete(data.user_id)
-        }
-        console.log('Updated online users:', Array.from(onlineUsers.value))
-      }
+		try {
+			const data = JSON.parse(event.data)
+			console.log('WebSocket message received:', data)
+			
+			if (data.type === 'user_status') {
+				console.log('Processing user status update:', data)
+				
+				if (data.is_online) {
+					onlineUsers.value.add(data.user_id)
+				} else {
+					onlineUsers.value.delete(data.user_id)
+				}
+				
+				const friendStore = useFriendStore()
+				friendStore.updateFriendStatus(data.user_id, data.is_online)
+				
+				console.log('Updated online users after WebSocket message:', 
+					Array.from(onlineUsers.value))
+			}
+		} catch (error) {
+			console.error('Error processing WebSocket message:', error)
+		}
     }
 
     socket.onclose = (event) => {

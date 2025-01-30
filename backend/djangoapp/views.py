@@ -13,22 +13,6 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import UserStatus
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def online_users(request):
-    online_users = UserStatus.objects.filter(is_online=True).values_list('user_id', flat=True)
-    return Response(list(online_users), status=200)
-import requests
-from django.conf import settings
-from django.urls import reverse
-
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
-from .models import UserStatus
-import secrets
-import string
-import json
-import urllib.parse
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -36,15 +20,6 @@ def online_users(request):
     online_users = UserStatus.objects.filter(is_online=True).values("user__id", "user__username")
     return Response({"online_users": list(online_users)}, status=200)
 
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
-from .models import UserStatus
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def online_users(request):
-    online_users = UserStatus.objects.filter(is_online=True).values("user__id", "user__username")
-    return Response({"online_users": list(online_users)}, status=200)
 
 
 @api_view(['POST'])

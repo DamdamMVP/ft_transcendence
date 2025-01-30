@@ -172,6 +172,7 @@ export const useFriendStore = defineStore('friend', () => {
     const friend = friends.value.find((f) => f.id === userId)
     if (friend) {
       friend.isOnline = isOnline
+	  console.log(`Updated status for user ${userId} to ${isOnline}`)
     }
   }
 
