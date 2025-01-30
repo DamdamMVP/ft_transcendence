@@ -8,20 +8,66 @@ import { useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const { t } = useI18n()
-const userHistory = ref([])
-const loading = ref(true)
 const route = useRoute()
+const userHistory = ref([]) // Initialiser comme un tableau vide
+const loading = ref(true)
+const profileUser = ref(null)
+const error = ref(null)
+
+// Récupérer les informations de l'utilisateur
+const fetchUserProfile = async () => {
+  try {
+    const response = await axios.get(`/users/read/${route.params.id_user}`, {
+      withCredentials: true,
+    })
+    profileUser.value = response.data
+  } catch (err) {
+    console.error('Erreur lors de la récupération du profil:', err)
+    error.value = err.message
+  }
+}
+
+// Récupérer l'historique pour les stats
+const fetchHistory = async () => {
+  try {
+    loading.value = true
+    const response = await axios.get(
+      `/users/histories/user/${route.params.id_user}`,
+      {
+        withCredentials: true,
+      }
+    )
+    // S'assurer que la réponse est un tableau
+    userHistory.value = Array.isArray(response.data) ? response.data : []
+  } catch (err) {
+    console.error('Erreur lors de la récupération des stats:', err)
+    error.value = err.message
+    userHistory.value = [] // Réinitialiser à un tableau vide en cas d'erreur
+  } finally {
+    loading.value = false
+  }
+}
 
 // Statistiques globales
 const stats = computed(() => {
+  // Vérifier que userHistory.value est un tableau
+  if (!Array.isArray(userHistory.value)) {
+    return {
+      victories: 0,
+      defeats: 0,
+      draws: 0,
+      winRate: 0,
+    }
+  }
+
   const victories = userHistory.value.filter(
-    (match) => match.user_score > match.guest_score
+    (match) => match && match.user_score > match.guest_score
   ).length
   const defeats = userHistory.value.filter(
-    (match) => match.user_score < match.guest_score
+    (match) => match && match.user_score < match.guest_score
   ).length
   const draws = userHistory.value.filter(
-    (match) => match.user_score === match.guest_score
+    (match) => match && match.user_score === match.guest_score
   ).length
   const total = victories + defeats + draws
   const winRate = total > 0 ? Math.round((victories / total) * 100) : 0
@@ -34,52 +80,50 @@ const stats = computed(() => {
   }
 })
 
-// Récupérer l'historique pour les stats
-const fetchHistory = async () => {
-  try {
-    loading.value = true
-    const userId = route.params.id_user
-    const response = await axios.get(`/users/histories/user/${userId}`, {
-      withCredentials: true,
-    })
-    userHistory.value = response.data
-  } catch (err) {
-    console.error('Erreur lors de la récupération des stats:', err)
-  } finally {
-    loading.value = false
+// URL de la photo de profil
+const profilePhotoUrl = computed(() => {
+  if (profileUser.value?.profile_picture) {
+    return `${import.meta.env.VITE_API_BASE_URL}${profileUser.value.profile_picture}`
   }
-}
+  return '/default-avatar.png'
+})
 
 // Mettre à jour l'historique quand un événement est reçu
 const updateHistory = (newHistory) => {
-  userHistory.value = newHistory
+  userHistory.value = Array.isArray(newHistory) ? newHistory : []
 }
 
-onMounted(() => {
-  fetchHistory()
-  // S'abonner à l'événement de mise à jour
-  eventBus.on('history-updated', updateHistory)
+onMounted(async () => {
+  try {
+    await fetchUserProfile()
+    await fetchHistory()
+    // S'abonner à l'événement de mise à jour
+    eventBus.on('history-updated', updateHistory)
+  } catch (err) {
+    console.error('Erreur lors du chargement initial:', err)
+    error.value = err.message
+  }
 })
 
 onUnmounted(() => {
   // Se désabonner de l'événement
   eventBus.off('history-updated', updateHistory)
 })
-
-const profilePhotoUrl = computed(
-  () => `${import.meta.env.VITE_API_BASE_URL}${authStore.user.profile_picture}`
-)
 </script>
 
 <template>
   <div class="profile-container">
-    <div class="profile-card">
+    <div v-if="loading" class="loading">Chargement...</div>
+    <div v-else-if="error" class="error">
+      {{ error }}
+    </div>
+    <div v-else class="profile-card">
       <h2 class="profile-name">
-        {{ authStore.user?.username || 'Utilisateur' }}
+        {{ profileUser?.username || 'Utilisateur' }}
       </h2>
       <img
         :src="profilePhotoUrl"
-        :alt="authStore.user?.username || 'Profile Picture'"
+        :alt="profileUser?.username || 'Profile Picture'"
         class="profile-picture"
       />
       <div class="stats-container">
@@ -96,9 +140,9 @@ const profilePhotoUrl = computed(
           <span class="stat-value">{{ stats.winRate }}%</span>
         </div>
       </div>
-      <p class="profile-stats" v-if="authStore.user?.stats">
-        W: {{ authStore.user.stats.wins || 0 }} | L:
-        {{ authStore.user.stats.losses || 0 }}
+      <p class="profile-stats" v-if="profileUser?.stats">
+        W: {{ profileUser.stats.wins || 0 }} | L:
+        {{ profileUser.stats.losses || 0 }}
       </p>
     </div>
   </div>
@@ -122,9 +166,9 @@ const profilePhotoUrl = computed(
 }
 
 .profile-picture {
+  border-radius: 50%;
   width: 100px;
   height: 100px;
-  border-radius: 50%;
   object-fit: cover;
   margin-bottom: 16px;
 }
@@ -173,6 +217,18 @@ const profilePhotoUrl = computed(
 }
 
 .defeats {
+  color: #ff4d4d;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+.error {
   color: #ff4d4d;
 }
 </style>
