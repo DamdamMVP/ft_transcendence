@@ -46,45 +46,45 @@ const router = createRouter({
         {
           path: '',
           name: 'pong-home',
-          component: HomePong
+          component: HomePong,
         },
         {
           path: 'local',
           name: 'pong-local',
-          component: PongLocal
+          component: PongLocal,
         },
         {
           path: 'ai',
           name: 'pong-ai',
-          component: PongVsAI
+          component: PongVsAI,
         },
         {
           path: 'tournament',
           name: 'pong-tournament',
-          component: PongTournament
-        }
-      ]
+          component: PongTournament,
+        },
+      ],
     },
     {
-      path: '/Catch',
-      name: 'Catch',
+      path: '/catch',
+      name: 'catch',
       component: CatchView,
       meta: { requiresAuth: true },
     },
     {
       path: '/auth-callback',
       name: 'AuthCallback',
-      component: () => import('../views/AuthCallback.vue')
+      component: () => import('../views/AuthCallback.vue'),
     },
     {
       path: '/404',
       name: 'not-found',
-      component: NotFoundView
+      component: NotFoundView,
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/404'
-    }
+      redirect: '/404',
+    },
   ],
 })
 
@@ -92,7 +92,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const isAuthenticated = authStore.isAuthenticated
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
 
   // Rediriger vers /pong si l'utilisateur est connecté et va sur la page d'accueil
   if (to.path === '/' && isAuthenticated) {
