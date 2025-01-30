@@ -50,7 +50,7 @@ def login(request):
             httponly=True,
             secure=True,
             samesite='None',
-            max_age=90
+            max_age=900
         )
         response.set_cookie(
             key='refresh_token',
