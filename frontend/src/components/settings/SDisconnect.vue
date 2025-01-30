@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import S2FA from './S2FA.vue'
 
 const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
@@ -48,6 +49,7 @@ const handleLogout = async () => {
     <button class="logout-button" @click="handleLogout">
       <i class="icon-logout"></i>{{ $t('settings.logout') }}
     </button>
+    <S2FA />
   </div>
 
   <!-- Popup de confirmation -->

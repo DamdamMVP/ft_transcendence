@@ -71,7 +71,12 @@
     "deleteAccountConfirm": "Да, удалить мой аккаунт",
     "cancel": "Отмена",
     "accountDeleted": "Аккаунт успешно удален",
-    "logout": "Выйти"
+    "logout": "Выйти",
+    "enable2FA": "Включить 2FA",
+    "disable2FA": "Отключить 2FA",
+    "enterVerificationCode": "Введите 6-значный код",
+    "verify": "Подтвердить",
+    "scanQRCode": "Отсканируйте этот QR-код с помощью приложения аутентификации (Google Authenticator, Authy и т.д.)"
   },
   "friendList": {
     "title": "Мои друзья",
