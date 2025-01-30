@@ -8,19 +8,20 @@
         {{ alertMessage }}
       </div>
 
-      <div class="qr-container" v-if="qrCode && !isVerificationMode">
+      <!-- Mode QR Code -->
+      <div v-if="qrCode && !isVerificationMode" class="qr-container">
         <img :src="`data:image/svg+xml;base64,${qrCode}`" alt="QR Code" />
         <p class="instructions">{{ t('security.scanQRCode') }}</p>
       </div>
       
-      <p v-if="isVerificationMode" class="instructions">{{ t('security.enter2FACode') }}</p>
-      
-      <div class="verification-section" v-if="showVerification">
+      <!-- Mode Vérification -->
+      <template v-else-if="isVerificationMode">
+        <p class="instructions">{{ t('security.enter2FACode') }}</p>
         <div class="input-group">
           <input
             type="text"
             v-model="verificationCode"
-            :placeholder="t('security.enterCode')"
+            placeholder="______"
             class="verification-input"
             maxlength="6"
             pattern="\d*"
@@ -39,7 +40,7 @@
         <small class="input-help" v-if="verificationCode && !isValidCode">
           {{ t('security.codeFormat') }}
         </small>
-      </div>
+      </template>
 
       <button v-if="!isVerificationMode" class="close-btn" @click="closeModal" :disabled="isLoading">
         {{ t('common.close') }}
@@ -62,7 +63,6 @@ const { verify2FAAndComplete } = useAuth()
 const show = ref(false)
 const qrCode = ref('')
 const verificationCode = ref('')
-const showVerification = ref(true)
 const isLoading = ref(false)
 const alertMessage = ref('')
 const alertType = ref('info')
@@ -110,7 +110,7 @@ const openVerificationModal = () => {
   isVerificationMode.value = true
   qrCode.value = ''
   verificationCode.value = ''
-  alertMessage.value = t('security.enter2FACode')
+  alertMessage.value = ''
   alertType.value = 'info'
 }
 
@@ -131,14 +131,12 @@ const verifyCode = async () => {
   isLoading.value = true
   try {
     if (isVerificationMode.value) {
-      // Mode vérification lors de la connexion
       const result = await verify2FAAndComplete(verificationCode.value)
       if (result.success) {
         show.value = false
         eventBus.emit('2fa-verified')
       }
     } else {
-      // Mode configuration initiale
       const response = await axios.post('/users/2fa/verify', {
         code: verificationCode.value
       })
@@ -167,7 +165,6 @@ onBeforeUnmount(() => {
   eventBus.off('show-2fa-qr', openModal)
   eventBus.off('show-2fa-verification', openVerificationModal)
 })
-
 </script>
 
 <style scoped>
