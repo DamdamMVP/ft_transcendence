@@ -1,6 +1,6 @@
 <template>
   <div class="pong-mode">
-    <h2>{{ $t('pong.local.title') }}</h2>
+    <h2>{{ t('pong.local.title') }}</h2>
 
     <div class="game-container">
       <canvas
@@ -12,26 +12,26 @@
       <!-- Scoreboard -->
       <div class="score-board">
         <div class="player">
-          <h3>{{ username || $t('pong.game.player1') }}</h3>
+          <h3>{{ username || t('pong.game.player1') }}</h3>
           <p class="score">{{ player1Score }}</p>
-          <p class="controls">{{ $t('pong.game.controls') }}: F / S</p>
+          <p class="controls">{{ t('pong.game.controls') }}: F / S</p>
         </div>
         <div class="player">
-          <h3>{{ player2Name || $t('pong.game.player2') }}</h3>
+          <h3>{{ player2Name || t('pong.game.player2') }}</h3>
           <p class="score">{{ player2Score }}</p>
-          <p class="controls">{{ $t('pong.game.controls') }}: ↑ / ↓</p>
+          <p class="controls">{{ t('pong.game.controls') }}: ↑ / ↓</p>
         </div>
       </div>
 
       <!-- Overlays -->
       <div v-if="gamePhase === 'menu'" class="game-overlay">
         <div class="overlay-content">
-          <h3>{{ $t('pong.game.enterName') }}</h3>
+          <h3>{{ t('pong.game.enterName') }}</h3>
           <input
             v-model="player2Name"
             type="text"
             class="player-input"
-            :placeholder="$t('pong.game.enterName')"
+            :placeholder="t('pong.game.enterName')"
             @keyup.enter="startCountdown"
           />
           <button
@@ -39,14 +39,14 @@
             class="overlay-button"
             :disabled="!player2Name.trim()"
           >
-            {{ $t('pong.game.startGame') }}
+            {{ t('pong.game.startGame') }}
           </button>
         </div>
       </div>
 
       <div v-if="gamePhase === 'countdown'" class="game-overlay">
         <div class="overlay-content">
-          <h2>{{ $t('pong.game.countdown') }} {{ countdownValue }}...</h2>
+          <h2>{{ t('pong.game.countdown') }} {{ countdownValue }}...</h2>
         </div>
       </div>
 
@@ -54,7 +54,7 @@
         <div class="overlay-content">
           <h2>{{ winnerMessage }}</h2>
           <button @click="restartGame" class="overlay-button">
-            {{ $t('pong.game.startGame') }}
+            {{ t('pong.game.startGame') }}
           </button>
         </div>
       </div>
@@ -63,12 +63,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../../stores/authStore'
 import axios from 'axios'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
-const username = ref(authStore.user?.username || '')
+const username = computed(() => authStore.user?.username)
 
 /* ---------------------------------------------------------------------
    CONSTANTES
@@ -556,35 +558,35 @@ function startGame() {
   gameLoop()
 }
 
-
 function endGame() {
   cancelAnimationFrame(animationId)
   if (player1Score.value >= WINNING_SCORE) {
-    winnerMessage.value = (username.value || $t('pong.game.player1')) + ' ' + ' wins'
+    winnerMessage.value =
+      (username.value || t('pong.game.player1')) + ' ' + t('pong.game.wins')
   } else {
-    winnerMessage.value = player2Name.value + ' wins'
+    winnerMessage.value = player2Name.value + ' ' + t('pong.game.wins')
   }
   gamePhase.value = 'over'
   saveGameHistory()
 }
 const guestUsername = ref(player2Name)
-const saveGameHistory = async () =>{
-	try {
-		const gameHistory = {
-			user: authStore.user.id,
-			guest_name: guestUsername.value,
-			user_score: player1Score.value,
-			guest_score: player2Score.value,
-			played_at: new Date().toISOString(),
-			game_name: 'pong',
-		}
-		await axios.post('/users/histories/add', gameHistory, {
-			withCredentials: true,
-		})
-		console.log('history saved')
-	} catch (error) {
-		console.error('Error saving game history:', error)
-	}
+const saveGameHistory = async () => {
+  try {
+    const gameHistory = {
+      user: authStore.user.id,
+      guest_name: guestUsername.value,
+      user_score: player1Score.value,
+      guest_score: player2Score.value,
+      played_at: new Date().toISOString(),
+      game_name: 'pong',
+    }
+    await axios.post('/users/histories/add', gameHistory, {
+      withCredentials: true,
+    })
+    console.log('history saved')
+  } catch (error) {
+    console.error('Error saving game history:', error)
+  }
 }
 
 function restartGame() {
