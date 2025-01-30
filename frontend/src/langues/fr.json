@@ -142,11 +142,13 @@
     "codeFormat": "Le code doit contenir 6 chiffres",
     "setupSuccess": "2FA configuré avec succès",
     "verifySuccess": "Code vérifié avec succès",
-    "invalidCode": "Code invalide"
+    "invalidCode": "Code invalide",
+    "scanInstructions": "Scannez le QR code avec votre application d'authentification (Google Authenticator, Authy, etc.)"
   },
   "errors": {
     "networkError": "Erreur de connexion au serveur",
     "unknownError": "Une erreur inattendue s'est produite",
-    "invalidCode": "Code invalide"
+    "invalidCode": "Code invalide",
+    "invalidCredentials": "Identifiants invalides"
   }
 }

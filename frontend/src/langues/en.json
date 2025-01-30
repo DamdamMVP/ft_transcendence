@@ -135,18 +135,20 @@
   "security": {
     "setup2FA": "Two-Factor Authentication Setup",
     "verify2FA": "Two-Factor Authentication Verification",
-    "scanQRCode": "Scan this QR code with your authentication app",
-    "enter2FACode": "Enter the 6-digit code from your authentication app",
+    "scanQRCode": "Scan this QR code with your authenticator app",
+    "enter2FACode": "Enter the 6-digit code from your authenticator app",
     "enterCode": "6-digit code",
     "verify": "Verify",
     "codeFormat": "Code must be 6 digits",
-    "setupSuccess": "2FA setup successful",
+    "setupSuccess": "2FA configured successfully",
     "verifySuccess": "Code verified successfully",
-    "invalidCode": "Invalid code"
+    "invalidCode": "Invalid code",
+    "scanInstructions": "Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.)"
   },
   "errors": {
     "networkError": "Server connection error",
     "unknownError": "An unexpected error occurred",
-    "invalidCode": "Invalid code"
+    "invalidCode": "Invalid code",
+    "invalidCredentials": "Invalid credentials"
   }
 }
