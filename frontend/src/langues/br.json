@@ -163,13 +163,15 @@
     "enterCode": "Kod 6 sifr",
     "verify": "Gwiriañ",
     "codeFormat": "Ar c'hod a rank bezañ 6 sifr",
-    "setupSuccess": "Dilesa daou-elfenn staliet gant berzh",
+    "setupSuccess": "2FA kefluniet gant berzh",
     "verifySuccess": "Kod gwiriet gant berzh",
-    "invalidCode": "Kod direizh"
+    "invalidCode": "Kod direizh",
+    "scanInstructions": "Skannit ar c'hod QR gant ho arload dilesa (Google Authenticator, Authy, h.a.)"
   },
   "errors": {
     "networkError": "Fazi kevreañ d'ar servijer",
     "unknownError": "Ur fazi dic'hortoz zo c'hoarvezet",
-    "invalidCode": "Kod direizh"
+    "invalidCode": "Kod direizh",
+    "invalidCredentials": "Titouroù dilesa direizh"
   }
 }

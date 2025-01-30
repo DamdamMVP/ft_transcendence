@@ -83,12 +83,10 @@ const validateInput = (event) => {
 // Gestion des erreurs API
 const handleApiError = (error) => {
   isLoading.value = false
-  if (error.response) {
-    alertMessage.value = t(`errors.${error.response.data.error}`) || error.response.data.error
-  } else if (error.request) {
-    alertMessage.value = t('errors.networkError')
+  if (error.message === 'invalidCode') {
+    alertMessage.value = t('security.invalidCode')
   } else {
-    alertMessage.value = t('errors.unknownError')
+    alertMessage.value = t(`errors.${error.message}`) || t('errors.unknownError')
   }
   alertType.value = 'error'
   setTimeout(() => {

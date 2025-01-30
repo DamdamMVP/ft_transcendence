@@ -69,7 +69,7 @@ export function useAuth() {
   const verify2FAAndComplete = async (code) => {
     try {
       const response = await axios.post('/users/2fa/verify', {
-        token: code  // Changé de 'code' à 'token' pour correspondre au backend
+        token: code
       })
 
       if (response.status === 200) {
@@ -80,7 +80,10 @@ export function useAuth() {
         return { success: true, data: response.data }
       }
     } catch (err) {
-      const errorMessage = err.response?.data?.error || 'Code 2FA invalide'
+      if (err.response?.status === 400) {
+        throw new Error('invalidCode')
+      }
+      const errorMessage = err.response?.data?.error || 'unknownError'
       throw new Error(errorMessage)
     }
   }
