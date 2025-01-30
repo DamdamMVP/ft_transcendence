@@ -69,8 +69,7 @@ export function useAuth() {
   const verify2FAAndComplete = async (code) => {
     try {
       const response = await axios.post('/users/2fa/verify', {
-        code,
-        token: tempAuthToken.value
+        token: code  // Changé de 'code' à 'token' pour correspondre au backend
       })
 
       if (response.status === 200) {
