@@ -1,6 +1,6 @@
 <template>
   <div class="pong-mode">
-    <h2>Mode 1v1 Local</h2>
+    <h2>{{ $t('pong.local.title') }}</h2>
 
     <div class="game-container">
       <canvas
@@ -12,26 +12,26 @@
       <!-- Scoreboard -->
       <div class="score-board">
         <div class="player">
-          <h3>Joueur 1</h3>
+          <h3>{{ username || $t('pong.game.player1') }}</h3>
           <p class="score">{{ player1Score }}</p>
-          <p class="controls">Contrôles: F / S</p>
+          <p class="controls">{{ $t('pong.game.controls') }}: F / S</p>
         </div>
         <div class="player">
-          <h3>{{ player2Name }}</h3>
+          <h3>{{ player2Name || $t('pong.game.player2') }}</h3>
           <p class="score">{{ player2Score }}</p>
-          <p class="controls">Contrôles: ↑ / ↓</p>
+          <p class="controls">{{ $t('pong.game.controls') }}: ↑ / ↓</p>
         </div>
       </div>
 
       <!-- Overlays -->
       <div v-if="gamePhase === 'menu'" class="game-overlay">
         <div class="overlay-content">
-          <h3>Entrez le nom du Joueur 2</h3>
+          <h3>{{ $t('pong.game.enterName') }}</h3>
           <input
             v-model="player2Name"
             type="text"
             class="player-input"
-            placeholder="Nom du Joueur 2"
+            :placeholder="$t('pong.game.enterName')"
             @keyup.enter="startCountdown"
           />
           <button
@@ -39,24 +39,23 @@
             class="overlay-button"
             :disabled="!player2Name.trim()"
           >
-            Commencer la partie
+            {{ $t('pong.game.startGame') }}
           </button>
         </div>
       </div>
 
       <div v-if="gamePhase === 'countdown'" class="game-overlay">
         <div class="overlay-content">
-          <h2>Début dans {{ countdownValue }}...</h2>
+          <h2>{{ $t('pong.game.countdown') }} {{ countdownValue }}...</h2>
         </div>
       </div>
 
       <div v-if="gamePhase === 'over'" class="game-overlay">
         <div class="overlay-content">
-          <h2>Partie terminée</h2>
-          <p>
-            <strong>{{ winnerMessage }}</strong>
-          </p>
-          <button @click="restartGame" class="overlay-button">Rejouer</button>
+          <h2>{{ winnerMessage }}</h2>
+          <button @click="restartGame" class="overlay-button">
+            {{ $t('pong.game.startGame') }}
+          </button>
         </div>
       </div>
     </div>
@@ -65,6 +64,10 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '../../../stores/authStore'
+
+const authStore = useAuthStore()
+const username = ref(authStore.user?.username || '')
 
 /* ---------------------------------------------------------------------
    CONSTANTES
@@ -555,9 +558,9 @@ function startGame() {
 function endGame() {
   cancelAnimationFrame(animationId)
   if (player1Score.value >= WINNING_SCORE) {
-    winnerMessage.value = 'Le Joueur 1 remporte la partie !'
+    winnerMessage.value = (username.value || $t('pong.game.player1')) + ' ' + $t('pong.game.wins')
   } else {
-    winnerMessage.value = `${player2Name.value} remporte la partie !`
+    winnerMessage.value = player2Name.value + ' ' + $t('pong.game.wins')
   }
   gamePhase.value = 'over'
 }

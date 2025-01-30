@@ -1,6 +1,6 @@
 <template>
   <div class="pong-mode">
-    <h2>Mode VS IA</h2>
+    <h2>{{ $t('pong.ai.title') }}</h2>
 
     <div class="game-container">
       <canvas
@@ -12,12 +12,12 @@
       <!-- Scoreboard -->
       <div class="score-board">
         <div class="player">
-          <h3>Joueur</h3>
+          <h3>{{ username || $t('pong.game.player1') }}</h3>
           <p class="score">{{ playerScore }}</p>
-          <p class="controls">Contrôles: F / S</p>
+          <p class="controls">{{ $t('pong.game.controls') }}: F / S</p>
         </div>
         <div class="player">
-          <h3>IA</h3>
+          <h3>{{ $t('pong.ai.title') }}</h3>
           <p class="score">{{ aiScore }}</p>
         </div>
       </div>
@@ -26,24 +26,23 @@
       <div v-if="gamePhase === 'menu'" class="game-overlay">
         <div class="overlay-content">
           <button @click="startCountdown" class="overlay-button">
-            Commencer la partie
+            {{ $t('pong.game.startGame') }}
           </button>
         </div>
       </div>
 
       <div v-if="gamePhase === 'countdown'" class="game-overlay">
         <div class="overlay-content">
-          <h2>Début dans {{ countdownValue }}...</h2>
+          <h2>{{ $t('pong.game.countdown') }} {{ countdownValue }}...</h2>
         </div>
       </div>
 
       <div v-if="gamePhase === 'over'" class="game-overlay">
         <div class="overlay-content">
-          <h2>Partie terminée</h2>
-          <p>
-            <strong>{{ winnerMessage }}</strong>
-          </p>
-          <button @click="restartGame" class="overlay-button">Rejouer</button>
+          <h2>{{ winnerMessage }}</h2>
+          <button @click="restartGame" class="overlay-button">
+            {{ $t('pong.game.startGame') }}
+          </button>
         </div>
       </div>
     </div>
@@ -52,6 +51,10 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '../../../stores/authStore'
+
+const authStore = useAuthStore()
+const username = ref(authStore.user?.username || '')
 
 /* ---------------------------------------------------------------------
    CONSTANTES
@@ -591,9 +594,9 @@ function startGame() {
 function endGame() {
   cancelAnimationFrame(animationId)
   if (playerScore.value >= WINNING_SCORE) {
-    winnerMessage.value = 'Le joueur remporte la partie !'
+    winnerMessage.value = (username.value || 'Player 1') + ' wins'
   } else {
-    winnerMessage.value = 'L’IA remporte la partie...'
+    winnerMessage.value = 'AI wins'
   }
   gamePhase.value = 'over'
 }

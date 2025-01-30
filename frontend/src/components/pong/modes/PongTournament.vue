@@ -1,33 +1,8 @@
 <template>
   <div class="pong-mode">
-    <h2>Mode Tournoi (4 joueurs)</h2>
+    <h2>{{ $t('pong.local.title') }}</h2>
 
-    <div v-if="currentPhase === 'bracket'" class="tournament-bracket">
-      <h3>Tournoi en cours</h3>
-      <div class="bracket-round">
-        <h4>Demi-finales</h4>
-        <div class="match">
-          <p>{{ matches[0].player1 }} vs {{ matches[0].player2 }}</p>
-          <button v-if="!matches[0].winner" @click="startMatch(0)">Commencer le match</button>
-          <p v-else>Vainqueur: {{ matches[0].winner }}</p>
-        </div>
-        <div class="match">
-          <p>{{ matches[1].player1 }} vs {{ matches[1].player2 }}</p>
-          <button v-if="!matches[1].winner" @click="startMatch(1)">Commencer le match</button>
-          <p v-else>Vainqueur: {{ matches[1].winner }}</p>
-        </div>
-      </div>
-      
-      <div class="bracket-round" v-if="matches[0].winner && matches[1].winner">
-        <h4>Finale</h4>
-        <div class="match">
-          <p>{{ matches[0].winner }} vs {{ matches[1].winner }}</p>
-          <button @click="startFinal">Commencer la finale</button>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="currentPhase === 'game'" class="game-container">
+    <div class="game-container">
       <canvas
         ref="gameCanvas"
         :width="canvasWidth"
@@ -37,40 +12,50 @@
       <!-- Scoreboard -->
       <div class="score-board">
         <div class="player">
-          <h3>{{ currentMatch.player1 }}</h3>
-          <p class="score">{{ playerScore }}</p>
-          <p class="controls">Contrôles: F / S</p>
+          <h3>{{ username || $t('pong.game.player1') }}</h3>
+          <p class="score">{{ player1Score }}</p>
+          <p class="controls">{{ $t('pong.game.controls') }}: F / S</p>
         </div>
         <div class="player">
-          <h3>{{ currentMatch.player2 }}</h3>
-          <p class="score">{{ aiScore }}</p>
-          <p class="controls">Contrôles: ↑ / ↓</p>
+          <h3>{{ player2Name || $t('pong.game.player2') }}</h3>
+          <p class="score">{{ player2Score }}</p>
+          <p class="controls">{{ $t('pong.game.controls') }}: ↑ / ↓</p>
         </div>
       </div>
 
-      <!-- Game Overlays -->
+      <!-- Overlays -->
       <div v-if="gamePhase === 'menu'" class="game-overlay">
         <div class="overlay-content">
-          <h3>{{ currentMatch.player1 }} vs {{ currentMatch.player2 }}</h3>
-          <button @click="startCountdown" class="overlay-button">
-            Commencer le match
+          <h3>{{ $t('pong.game.enterName') }}</h3>
+          <input
+            v-model="player2Name"
+            type="text"
+            class="player-input"
+            :placeholder="$t('pong.game.enterName')"
+            @keyup.enter="startCountdown"
+          />
+          <button
+            @click="startCountdown"
+            class="overlay-button"
+            :disabled="!player2Name.trim()"
+          >
+            {{ $t('pong.game.startGame') }}
           </button>
         </div>
       </div>
 
       <div v-if="gamePhase === 'countdown'" class="game-overlay">
         <div class="overlay-content">
-          <h2>Début dans {{ countdownValue }}...</h2>
+          <h2>{{ $t('pong.game.countdown') }} {{ countdownValue }}...</h2>
         </div>
       </div>
 
       <div v-if="gamePhase === 'over'" class="game-overlay">
         <div class="overlay-content">
-          <h2>Match terminé</h2>
-          <p>
-            <strong>{{ winnerMessage }}</strong>
-          </p>
-          <button @click="returnToBracket" class="overlay-button">Retour au tournoi</button>
+          <h2>{{ winnerMessage }}</h2>
+          <button @click="restartGame" class="overlay-button">
+            {{ $t('pong.game.startGame') }}
+          </button>
         </div>
       </div>
     </div>
@@ -79,6 +64,10 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useAuthStore } from '../../../stores/authStore'
+
+const authStore = useAuthStore()
+const username = ref(authStore.user?.username || '')
 
 /* ---------------------------------------------------------------------
    CONSTANTES
@@ -93,41 +82,39 @@ const BALL_SPEED_INCREASE = 1.1
 const MAX_BALL_SPEED = 10
 
 // Bonus
-const BONUS_SPAWN_INTERVAL = 4000
+const BONUS_SPAWN_INTERVAL = 4000 // toutes les 4s
 const BONUS_COLORS = ['red', 'green', 'blue']
 const BONUS_BAR_WIDTH = 10
 const BONUS_BAR_HEIGHT = 60
 
+// Raquettes
 const INITIAL_PADDLE_HEIGHT = 80
 
 /* ---------------------------------------------------------------------
-   ÉTATS DU TOURNOI
---------------------------------------------------------------------- */
-const currentPhase = ref('bracket') // 'bracket' ou 'game'
-const matches = ref([
-  { player1: 'Joueur 1', player2: 'Joueur 2', winner: null },
-  { player1: 'Joueur 3', player2: 'Joueur 4', winner: null }
-])
-const currentMatch = ref(null)
-const currentMatchIndex = ref(null)
-const isFinal = ref(false)
-
-/* ---------------------------------------------------------------------
-   ÉTATS DU JEU
+   ÉTATS
 --------------------------------------------------------------------- */
 const gameCanvas = ref(null)
-const playerScore = ref(0)
-const aiScore = ref(0)
+const player1Score = ref(0)
+const player2Score = ref(0)
+const player2Name = ref('')
 
+// Phases : 'menu' | 'countdown' | 'playing' | 'over'
 const gamePhase = ref('menu')
 const countdownValue = ref(3)
 const winnerMessage = ref('')
 
+// Mémorise qui a touché la balle en dernier : 'player1' ou 'player2'
 let lastPaddleTouched = null
+
+// Compte à rebours de début de manche
 const roundStartCountdown = ref(0)
 
+/**
+ * État principal
+ */
 const gameState = ref({
-  player: {
+  // Joueur 1
+  player1: {
     x: 20,
     y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
     width: 10,
@@ -136,7 +123,8 @@ const gameState = ref({
     upPressed: false,
     downPressed: false,
   },
-  ai: {
+  // Joueur 2
+  player2: {
     x: canvasWidth - 30,
     y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
     width: 10,
@@ -145,6 +133,7 @@ const gameState = ref({
     upPressed: false,
     downPressed: false,
   },
+  // Balle
   ball: {
     x: canvasWidth / 2,
     y: canvasHeight / 2,
@@ -152,45 +141,17 @@ const gameState = ref({
     speedX: 0,
     speedY: 0,
   },
+  // Liste de barres bonus
   bonusBars: [],
   lastBonusSpawnTime: Date.now(),
 })
 
 /* ---------------------------------------------------------------------
-   FONCTIONS DU TOURNOI
+   FONCTIONS UTILES
 --------------------------------------------------------------------- */
-function startMatch(matchIndex) {
-  currentMatchIndex.value = matchIndex
-  currentMatch.value = matches.value[matchIndex]
-  currentPhase.value = 'game'
-  gamePhase.value = 'menu'
-  resetGame()
-}
-
-function startFinal() {
-  isFinal.value = true
-  currentMatch.value = {
-    player1: matches.value[0].winner,
-    player2: matches.value[1].winner
-  }
-  currentPhase.value = 'game'
-  gamePhase.value = 'menu'
-  resetGame()
-}
-
-function returnToBracket() {
-  if (!isFinal.value) {
-    matches.value[currentMatchIndex.value].winner = 
-      playerScore.value >= WINNING_SCORE ? currentMatch.value.player1 : currentMatch.value.player2
-  }
-  currentPhase.value = 'bracket'
-  currentMatch.value = null
-  currentMatchIndex.value = null
-}
-
-/* ---------------------------------------------------------------------
-   FONCTIONS UTILITAIRES
---------------------------------------------------------------------- */
+/**
+ * y aléatoire pour la barre, en évitant la zone trop proche du centre
+ */
 function getRandomYNotCenter(barHeight) {
   const forbiddenMargin = 60
   const forbiddenMin = canvasHeight / 2 - forbiddenMargin
@@ -204,9 +165,9 @@ function getRandomYNotCenter(barHeight) {
   return y
 }
 
-/* ---------------------------------------------------------------------
-   GESTION BONUS
---------------------------------------------------------------------- */
+/**
+ * Vérifie si deux barres se chevauchent
+ */
 function doBarsOverlap(bar1, bar2) {
   return !(
     bar1.x + bar1.width < bar2.x ||
@@ -216,11 +177,17 @@ function doBarsOverlap(bar1, bar2) {
   )
 }
 
+/**
+ * Fait apparaître un nouveau bonus (barre verticale)
+ * sans chevauchement avec les autres
+ */
 function spawnBonusBar() {
   const state = gameState.value
 
+  // Limite à 4 bonus simultanés
   if (state.bonusBars.length >= 4) return
 
+  // On tente 10 fois de placer un nouveau bonus
   for (let attempts = 0; attempts < 10; attempts++) {
     const colorIndex = Math.floor(Math.random() * BONUS_COLORS.length)
     const color = BONUS_COLORS[colorIndex]
@@ -233,6 +200,7 @@ function spawnBonusBar() {
       y: getRandomYNotCenter(BONUS_BAR_HEIGHT),
     }
 
+    // Vérifie le chevauchement
     let hasOverlap = false
     for (const existingBar of state.bonusBars) {
       if (doBarsOverlap(newBar, existingBar)) {
@@ -248,11 +216,15 @@ function spawnBonusBar() {
   }
 }
 
+/**
+ * Applique l'effet du bonus sur le dernier joueur ayant touché la balle
+ */
 function applyBonusEffect(color) {
   const state = gameState.value
 
   switch (color) {
     case 'red':
+      // Rétrécit la raquette
       if (lastPaddleTouched) {
         state[lastPaddleTouched].height -= 15
         if (state[lastPaddleTouched].height < 40) {
@@ -260,7 +232,9 @@ function applyBonusEffect(color) {
         }
       }
       break
+
     case 'green':
+      // Agrandit la raquette
       if (lastPaddleTouched) {
         state[lastPaddleTouched].height += 15
         if (state[lastPaddleTouched].height > 120) {
@@ -268,7 +242,10 @@ function applyBonusEffect(color) {
         }
       }
       break
+
     case 'blue':
+      // Inverse la direction de la balle
+      // (même si personne n'a touché, on inverse la balle)
       state.ball.speedX = -state.ball.speedX
       state.ball.speedY = -state.ball.speedY
       break
@@ -276,10 +253,36 @@ function applyBonusEffect(color) {
 }
 
 /* ---------------------------------------------------------------------
-   COLLISIONS & RESET
+   GESTION DES RAQUETTES
+--------------------------------------------------------------------- */
+function resetPaddles() {
+  const state = gameState.value
+  // Centre les deux raquettes
+  state.player1.y = canvasHeight / 2 - state.player1.height / 2
+  state.player2.y = canvasHeight / 2 - state.player2.height / 2
+}
+
+function resetPaddleSizes() {
+  const state = gameState.value
+  // Remet les raquettes à leur taille initiale
+  state.player1.height = INITIAL_PADDLE_HEIGHT
+  state.player2.height = INITIAL_PADDLE_HEIGHT
+}
+
+function resetBonuses() {
+  const state = gameState.value
+  // Vide la liste des bonus
+  state.bonusBars = []
+  // Réinitialise le timer
+  state.lastBonusSpawnTime = Date.now()
+}
+
+/* ---------------------------------------------------------------------
+   BALLE & COLLISIONS
 --------------------------------------------------------------------- */
 function paddleBounce(who) {
   lastPaddleTouched = who
+
   const state = gameState.value
   const paddle = state[who]
 
@@ -291,7 +294,7 @@ function paddleBounce(who) {
   const maxBounceAngle = 60 * (Math.PI / 180)
   const bounceAngle = distFromCenter * maxBounceAngle
 
-  if (who === 'player') {
+  if (who === 'player1') {
     state.ball.speedX = Math.abs(currentSpeed * Math.cos(bounceAngle))
   } else {
     state.ball.speedX = -Math.abs(currentSpeed * Math.cos(bounceAngle))
@@ -299,87 +302,97 @@ function paddleBounce(who) {
   state.ball.speedY = currentSpeed * Math.sin(bounceAngle)
 }
 
-function resetPaddles() {
-  const state = gameState.value
-  state.player.y = canvasHeight / 2 - state.player.height / 2
-  state.ai.y = canvasHeight / 2 - state.ai.height / 2
-}
-
-function resetPaddleSizes() {
-  const state = gameState.value
-  state.player.height = INITIAL_PADDLE_HEIGHT
-  state.ai.height = INITIAL_PADDLE_HEIGHT
-}
-
-function resetBonuses() {
-  const state = gameState.value
-  state.bonusBars = []
-  state.lastBonusSpawnTime = Date.now()
-}
-
+/**
+ * Reset de la balle et raquettes après un point
+ */
 function resetBall() {
   const state = gameState.value
-  
+  // Centre la balle
   state.ball.x = canvasWidth / 2
   state.ball.y = canvasHeight / 2
+
+  // Centre les raquettes et remets leur taille
   resetPaddles()
-  
   resetPaddleSizes()
+
+  // Reset bonus
   resetBonuses()
-  
+
+  // Immobilise la balle pendant 1 seconde
   state.ball.speedX = 0
   state.ball.speedY = 0
-  
+
+  // Après 1 seconde, on lance la balle
   roundStartCountdown.value = 1
   setTimeout(() => {
     const goingRight = Math.random() > 0.5
     state.ball.speedX = INITIAL_BALL_SPEED * (goingRight ? 1 : -1)
     state.ball.speedY = INITIAL_BALL_SPEED * (Math.random() * 2 - 1)
-    lastPaddleTouched = goingRight ? 'player' : 'ai'
+    lastPaddleTouched = goingRight ? 'player1' : 'player2'
     roundStartCountdown.value = 0
   }, 1000)
 }
 
 /* ---------------------------------------------------------------------
-   BOUCLE DE JEU
+   BOUCLE DE MISE À JOUR
 --------------------------------------------------------------------- */
 function updateGame() {
   const state = gameState.value
 
-  if (playerScore.value >= WINNING_SCORE || aiScore.value >= WINNING_SCORE) {
+  // Vérif victoire
+  if (
+    player1Score.value >= WINNING_SCORE ||
+    player2Score.value >= WINNING_SCORE
+  ) {
     endGame()
     return
   }
 
-  // Joueur 1
-  if (state.player.upPressed && state.player.y > 0) {
-    state.player.y -= state.player.speed
+  // Mouvements Joueur 1
+  if (state.player1.upPressed && state.player1.y > 0) {
+    state.player1.y -= state.player1.speed
   }
-  if (state.player.downPressed && state.player.y + state.player.height < canvasHeight) {
-    state.player.y += state.player.speed
+  if (
+    state.player1.downPressed &&
+    state.player1.y + state.player1.height < canvasHeight
+  ) {
+    state.player1.y += state.player1.speed
   }
 
-  // Joueur 2
-  updatePlayer2()
+  // Mouvements Joueur 2
+  if (state.player2.upPressed && state.player2.y > 0) {
+    state.player2.y -= state.player2.speed
+  }
+  if (
+    state.player2.downPressed &&
+    state.player2.y + state.player2.height < canvasHeight
+  ) {
+    state.player2.y += state.player2.speed
+  }
 
-  // Spawn des bonus
+  // BONUS : spawn toutes les 4s
   const now = Date.now()
   if (now - state.lastBonusSpawnTime > BONUS_SPAWN_INTERVAL) {
     spawnBonusBar()
     state.lastBonusSpawnTime = now
   }
 
-  // Collisions avec les bonus
+  // Collision balle / bonus
   for (let i = state.bonusBars.length - 1; i >= 0; i--) {
     const bar = state.bonusBars[i]
     if (
       state.ball.x + state.ball.radius >= bar.x &&
-      state.ball.x - state.ball.radius <= bar.x + bar.width &&
-      state.ball.y + state.ball.radius >= bar.y &&
-      state.ball.y - state.ball.radius <= bar.y + bar.height
+      state.ball.x - state.ball.radius <= bar.x + bar.width
     ) {
-      applyBonusEffect(bar.color)
-      state.bonusBars.splice(i, 1)
+      if (
+        state.ball.y + state.ball.radius >= bar.y &&
+        state.ball.y - state.ball.radius <= bar.y + bar.height
+      ) {
+        // Applique l'effet
+        applyBonusEffect(bar.color)
+        // Retire le bonus
+        state.bonusBars.splice(i, 1)
+      }
     }
   }
 
@@ -387,33 +400,33 @@ function updateGame() {
   let nextX = state.ball.x + state.ball.speedX
   let nextY = state.ball.y + state.ball.speedY
 
-  // Collision raquette gauche
+  // Collision raquette gauche (player1)
   if (
-    nextX - state.ball.radius <= state.player.x + state.player.width &&
-    nextX - state.ball.radius >= state.player.x &&
-    state.ball.y >= state.player.y &&
-    state.ball.y <= state.player.y + state.player.height &&
+    nextX - state.ball.radius <= state.player1.x + state.player1.width &&
+    nextX - state.ball.radius >= state.player1.x &&
+    state.ball.y >= state.player1.y &&
+    state.ball.y <= state.player1.y + state.player1.height &&
     state.ball.speedX < 0
   ) {
-    paddleBounce('player')
+    paddleBounce('player1')
     nextX = state.ball.x + state.ball.speedX
     nextY = state.ball.y + state.ball.speedY
   }
 
-  // Collision raquette droite
+  // Collision raquette droite (player2)
   if (
-    nextX + state.ball.radius >= state.ai.x &&
-    nextX + state.ball.radius <= state.ai.x + state.ai.width &&
-    state.ball.y >= state.ai.y &&
-    state.ball.y <= state.ai.y + state.ai.height &&
+    nextX + state.ball.radius >= state.player2.x &&
+    nextX + state.ball.radius <= state.player2.x + state.player2.width &&
+    state.ball.y >= state.player2.y &&
+    state.ball.y <= state.player2.y + state.player2.height &&
     state.ball.speedX > 0
   ) {
-    paddleBounce('ai')
+    paddleBounce('player2')
     nextX = state.ball.x + state.ball.speedX
     nextY = state.ball.y + state.ball.speedY
   }
 
-  // Position
+  // Applique la nouvelle position
   state.ball.x = nextX
   state.ball.y = nextY
 
@@ -426,16 +439,18 @@ function updateGame() {
     state.ball.speedY = -state.ball.speedY
   }
 
-  // Points
+  // Sortie à gauche => point Joueur 2
   if (state.ball.x - state.ball.radius < 0) {
-    aiScore.value++
-    if (aiScore.value < WINNING_SCORE) {
+    player2Score.value++
+    if (player2Score.value < WINNING_SCORE) {
       resetBall()
     }
   }
+
+  // Sortie à droite => point Joueur 1
   if (state.ball.x + state.ball.radius > canvasWidth) {
-    playerScore.value++
-    if (playerScore.value < WINNING_SCORE) {
+    player1Score.value++
+    if (player1Score.value < WINNING_SCORE) {
       resetBall()
     }
   }
@@ -458,17 +473,24 @@ function drawGame() {
   ctx.lineWidth = 2
   ctx.strokeRect(0, 0, canvasWidth, canvasHeight)
 
-  // Raquettes
+  // Raquette Joueur 1
   ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
     '--primary-color'
   )
   ctx.fillRect(
-    state.player.x,
-    state.player.y,
-    state.player.width,
-    state.player.height
+    state.player1.x,
+    state.player1.y,
+    state.player1.width,
+    state.player1.height
   )
-  ctx.fillRect(state.ai.x, state.ai.y, state.ai.width, state.ai.height)
+
+  // Raquette Joueur 2
+  ctx.fillRect(
+    state.player2.x,
+    state.player2.y,
+    state.player2.width,
+    state.player2.height
+  )
 
   // Balle
   ctx.beginPath()
@@ -479,19 +501,23 @@ function drawGame() {
   ctx.fill()
   ctx.closePath()
 
-  // Bonus
+  // Dessine tous les bonus
   state.bonusBars.forEach((bar) => {
     ctx.fillStyle = bar.color
     ctx.fillRect(bar.x, bar.y, bar.width, bar.height)
   })
 
-  // Compte à rebours
+  // Affiche un compte à rebours de 1 seconde si roundStartCountdown > 0
   if (roundStartCountdown.value > 0) {
     ctx.fillStyle = 'white'
     ctx.font = '48px Arial'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText(roundStartCountdown.value.toString(), canvasWidth / 2, canvasHeight / 2)
+    ctx.fillText(
+      roundStartCountdown.value.toString(),
+      canvasWidth / 2,
+      canvasHeight / 2
+    )
   }
 }
 
@@ -504,9 +530,10 @@ function gameLoop() {
 }
 
 /* ---------------------------------------------------------------------
-   PHASES DE JEU
+   PHASES
 --------------------------------------------------------------------- */
 function startCountdown() {
+  if (!player2Name.value.trim()) return
   countdownValue.value = 3
   gamePhase.value = 'countdown'
   const interval = setInterval(() => {
@@ -519,8 +546,8 @@ function startCountdown() {
 }
 
 function startGame() {
-  playerScore.value = 0
-  aiScore.value = 0
+  player1Score.value = 0
+  player2Score.value = 0
   resetGameState()
   resetPaddles()
   resetBall()
@@ -530,14 +557,26 @@ function startGame() {
 
 function endGame() {
   cancelAnimationFrame(animationId)
-  const winner = playerScore.value >= WINNING_SCORE ? currentMatch.value.player1 : currentMatch.value.player2
-  winnerMessage.value = `${winner} remporte le match !`
+  if (player1Score.value >= WINNING_SCORE) {
+    winnerMessage.value =
+      (username.value || $t('pong.game.player1')) + ' ' + $t('pong.game.wins')
+  } else {
+    winnerMessage.value = player2Name.value + ' ' + $t('pong.game.wins')
+  }
   gamePhase.value = 'over'
 }
 
+function restartGame() {
+  player2Name.value = ''
+  gamePhase.value = 'menu'
+}
+
+/**
+ * Reset l'état du jeu
+ */
 function resetGameState() {
   gameState.value = {
-    player: {
+    player1: {
       x: 20,
       y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
       width: 10,
@@ -546,7 +585,7 @@ function resetGameState() {
       upPressed: false,
       downPressed: false,
     },
-    ai: {
+    player2: {
       x: canvasWidth - 30,
       y: canvasHeight / 2 - INITIAL_PADDLE_HEIGHT / 2,
       width: 10,
@@ -569,12 +608,37 @@ function resetGameState() {
 }
 
 /* ---------------------------------------------------------------------
+   CONTRÔLES CLAVIER
+--------------------------------------------------------------------- */
+function handleKeyDown(e) {
+  const key = e.key
+  // Joueur 1
+  if (key.toLowerCase() === 'f') gameState.value.player1.upPressed = true
+  if (key.toLowerCase() === 's') gameState.value.player1.downPressed = true
+
+  // Joueur 2
+  if (key === 'ArrowUp') gameState.value.player2.upPressed = true
+  if (key === 'ArrowDown') gameState.value.player2.downPressed = true
+}
+
+function handleKeyUp(e) {
+  const key = e.key
+  // Joueur 1
+  if (key.toLowerCase() === 'f') gameState.value.player1.upPressed = false
+  if (key.toLowerCase() === 's') gameState.value.player1.downPressed = false
+
+  // Joueur 2
+  if (key === 'ArrowUp') gameState.value.player2.upPressed = false
+  if (key === 'ArrowDown') gameState.value.player2.downPressed = false
+}
+
+/* ---------------------------------------------------------------------
    LIFECYCLE
 --------------------------------------------------------------------- */
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
   window.addEventListener('keyup', handleKeyUp)
-  drawGame()
+  drawGame() // Dessin initial
 })
 
 onUnmounted(() => {
@@ -585,124 +649,112 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.pong-container {
+.pong-mode {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100%;
+  padding: 20px;
+  background: var(--background-color);
+  min-height: 65vh;
+  color: var(--text-color);
+}
+
+.game-container {
+  position: relative;
+  margin-top: 20px;
+}
+
+canvas {
+  border: 2px solid var(--primary-color);
+  background: var(--background-color);
+}
+
+.score-board {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
+  margin-top: 20px;
   gap: 20px;
 }
 
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 800px;
-  padding: 0 20px;
+.player {
+  text-align: center;
+  padding: 10px;
+  background: var(--background-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
+  min-width: 150px;
 }
 
 .score {
-  font-size: 2em;
+  font-size: 24px;
   font-weight: bold;
-  color: var(--primary-color);
+  color: var(--success-color);
 }
 
-.game-canvas {
-  border: 2px solid var(--primary-color);
-  background-color: var(--background-color);
+.controls {
+  font-size: 14px;
+  opacity: 0.8;
+  color: var(--text-color);
 }
 
-.menu-screen,
-.countdown-screen,
-.game-over-screen {
+/* Overlays (menu, countdown, over) */
+.game-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.8);
-  gap: 20px;
 }
 
-.menu-title {
-  font-size: 3em;
-  color: var(--primary-color);
-  margin-bottom: 20px;
-}
-
-.countdown-value {
-  font-size: 5em;
-  color: var(--primary-color);
-}
-
-.winner-message {
-  font-size: 2em;
-  color: var(--primary-color);
+.overlay-content {
+  background: var(--background-color);
+  padding: 30px;
+  border-radius: 8px;
+  border: 2px solid var(--primary-color);
   text-align: center;
-  margin-bottom: 20px;
 }
 
-button {
-  padding: 10px 20px;
-  font-size: 1.2em;
-  background-color: var(--primary-color);
-  color: var(--background-color);
+.overlay-button {
+  padding: 15px 30px;
+  font-size: 18px;
+  background: var(--primary-color);
+  color: var(--text-color);
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: var(--accent-color);
-}
-
-.controls-info {
-  text-align: center;
-  color: var(--text-color);
+  transition: all 0.3s ease;
   margin-top: 10px;
 }
 
-/* Styles spécifiques au tournoi */
-.tournament-bracket {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin: 20px 0;
+.overlay-button:hover {
+  background: var(--primary-hover-color);
+  transform: translateY(-2px);
 }
 
-.tournament-round {
-  display: flex;
-  justify-content: space-around;
+.player-input {
   width: 100%;
-}
-
-.tournament-match {
-  background-color: var(--background-color);
-  border: 2px solid var(--primary-color);
   padding: 10px;
+  margin: 10px 0;
+  border: 2px solid var(--primary-color);
   border-radius: 5px;
-  text-align: center;
+  background: var(--background-color);
+  color: var(--text-color);
+  font-size: 16px;
 }
 
-.tournament-match.active {
+.player-input:focus {
+  outline: none;
   border-color: var(--accent-color);
 }
 
-.tournament-player {
-  padding: 5px;
-  color: var(--text-color);
-}
-
-.tournament-player.winner {
-  color: var(--accent-color);
-  font-weight: bold;
+.overlay-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 </style>

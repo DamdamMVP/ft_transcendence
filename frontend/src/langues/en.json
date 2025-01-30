@@ -102,5 +102,29 @@
     "victories": "Victories",
     "defeats": "Defeats",
     "winRate": "Win Rate"
+  },
+  "pong": {
+    "tournament": {
+      "title": "Tournament Mode",
+      "description": "4 players local"
+    },
+    "ai": {
+      "title": "VS AI",
+      "description": "1 vs 1 against AI"
+    },
+    "local": {
+      "title": "Local VS",
+      "description": "1 vs 1 local"
+    },
+    "game": {
+      "player1": "Player 1",
+      "player2": "Player 2",
+      "controls": "Controls",
+      "score": "Score",
+      "enterName": "Enter Player 2 name",
+      "startGame": "Start game",
+      "wins": "wins the game!",
+      "countdown": "Ready..."
+    }
   }
 }

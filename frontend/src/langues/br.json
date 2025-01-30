@@ -97,5 +97,29 @@
     "victories": "Trec'hioù",
     "defeats": "C'hwioù",
     "winRate": "Feur trec'h"
+  },
+  "pong": {
+    "tournament": {
+      "title": "Mod Tournamantoù",
+      "description": "4 c'hoarier lec'hel"
+    },
+    "ai": {
+      "title": "A-enep OA",
+      "description": "1 a-enep 1 gant OA"
+    },
+    "local": {
+      "title": "A-enep lec'hel",
+      "description": "1 a-enep 1 lec'hel"
+    },
+    "game": {
+      "player1": "C'hoarier 1",
+      "player2": "C'hoarier 2",
+      "controls": "Kontrolloù",
+      "score": "Skor",
+      "enterName": "Lakait anv ar C'hoarier 2",
+      "startGame": "Kregiñ gant ar c'hoari",
+      "wins": "a c'hounez ar bartiad!",
+      "countdown": "Prest..."
+    }
   }
 }

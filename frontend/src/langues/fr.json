@@ -102,5 +102,29 @@
     "victories": "Victoires",
     "defeats": "Défaites",
     "winRate": "Ratio de victoires"
+  },
+  "pong": {
+    "tournament": {
+      "title": "Mode Tournoi",
+      "description": "4 joueurs en local"
+    },
+    "ai": {
+      "title": "VS IA",
+      "description": "1 vs 1 contre l'IA"
+    },
+    "local": {
+      "title": "VS Local",
+      "description": "1 vs 1 en local"
+    },
+    "game": {
+      "player1": "Joueur 1",
+      "player2": "Joueur 2",
+      "controls": "Contrôles",
+      "score": "Score",
+      "enterName": "Entrez le nom du Joueur 2",
+      "startGame": "Commencer la partie",
+      "wins": "remporte la partie !",
+      "countdown": "Prêt..."
+    }
   }
 }

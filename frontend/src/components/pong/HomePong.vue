@@ -1,20 +1,20 @@
 <template>
-  <div class="home-pong">
-    <h1>Pong Game</h1>
+  <div class="pong-home">
+    <h1>PONG</h1>
     <div class="game-modes">
       <button @click="selectMode('tournament')" class="mode-button">
-        <h2>Tournament Mode</h2>
-        <p>4 joueurs en local</p>
+        <h2>{{ $t('pong.tournament.title') }}</h2>
+        <p>{{ $t('pong.tournament.description') }}</p>
       </button>
 
       <button @click="selectMode('ai')" class="mode-button">
-        <h2>VS AI</h2>
-        <p>1 vs 1 contre l'IA</p>
+        <h2>{{ $t('pong.ai.title') }}</h2>
+        <p>{{ $t('pong.ai.description') }}</p>
       </button>
 
       <button @click="selectMode('local')" class="mode-button">
-        <h2>Local VS</h2>
-        <p>1 vs 1 en local</p>
+        <h2>{{ $t('pong.local.title') }}</h2>
+        <p>{{ $t('pong.local.description') }}</p>
       </button>
     </div>
   </div>
@@ -34,14 +34,16 @@ const selectMode = (mode) => {
 </script>
 
 <style scoped>
-.home-pong {
+.pong-home {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 2rem;
   min-height: 65vh;
   background: #1a1a1a;
   color: white;
+  width: 100%;
 }
 
 h1 {
@@ -56,6 +58,7 @@ h1 {
   gap: 2rem;
   width: 100%;
   max-width: 1200px;
+  justify-items: center;
 }
 
 .mode-button {
@@ -67,6 +70,8 @@ h1 {
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
+  width: 100%;
+  max-width: 350px;
 }
 
 .mode-button:hover {
