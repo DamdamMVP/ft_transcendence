@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import eventBus from '../utils/eventBus'
+import { useAuthStore } from '../stores/authStore'
 
 export function useAuth() {
   const error = ref('')
@@ -38,6 +39,9 @@ export function useAuth() {
       })
 
       if (response.status === 200) {
+        const authStore = useAuthStore()
+        authStore.login({ email, ...response.data })
+        console.log('Données utilisateur dans le store:', authStore.user)
         // Vérifier le statut 2FA
         try {
           const twoFAResponse = await axios.get('/users/2fa/status')
