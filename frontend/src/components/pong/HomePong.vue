@@ -42,14 +42,14 @@ const selectMode = (mode) => {
   padding: 2rem;
   min-height: 65vh;
   background: var(--background-color);
-  color: white;
+  color: var(--text-color);
   width: 100%;
 }
 
 h1 {
   font-size: 3rem;
   margin-bottom: 2rem;
-  color: #4caf50;
+  color: var(--primary-color);
 }
 
 .game-modes {
@@ -62,11 +62,11 @@ h1 {
 }
 
 .mode-button {
-  background: #2a2a2a;
-  border: 2px solid #4caf50;
+  background: var(--background-secondary-color);
+  border: 2px solid var(--primary-color);
   border-radius: 10px;
   padding: 2rem;
-  color: white;
+  color: var(--text-color);
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
@@ -76,17 +76,18 @@ h1 {
 
 .mode-button:hover {
   transform: translateY(-5px);
-  background: #3a3a3a;
-  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+  background: var(--background-hover-color);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
 }
 
 .mode-button h2 {
   margin: 0 0 1rem 0;
-  color: #4caf50;
+  color: var(--primary-color);
 }
 
 .mode-button p {
   margin: 0;
+  color: var(--text-color);
   opacity: 0.8;
 }
 </style>

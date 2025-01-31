@@ -19,17 +19,17 @@
         <!-- Overlay personnalisé pour la saisie du pseudo -->
         <template #menu-overlay>
           <div class="player-setup-overlay">
-            <h3>{{ t('pong.game.enterNames') }}</h3>
+            <h3>{{ t('pong.game.enterName') }}</h3>
             <div class="player-input">
               <label>{{ t('pong.game.player2') }}:</label>
-              <input 
-                v-model="player2Name" 
+              <input
+                v-model="player2Name"
                 :placeholder="t('pong.game.enterName')"
                 class="name-input"
               />
             </div>
-            <button 
-              @click="startGame" 
+            <button
+              @click="startGame"
               :disabled="!canStart"
               class="start-button"
             >
@@ -84,7 +84,7 @@ function startGame() {
 function launchGame() {
   countdownValue.value = 3
   gamePhase.value = 'countdown'
-  
+
   const interval = setInterval(() => {
     countdownValue.value--
     if (countdownValue.value <= 0) {
@@ -111,7 +111,7 @@ function gameLoop() {
       // Pause pendant 1 seconde pour montrer le score
       gamePhase.value = 'score'
       if (scoreTimeout) clearTimeout(scoreTimeout)
-      
+
       scoreTimeout = setTimeout(() => {
         if (!isGameOver && gameEngine.value) {
           gamePhase.value = 'playing'
@@ -132,7 +132,12 @@ function gameLoop() {
   if (!canvas) return
 
   const ctx = canvas.getContext('2d')
-  gameEngine.value.drawGame(ctx, gamePhase.value, playerScore.value, player2Score.value)
+  gameEngine.value.drawGame(
+    ctx,
+    gamePhase.value,
+    playerScore.value,
+    player2Score.value
+  )
   if (gamePhase.value === 'playing') {
     animationId = requestAnimationFrame(gameLoop)
   }
@@ -147,9 +152,12 @@ async function endGame() {
     clearTimeout(scoreTimeout)
     scoreTimeout = null
   }
-  
+
   gamePhase.value = 'over'
-  winner.value = playerScore.value > player2Score.value ? playerName.value : player2Name.value
+  winner.value =
+    playerScore.value > player2Score.value
+      ? playerName.value
+      : player2Name.value
 
   // Sauvegarder le match dans l'historique
   try {
@@ -180,7 +188,7 @@ function resetGame() {
     clearTimeout(scoreTimeout)
     scoreTimeout = null
   }
-  
+
   gamePhase.value = 'menu'
   playerScore.value = 0
   player2Score.value = 0
@@ -226,6 +234,7 @@ onUnmounted(() => {
   gap: 2rem;
   padding: 2rem;
   width: 100%;
+  color: var(--text-color);
 }
 
 .game-container {
@@ -240,6 +249,7 @@ onUnmounted(() => {
   border-radius: 8px;
   border: 2px solid var(--primary-color);
   text-align: center;
+  color: var(--text-color);
 }
 
 .player-input {
@@ -255,7 +265,6 @@ onUnmounted(() => {
   border-radius: 4px;
   background: var(--background-color);
   color: var(--text-color);
-  font-size: 1rem;
 }
 
 .start-button {

@@ -220,11 +220,16 @@ onUnmounted(() => {
   gap: 2rem;
   padding: 2rem;
   width: 100%;
+  color: var(--text-color);
 }
 
 .game-container {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+}
+
+h2 {
+  color: var(--text-color);
 }
 </style>
