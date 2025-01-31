@@ -1,13 +1,22 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import eventBus from '@/utils/eventBus'
 import axios from 'axios'
 import TwoFactorModal from '@/components/modals/TwoFactorModal.vue'
 
+// Configuration d'axios pour inclure les cookies
+axios.defaults.withCredentials = true
+
 const router = useRouter()
 const authStore = useAuthStore()
+
+// Gestionnaire pour l'annulation de la 2FA
+const handle2FACancelled = () => {
+  console.log('2FA annulée, redirection vers login')
+  router.push('/login')
+}
 
 onMounted(async () => {
   const params = new URLSearchParams(window.location.search)
@@ -28,8 +37,18 @@ onMounted(async () => {
           console.log('2FA validée, connexion...')
           authStore.login(userData, token)
           eventBus.off('2fa-success')
+          eventBus.off('2fa-cancelled')  // Ne pas oublier de retirer cet écouteur aussi
           router.push('/pong')
         })
+        
+        // Écouter l'événement d'annulation
+        eventBus.on('2fa-cancelled', () => {
+          console.log('2FA annulée, redirection vers login')
+          eventBus.off('2fa-success')
+          eventBus.off('2fa-cancelled')
+          router.push('/')
+        })
+        
         // Ouvrir le modal 2FA
         eventBus.emit('show-2fa-verification')
         return
@@ -42,8 +61,14 @@ onMounted(async () => {
     authStore.login(userData, token)
     router.push('/pong')
   } else {
-    router.push('/login')
+    router.push('/')
   }
+})
+
+// Nettoyage des écouteurs au démontage du composant
+onBeforeUnmount(() => {
+  eventBus.off('2fa-success')
+  eventBus.off('2fa-cancelled')
 })
 </script>
 

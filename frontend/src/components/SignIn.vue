@@ -45,6 +45,7 @@ const handleSignIn = async () => {
         eventBus.on('2fa-success', (data) => {
           console.log('2FA validée, connexion...')
           authStore.login(userData.user, userData.token)
+          router.push('/pong')
           // Ne pas oublier de retirer l'écouteur
           eventBus.off('2fa-success')
         })
