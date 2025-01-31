@@ -4,6 +4,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 import { useUserStatus } from '@/composables/useUserStatus'
+import eventBus from '@/utils/eventBus'
 
 const emit = defineEmits(['success', 'switch-mode'])
 const router = useRouter()
@@ -37,9 +38,17 @@ const handleSignIn = async () => {
       if (result.requires2FA) {
         console.log('2FA requise, attente de validation...')
         // Le modal 2FA s'affichera via l'eventBus
-        // On stocke déjà les données partielles
-        // authStore.login(result.data.user, result.data.token)
-        // return
+        // On stocke déjà les données partielles pour plus tard
+        const userData = result.data
+        
+        // Écouter l'événement de succès 2FA
+        eventBus.on('2fa-success', (data) => {
+          console.log('2FA validée, connexion...')
+          authStore.login(userData.user, userData.token)
+          // Ne pas oublier de retirer l'écouteur
+          eventBus.off('2fa-success')
+        })
+        return
       }
       
       // Cas sans 2FA ou 2FA déjà validée
