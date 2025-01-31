@@ -6,10 +6,6 @@
     <div v-if="gamePhase === 'menu'" class="player-setup">
       <div class="player-names">
         <div class="player-entry">
-          <label>{{ t('pong.game.player') }} 1:</label>
-          <input v-model="player1Name" :placeholder="t('pong.game.enterName')" />
-        </div>
-        <div class="player-entry">
           <label>{{ t('pong.game.player') }} 2:</label>
           <input v-model="player2Name" :placeholder="t('pong.game.enterName')" />
         </div>
@@ -44,8 +40,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/authStore'
+import axios from 'axios'
 import GameCanvas from '../common/GameCanvas.vue'
 import { GameEngine } from '../common/GameEngine'
+
+const { t } = useI18n()
+const authStore = useAuthStore()
 
 // Game state
 const gameCanvasRef = ref(null)
@@ -57,11 +58,11 @@ const player2Score = ref(0)
 const winner = ref('')
 
 // Player names
-const player1Name = ref('')
+const player1Name = ref(authStore.user?.username || '')
 const player2Name = ref('')
 
 const canStart = computed(() => {
-  return player1Name.value.trim() && player2Name.value.trim()
+  return player2Name.value.trim() !== ''
 })
 
 let animationId = null
@@ -113,29 +114,48 @@ function gameLoop() {
 
   const ctx = canvas.getContext('2d')
   gameEngine.value.drawGame(ctx)
-
   animationId = requestAnimationFrame(gameLoop)
 }
 
-function endGame() {
-  cancelAnimationFrame(animationId)
-  if (player1Score.value >= gameEngine.value.WINNING_SCORE) {
-    winner.value = player1Name.value
-  } else {
-    winner.value = player2Name.value
+async function endGame() {
+  if (animationId) {
+    cancelAnimationFrame(animationId)
+    animationId = null
   }
   gamePhase.value = 'over'
+  
+  const winnerName = player1Score.value > player2Score.value ? player1Name.value : player2Name.value
+  winner.value = winnerName
+
+  // Sauvegarder le match dans l'historique
+  try {
+    const historyData = {
+      user: authStore.user.id,
+      guest_name: player2Name.value,
+      user_score: player1Score.value,
+      guest_score: player2Score.value,
+      played_at: new Date().toISOString(),
+      game_name: 'pong',
+    }
+
+    await axios.post('/users/histories/add', historyData, {
+      withCredentials: true,
+    })
+    console.log('history saved')
+  } catch (error) {
+    console.error('Error saving game history:', error)
+  }
 }
 
 function resetGame() {
+  gamePhase.value = 'menu'
   player1Score.value = 0
   player2Score.value = 0
   winner.value = ''
-  gamePhase.value = 'menu'
+  player2Name.value = ''
   gameEngine.value = null
 }
 
-// Event listeners
 function handleKeyDown(e) {
   if (gameEngine.value && gamePhase.value === 'playing') {
     gameEngine.value.handleKeyDown(e)
@@ -156,61 +176,73 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('keyup', handleKeyUp)
-  cancelAnimationFrame(animationId)
+  if (animationId) {
+    cancelAnimationFrame(animationId)
+  }
 })
-
-const { t } = useI18n()
 </script>
 
 <style scoped>
 .local-mode {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+  width: 100%;
 }
 
 .player-setup {
-  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 600px;
 }
 
 .player-names {
-  margin: 20px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
 }
 
 .player-entry {
-  margin: 10px 0;
   display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.player-entry label {
-  width: 80px;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .player-entry input {
-  padding: 8px;
-  width: 200px;
-  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border: 1px solid var(--primary-color);
   border-radius: 4px;
+  background: var(--background-color);
+  color: var(--text-color);
 }
 
 .button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background: #666;
-  color: white;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: var(--text-color);
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background: var(--primary-hover-color);
 }
 
 .button:disabled {
-  opacity: 0.5;
+  background: var(--disabled-color);
   cursor: not-allowed;
 }
 
 .game-container {
-  margin-top: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 </style>
