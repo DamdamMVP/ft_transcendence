@@ -136,7 +136,7 @@ def getData(request):
 @permission_classes([IsAuthenticated])
 def getUser(request, pk):
     try:
-        user = request.user
+        user = User.objects.get(id=pk)
         serializer = UserSerializer(user, many=False)
         return Response(serializer.data)
     except User.DoesNotExist:
