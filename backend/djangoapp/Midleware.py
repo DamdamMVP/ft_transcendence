@@ -116,6 +116,17 @@ class CookieJWTAuthentication(JWTAuthentication):
 User = get_user_model()
 
 
+from channels.middleware import BaseMiddleware
+from channels.db import database_sync_to_async
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import InvalidToken
+from jwt import ExpiredSignatureError, decode as jwt_decode
+from django.conf import settings
+
+User = get_user_model()
+
 class TokenAuthMiddleware(BaseMiddleware):
     """
     Custom Channels middleware that:
@@ -140,49 +151,73 @@ class TokenAuthMiddleware(BaseMiddleware):
         access_token = cookies.get("access_token")
         refresh_token = cookies.get("refresh_token")
 
-        # Attempt to authenticate user
-        user = await self.get_user_from_tokens(access_token, refresh_token)
+        # Attempt to authenticate user (and possibly refresh tokens)
+        user, new_access_token = await self.get_user_from_tokens(access_token, refresh_token)
+
+        # Attach user to the scope
         scope["user"] = user
 
-        # Continue the handshake/connection
+        # NOTE: If you wanted to somehow send the new_access_token back to the client
+        # during the handshake, you'd have to add some handshake header or a
+        # custom protocol approach. Channels doesn't have a direct "set-cookie" concept
+        # for WebSocket upgrades. You might do something like:
+        #
+        # if new_access_token:
+        #     # Some advanced hack to modify an HTTP handshake response header
+        #     # But there's no simple built-in for that in Channels
+        #     pass
+
+        # Continue with the connection
         return await super().__call__(scope, receive, send)
 
     @database_sync_to_async
     def get_user_from_tokens(self, access_token, refresh_token):
+        """
+        Checks if the access token is valid. If expired, tries to refresh using the
+        refresh token. Returns (user, new_access_token).
+        new_access_token is None if we didn't refresh.
+        """
         if not access_token:
-            return AnonymousUser()
+            return AnonymousUser(), None
 
         try:
             # 1) Try decoding the current access token
             decoded_data = jwt_decode(access_token, settings.SECRET_KEY, algorithms=["HS256"])
             user_id = decoded_data.get("user_id")
             if not user_id:
-                return AnonymousUser()
-            return User.objects.get(id=user_id)
+                return AnonymousUser(), None
+
+            # 2) Fetch the user from DB
+            user = User.objects.get(id=user_id)
+            return user, None
 
         except ExpiredSignatureError:
-            # 2) If the access token is expired, attempt to refresh
+            # The access token is expired, attempt to refresh
             if not refresh_token:
-                return AnonymousUser()
+                return AnonymousUser(), None
 
             try:
                 refresh = RefreshToken(refresh_token)
+                # Generate new access token
                 new_access_token = str(refresh.access_token)
                 
                 # Decode the newly generated access token
-                new_decoded_data = jwt_decode(new_access_token, settings.SECRET_KEY, algorithms=["HS256"])
+                new_decoded_data = jwt_decode(
+                    new_access_token, settings.SECRET_KEY, algorithms=["HS256"]
+                )
                 user_id = new_decoded_data.get("user_id")
                 if not user_id:
-                    return AnonymousUser()
-                
-                return User.objects.get(id=user_id)
+                    return AnonymousUser(), None
+
+                user = User.objects.get(id=user_id)
+                return user, new_access_token
 
             except Exception:
                 # If refresh fails (invalid/expired refresh token), anonymous
-                return AnonymousUser()
+                return AnonymousUser(), None
 
         except (InvalidToken, User.DoesNotExist):
-            return AnonymousUser()
+            return AnonymousUser(), None
 
 
 

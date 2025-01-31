@@ -55,6 +55,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         user = self.scope["user"]
+        if user.is_anonymous:
+            return
 
         # Mark user as offline
         await self.set_user_offline(user)
@@ -146,6 +148,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """
         Set the user status to offline.
         """
+        if user.is_anonymous:
+            return
         UserStatus.objects.filter(user=user).update(is_online=False)
 
     @database_sync_to_async
@@ -160,11 +164,15 @@ class StatusConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.channel_layer.group_add("status", self.channel_name)
         await self.accept()
+        if self.scope["user"].is_anonymous:
+            return
         if self.scope["user"].is_authenticated:
             status_update = await self.update_user_status(True)
             await self.channel_layer.group_send("status", status_update)
             
     async def disconnect(self, close_code):
+        if self.scope["user"].is_anonymous:
+            return
         if self.scope["user"].is_authenticated:
             status_update = await self.update_user_status(False)
             await self.channel_layer.group_send("status", status_update)
@@ -172,6 +180,8 @@ class StatusConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def update_user_status(self, is_online):
+        if self.scope["user"].is_anonymous:
+            return
         user = self.scope["user"]
         status, _ = UserStatus.objects.get_or_create(user=user)
         status.is_online = is_online
