@@ -41,9 +41,9 @@
     <!-- Game over overlay -->
     <div v-if="gamePhase === 'over'" class="overlay">
       <div class="game-over">
-        <h3 class="winner">{{ t('pong.game.winner') }} : {{ winner }}</h3>
+        <h3 class="winner">{{ t('pong.game.winner') }} {{ winner }}</h3>
         <p class="score">
-          {{ t('pong.game.score') }}: {{ player1Score }} - {{ player2Score }}
+          {{ t('catch.score') }} : {{ player1Score }} - {{ player2Score }}
         </p>
         <button @click="$emit('close-match')" class="close-button">
           {{ t('pong.game.close') }}
