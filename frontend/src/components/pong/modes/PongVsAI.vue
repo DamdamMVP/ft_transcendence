@@ -126,7 +126,7 @@ function gameLoop() {
   if (!canvas) return
 
   const ctx = canvas.getContext('2d')
-  gameEngine.value.drawGame(ctx)
+  gameEngine.value.drawGame(ctx, gamePhase.value, playerScore.value, aiScore.value)
   if (gamePhase.value === 'playing') {
     animationId = requestAnimationFrame(gameLoop)
   }

@@ -283,32 +283,24 @@ export class GameEngine {
     return player1Score >= this.WINNING_SCORE || player2Score >= this.WINNING_SCORE
   }
 
-  drawGame(ctx) {
-    // Get CSS variables
-    const style = getComputedStyle(document.documentElement)
-    const backgroundColor = style.getPropertyValue('--background-color')
-    const primaryColor = style.getPropertyValue('--primary-color')
-    const accentColor = style.getPropertyValue('--accent-color')
-
-    // Clear
-    ctx.fillStyle = backgroundColor
+  drawGame(ctx, gamePhase, player1Score, player2Score) {
+    // Clear canvas
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-color')
     ctx.fillRect(0, 0, this.canvasWidth, this.canvasHeight)
 
-    // Border
-    ctx.strokeStyle = primaryColor
+    // Draw border
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
     ctx.lineWidth = 2
     ctx.strokeRect(0, 0, this.canvasWidth, this.canvasHeight)
 
-    // Draw player1
-    ctx.fillStyle = primaryColor
+    // Draw paddles
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
     ctx.fillRect(
       this.gameState.player1.x,
       this.gameState.player1.y,
       this.gameState.player1.width,
       this.gameState.player1.height
     )
-
-    // Draw player2
     ctx.fillRect(
       this.gameState.player2.x,
       this.gameState.player2.y,
@@ -316,24 +308,31 @@ export class GameEngine {
       this.gameState.player2.height
     )
 
-    // Draw ball
-    ctx.beginPath()
-    ctx.arc(
-      this.gameState.ball.x,
-      this.gameState.ball.y,
-      this.gameState.ball.radius,
-      0,
-      Math.PI * 2
-    )
-    ctx.fillStyle = accentColor
-    ctx.fill()
-    ctx.closePath()
-
     // Draw bonus bars
     this.gameState.bonusBars.forEach((bar) => {
       ctx.fillStyle = bar.color
       ctx.fillRect(bar.x, bar.y, bar.width, bar.height)
     })
+
+    // Draw ball
+    ctx.beginPath()
+    ctx.arc(this.gameState.ball.x, this.gameState.ball.y, this.gameState.ball.radius, 0, Math.PI * 2)
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color')
+    ctx.fill()
+    ctx.closePath()
+
+    // Si on est en phase de score, afficher le score au centre
+    if (gamePhase === 'score') {
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
+      ctx.font = 'bold 48px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(
+        `${player1Score} - ${player2Score}`,
+        this.canvasWidth / 2,
+        this.canvasHeight / 2
+      )
+    }
   }
 
   handleKeyDown(e) {
