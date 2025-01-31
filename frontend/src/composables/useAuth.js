@@ -39,9 +39,6 @@ export function useAuth() {
       })
 
       if (response.status === 200) {
-        const authStore = useAuthStore()
-        authStore.login({ email, ...response.data })
-        console.log('Données utilisateur dans le store:', authStore.user)
         // Vérifier le statut 2FA
         try {
           const twoFAResponse = await axios.get('/users/2fa/status')
@@ -52,7 +49,7 @@ export function useAuth() {
             tempAuthToken.value = response.data.token // Stocker temporairement le token
             // Ouvrir le modal 2FA
             eventBus.emit('show-2fa-verification')
-            return { success: false, requires2FA: true }
+            return { success: true, requires2FA: true, data: response.data }
           }
         } catch (error) {
           console.warn('Impossible de récupérer le statut 2FA:', error)
