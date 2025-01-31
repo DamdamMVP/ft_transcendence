@@ -1,10 +1,6 @@
 <template>
-  <div class="game-container">
-    <canvas
-      ref="canvas"
-      :width="canvasWidth"
-      :height="canvasHeight"
-    ></canvas>
+  <div class="game-canvas-container">
+    <canvas ref="canvas" class="game-canvas" :width="canvasWidth" :height="canvasHeight"></canvas>
 
     <!-- Scoreboard -->
     <div class="score-board">
@@ -20,27 +16,29 @@
       </div>
     </div>
 
-    <!-- Overlays -->
-    <div v-if="gamePhase === 'menu'" class="game-overlay">
-      <div class="overlay-content">
-        <h3>{{ t('pong.game.ready') }}</h3>
-        <button @click="$emit('start-game')" class="overlay-button">
-          {{ t('pong.game.startGame') }}
-        </button>
-      </div>
+    <!-- Menu overlay -->
+    <div v-if="gamePhase === 'menu'" class="overlay">
+      <slot name="menu-overlay">
+        <div class="menu-content">
+          <h3>{{ t('pong.game.ready') }}</h3>
+          <button @click="$emit('start-game')" class="start-button">
+            {{ t('pong.game.startGame') }}
+          </button>
+        </div>
+      </slot>
     </div>
 
-    <div v-if="gamePhase === 'countdown'" class="game-overlay">
-      <div class="overlay-content">
-        <h2>{{ t('pong.game.countdown') }} {{ countdownValue }}...</h2>
-      </div>
+    <!-- Countdown overlay -->
+    <div v-if="gamePhase === 'countdown'" class="overlay">
+      <div class="countdown">{{ countdownValue }}</div>
     </div>
 
-    <div v-if="gamePhase === 'over'" class="game-overlay">
-      <div class="overlay-content">
-        <h2>{{ t('pong.game.matchOver') }}</h2>
-        <p>{{ t('pong.game.winner') }}: {{ winner }}</p>
-        <button @click="$emit('close-match')" class="overlay-button">
+    <!-- Game over overlay -->
+    <div v-if="gamePhase === 'over'" class="overlay">
+      <div class="game-over">
+        <h3>{{ t('pong.game.gameOver') }}</h3>
+        <p>{{ t('pong.game.winner', { winner }) }}</p>
+        <button @click="$emit('close-match')" class="close-button">
           {{ t('pong.game.close') }}
         </button>
       </div>
@@ -49,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -61,7 +59,19 @@ const props = defineProps({
   },
   canvasHeight: {
     type: Number,
-    default: 400
+    default: 450
+  },
+  gamePhase: {
+    type: String,
+    required: true
+  },
+  countdownValue: {
+    type: Number,
+    required: true
+  },
+  winner: {
+    type: String,
+    default: ''
   },
   player1Name: {
     type: String,
@@ -78,18 +88,6 @@ const props = defineProps({
   player2Score: {
     type: Number,
     required: true
-  },
-  gamePhase: {
-    type: String,
-    required: true
-  },
-  countdownValue: {
-    type: Number,
-    default: 3
-  },
-  winner: {
-    type: String,
-    default: ''
   }
 })
 
@@ -98,7 +96,9 @@ defineEmits(['start-game', 'close-match'])
 const canvas = ref(null)
 
 onMounted(() => {
-  // Initialisation du canvas si nécessaire
+  if (canvas.value) {
+    canvas.value.focus()
+  }
   const ctx = canvas.value.getContext('2d')
   ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-color')
   ctx.fillRect(0, 0, props.canvasWidth, props.canvasHeight)
@@ -110,13 +110,20 @@ defineExpose({
 </script>
 
 <style scoped>
-.game-container {
+.game-canvas-container {
   position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  aspect-ratio: 16/9;
 }
 
-canvas {
-  border: 2px solid var(--primary-color);
+.game-canvas {
+  width: 100%;
+  height: 100%;
   background: var(--background-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 4px;
 }
 
 .score-board {
@@ -144,39 +151,49 @@ canvas {
   color: var(--text-color);
 }
 
-.game-overlay {
+.overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 4px;
 }
 
-.overlay-content {
+.menu-content,
+.game-over {
   background: var(--background-color);
-  padding: 20px;
-  border-radius: 6px;
-  border: 1px solid var(--primary-color);
-  color: var(--text-color);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid var(--primary-color);
   text-align: center;
 }
 
-.overlay-button {
-  padding: 10px 20px;
+.countdown {
+  font-size: 6rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.start-button,
+.close-button {
+  padding: 0.75rem 1.5rem;
   background: var(--primary-color);
   color: var(--text-color);
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
-  margin-top: 10px;
+  font-size: 1rem;
+  margin-top: 1rem;
+  transition: background-color 0.2s;
 }
 
-.overlay-button:hover {
+.start-button:hover,
+.close-button:hover {
   background: var(--primary-hover-color);
 }
 </style>

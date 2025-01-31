@@ -2,37 +2,42 @@
   <div class="local-mode">
     <h2>{{ t('pong.local.title') }}</h2>
 
-    <!-- Phase de saisie des noms -->
-    <div v-if="gamePhase === 'menu'" class="player-setup">
-      <div class="player-names">
-        <div class="player-entry">
-          <label>{{ t('pong.game.player') }} 2:</label>
-          <input v-model="player2Name" :placeholder="t('pong.game.enterName')" />
-        </div>
-      </div>
-      <button
-        @click="startGame"
-        :disabled="!canStart"
-        class="button"
-      >
-        {{ t('pong.game.startGame') }}
-      </button>
-    </div>
-
     <!-- Le jeu -->
-    <div v-else class="game-container">
+    <div class="game-container">
       <GameCanvas
         ref="gameCanvasRef"
-        :player1-name="player1Name"
+        :player1-name="playerName"
         :player2-name="player2Name"
-        :player1-score="player1Score"
+        :player1-score="playerScore"
         :player2-score="player2Score"
         :game-phase="gamePhase"
         :countdown-value="countdownValue"
         :winner="winner"
-        @start-game="launchGame"
+        @start-game="startGame"
         @close-match="resetGame"
-      />
+      >
+        <!-- Overlay personnalisé pour la saisie du pseudo -->
+        <template #menu-overlay>
+          <div class="player-setup-overlay">
+            <h3>{{ t('pong.game.enterNames') }}</h3>
+            <div class="player-input">
+              <label>{{ t('pong.game.player2') }}:</label>
+              <input 
+                v-model="player2Name" 
+                :placeholder="t('pong.game.enterName')"
+                class="name-input"
+              />
+            </div>
+            <button 
+              @click="startGame" 
+              :disabled="!canStart"
+              class="start-button"
+            >
+              {{ t('pong.game.startGame') }}
+            </button>
+          </div>
+        </template>
+      </GameCanvas>
     </div>
   </div>
 </template>
@@ -53,12 +58,12 @@ const gameCanvasRef = ref(null)
 const gameEngine = ref(null)
 const gamePhase = ref('menu')
 const countdownValue = ref(3)
-const player1Score = ref(0)
+const playerScore = ref(0)
 const player2Score = ref(0)
 const winner = ref('')
 
 // Player names
-const player1Name = ref(authStore.user?.username || '')
+const playerName = ref(authStore.user?.username || '')
 const player2Name = ref('')
 
 const canStart = computed(() => {
@@ -66,10 +71,11 @@ const canStart = computed(() => {
 })
 
 let animationId = null
+let scoreTimeout = null
 
 function startGame() {
   if (!canStart.value) return
-  
+
   gameEngine.value = new GameEngine()
   gamePhase.value = 'countdown'
   launchGame()
@@ -93,14 +99,27 @@ function launchGame() {
 }
 
 function gameLoop() {
-  if (gamePhase.value !== 'playing') return
+  if (gamePhase.value !== 'playing' || !gameEngine.value) return
 
   const isGameOver = gameEngine.value.updateGame(
-    player1Score.value,
+    playerScore.value,
     player2Score.value,
-    (player) => {
-      if (player === 'player1') player1Score.value++
+    async (player) => {
+      if (player === 'player1') playerScore.value++
       else player2Score.value++
+
+      // Pause pendant 1 seconde pour montrer le score
+      gamePhase.value = 'score'
+      if (scoreTimeout) clearTimeout(scoreTimeout)
+      
+      scoreTimeout = setTimeout(() => {
+        if (!isGameOver && gameEngine.value) {
+          gamePhase.value = 'playing'
+          gameEngine.value.resetBall()
+          gameEngine.value.launchBall()
+          animationId = requestAnimationFrame(gameLoop)
+        }
+      }, 1000)
     }
   )
 
@@ -113,8 +132,10 @@ function gameLoop() {
   if (!canvas) return
 
   const ctx = canvas.getContext('2d')
-  gameEngine.value.drawGame(ctx)
-  animationId = requestAnimationFrame(gameLoop)
+  gameEngine.value.drawGame(ctx, gamePhase.value, playerScore.value, player2Score.value)
+  if (gamePhase.value === 'playing') {
+    animationId = requestAnimationFrame(gameLoop)
+  }
 }
 
 async function endGame() {
@@ -122,17 +143,20 @@ async function endGame() {
     cancelAnimationFrame(animationId)
     animationId = null
   }
-  gamePhase.value = 'over'
+  if (scoreTimeout) {
+    clearTimeout(scoreTimeout)
+    scoreTimeout = null
+  }
   
-  const winnerName = player1Score.value > player2Score.value ? player1Name.value : player2Name.value
-  winner.value = winnerName
+  gamePhase.value = 'over'
+  winner.value = playerScore.value > player2Score.value ? playerName.value : player2Name.value
 
   // Sauvegarder le match dans l'historique
   try {
     const historyData = {
       user: authStore.user.id,
       guest_name: player2Name.value,
-      user_score: player1Score.value,
+      user_score: playerScore.value,
       guest_score: player2Score.value,
       played_at: new Date().toISOString(),
       game_name: 'pong',
@@ -148,12 +172,21 @@ async function endGame() {
 }
 
 function resetGame() {
+  if (animationId) {
+    cancelAnimationFrame(animationId)
+    animationId = null
+  }
+  if (scoreTimeout) {
+    clearTimeout(scoreTimeout)
+    scoreTimeout = null
+  }
+  
   gamePhase.value = 'menu'
-  player1Score.value = 0
+  playerScore.value = 0
   player2Score.value = 0
   winner.value = ''
-  player2Name.value = ''
   gameEngine.value = null
+  player2Name.value = ''
 }
 
 function handleKeyDown(e) {
@@ -179,6 +212,9 @@ onUnmounted(() => {
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
+  if (scoreTimeout) {
+    clearTimeout(scoreTimeout)
+  }
 })
 </script>
 
@@ -192,35 +228,37 @@ onUnmounted(() => {
   width: 100%;
 }
 
-.player-setup {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.game-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.player-names {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+.player-setup-overlay {
+  background: var(--background-color);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid var(--primary-color);
+  text-align: center;
 }
 
-.player-entry {
+.player-input {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin: 1rem 0;
 }
 
-.player-entry input {
+.name-input {
   padding: 0.5rem;
   border: 1px solid var(--primary-color);
   border-radius: 4px;
   background: var(--background-color);
   color: var(--text-color);
+  font-size: 1rem;
 }
 
-.button {
+.start-button {
   padding: 0.75rem 1.5rem;
   background: var(--primary-color);
   color: var(--text-color);
@@ -231,18 +269,12 @@ onUnmounted(() => {
   transition: background-color 0.2s;
 }
 
-.button:hover {
+.start-button:hover:not(:disabled) {
   background: var(--primary-hover-color);
 }
 
-.button:disabled {
-  background: var(--disabled-color);
+.start-button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
-}
-
-.game-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
 }
 </style>

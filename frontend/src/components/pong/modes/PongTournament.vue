@@ -7,20 +7,22 @@
       <div class="player-names">
         <div v-for="index in 3" :key="index" class="player-entry">
           <label>{{ t('pong.game.player') }} {{ index + 1 }}:</label>
-          <input v-model="players[index]" :placeholder="t('pong.tournament.enterName')" />
+          <input
+            v-model="players[index]"
+            :placeholder="t('pong.tournament.enterName')"
+          />
         </div>
       </div>
-      <button
-        @click="startTournament"
-        :disabled="!canStart"
-        class="button"
-      >
+      <button @click="startTournament" :disabled="!canStart" class="button">
         {{ t('pong.game.startGame') }}
       </button>
     </div>
 
     <!-- Arbre du tournoi -->
-    <div v-if="gamePhase === 'menu' || gamePhase === 'tournament-tree'" class="tournament-tree">
+    <div
+      v-if="gamePhase === 'menu' || gamePhase === 'tournament-tree'"
+      class="tournament-tree"
+    >
       <div class="round semi-finals">
         <div class="match">
           <div class="player">{{ getPlayerName(0) }}</div>
@@ -46,7 +48,10 @@
     </div>
 
     <!-- Bouton pour lancer le prochain match -->
-    <div v-if="gamePhase === 'tournament-tree' && !tournamentWinner" class="next-match">
+    <div
+      v-if="gamePhase === 'tournament-tree' && !tournamentWinner"
+      class="next-match"
+    >
       <button @click="startNextMatch" class="button">
         {{ t('pong.tournament.nextMatch') }}
       </button>
@@ -87,8 +92,10 @@ const authStore = useAuthStore()
 const gamePhase = ref('menu')
 const canvasPhase = ref('ready')
 const players = ref([
-  authStore.user?.username || '',  // Utiliser le pseudo de l'utilisateur connecté
-  '', '', ''
+  authStore.user?.username || '', // Utiliser le pseudo de l'utilisateur connecté
+  '',
+  '',
+  '',
 ])
 const winners = ref(['', ''])
 const tournamentWinner = ref('')
@@ -107,7 +114,7 @@ let animationId = null
 
 // Vérifier uniquement les joueurs 2 à 4
 const canStart = computed(() => {
-  return players.value.slice(1).every(player => player.trim() !== '')
+  return players.value.slice(1).every((player) => player.trim() !== '')
 })
 
 function getPlayerName(index) {
@@ -127,14 +134,14 @@ function setupNextMatch() {
     currentMatch.value = {
       player1: getPlayerName(matchIndex * 2),
       player2: getPlayerName(matchIndex * 2 + 1),
-      round: 'semi'
+      round: 'semi',
     }
   } else if (currentMatchIndex.value === 2) {
     // Finale
     currentMatch.value = {
       player1: winners.value[0],
       player2: winners.value[1],
-      round: 'final'
+      round: 'final',
     }
   }
 }
@@ -145,7 +152,7 @@ function startNextMatch() {
   player1Score.value = 0
   player2Score.value = 0
   matchWinner.value = ''
-  
+
   nextTick(() => {
     const canvas = gameCanvasRef.value?.canvas
     if (canvas) {
@@ -161,10 +168,10 @@ function startNextMatch() {
 
 function launchGame() {
   if (!gameEngine.value) return
-  
+
   countdownValue.value = 3
   canvasPhase.value = 'countdown'
-  
+
   const interval = setInterval(() => {
     countdownValue.value--
     if (countdownValue.value <= 0) {
@@ -213,7 +220,10 @@ function endMatch() {
     animationId = null
   }
   canvasPhase.value = 'over'
-  const winner = player1Score.value > player2Score.value ? currentMatch.value.player1 : currentMatch.value.player2
+  const winner =
+    player1Score.value > player2Score.value
+      ? currentMatch.value.player1
+      : currentMatch.value.player2
   matchWinner.value = winner
 
   if (currentMatch.value.round === 'semi') {

@@ -106,42 +106,35 @@
     "winRate": "Ratio de victoires"
   },
   "pong": {
-    "tournament": {
-      "title": "Mode Tournoi",
-      "description": "4 joueurs en local",
-      "nextMatch": "Lancer le prochain match",
-      "enterName": "Entrer un nom"
+    "local": {
+      "title": "Mode Local",
+      "description": "2 joueurs en local"
     },
     "ai": {
       "title": "VS IA",
       "description": "1 vs 1 contre l'IA"
     },
-    "local": {
-      "title": "Mode Local",
-      "description": "2 joueurs en local"
+    "tournament": {
+      "title": "Tournoi",
+      "description": "4 joueurs en local",
+      "enterName": "Entrez le nom du joueur",
+      "nextMatch": "Match suivant"
     },
     "game": {
-      "player": "Joueur",
-      "enterName": "Entrez le nom",
-      "startGame": "Commencer",
       "ready": "Prêt ?",
-      "countdown": "Début dans",
-      "matchOver": "Partie terminée",
-      "winner": "Gagnant",
+      "startGame": "Commencer la partie",
+      "countdown": "Départ dans",
+      "gameOver": "Partie terminée !",
+      "winner": "Gagnant : {winner}",
       "close": "Fermer",
-      "wins": "gagne !",
-      "controls": "Contrôles",
+      "player": "Joueur",
       "player1": "Joueur 1",
       "player2": "Joueur 2",
-      "score": "Score",
-      "enterName": "Entrez le nom du Joueur 2",
-      "startGame": "Commencer la partie",
-      "wins": "remporte la partie !",
-      "countdown": "Prêt...",
-      "matchOver": "Partie terminée",
-      "winner": "Gagnant",
-      "close": "Fermer",
-      "ready": "Prêt ?"
+      "player3": "Joueur 3",
+      "player4": "Joueur 4",
+      "enterName": "Entrez votre pseudo",
+      "enterNames": "Entrez le pseudo du Joueur 2",
+      "controls": "Contrôles"
     }
   },
   "catch": {

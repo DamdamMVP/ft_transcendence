@@ -1,5 +1,5 @@
 export class GameEngine {
-  constructor(canvasWidth = 800, canvasHeight = 400) {
+  constructor(canvasWidth = 800, canvasHeight = 450) {
     this.canvasWidth = canvasWidth
     this.canvasHeight = canvasHeight
     this.WINNING_SCORE = 5
@@ -12,27 +12,29 @@ export class GameEngine {
     this.BONUS_COLORS = ['red', 'green', 'blue']
     this.BONUS_BAR_WIDTH = 10
     this.BONUS_BAR_HEIGHT = 60
-    this.INITIAL_PADDLE_HEIGHT = 80
+    this.INITIAL_PADDLE_HEIGHT = this.canvasHeight * 0.15
 
     this.resetGameState()
   }
 
   resetGameState() {
+    const paddleHeight = this.INITIAL_PADDLE_HEIGHT
+
     this.gameState = {
       player1: {
         x: 20,
-        y: this.canvasHeight / 2 - this.INITIAL_PADDLE_HEIGHT / 2,
+        y: this.canvasHeight / 2 - paddleHeight / 2,
         width: 10,
-        height: this.INITIAL_PADDLE_HEIGHT,
+        height: paddleHeight,
         speed: 4.5,
         upPressed: false,
         downPressed: false,
       },
       player2: {
         x: this.canvasWidth - 30,
-        y: this.canvasHeight / 2 - this.INITIAL_PADDLE_HEIGHT / 2,
+        y: this.canvasHeight / 2 - paddleHeight / 2,
         width: 10,
-        height: this.INITIAL_PADDLE_HEIGHT,
+        height: paddleHeight,
         speed: 4.5,
         upPressed: false,
         downPressed: false,
