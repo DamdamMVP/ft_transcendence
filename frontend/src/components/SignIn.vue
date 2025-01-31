@@ -15,6 +15,7 @@ const password = ref('')
 const error = ref('')
 const isLoading = ref(false)
 const { signIn } = useAuth()
+
 const handleSignIn = async () => {
   if (!email.value || !password.value) {
     error.value = 'Veuillez remplir tous les champs'
@@ -30,8 +31,18 @@ const handleSignIn = async () => {
       password: password.value,
     })
     
+    console.log('Résultat complet:', result)
+    
     if (result.success) {
-      // Mettre à jour le store d'authentification avec l'utilisateur et le token
+      if (result.requires2FA) {
+        console.log('2FA requise, attente de validation...')
+        // Le modal 2FA s'affichera via l'eventBus
+        // On stocke déjà les données partielles
+        // authStore.login(result.data.user, result.data.token)
+        // return
+      }
+      
+      // Cas sans 2FA ou 2FA déjà validée
       authStore.login(result.data.user, result.data.token)
       
       // Initialiser le WebSocket
