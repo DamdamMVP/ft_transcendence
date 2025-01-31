@@ -114,6 +114,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # If current user (`user`) has blocked the sender (`sender_id`), ignore message
         if sender_id in blocked_senders:
+            print(f"User {user} has blocked sender {sender_id}")
             return
 
         # Send message to user

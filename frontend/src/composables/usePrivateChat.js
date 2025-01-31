@@ -47,7 +47,7 @@ export function usePrivateChat() {
     }
 
     // Crée une nouvelle connexion WebSocket
-    const ws = new WebSocket(`ws/chat/${roomName}/`)
+    const ws = new WebSocket(`/ws/chat/${roomName}/`)
 
     ws.onopen = () => {
       console.log(`Connected to chat room: ${roomName}`)
