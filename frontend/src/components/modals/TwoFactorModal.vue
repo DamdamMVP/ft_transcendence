@@ -1,9 +1,19 @@
 <template>
-  <div v-if="show" class="modal-overlay" @keyup.esc="!isLoading && closeModal()">
+  <div
+    v-if="show"
+    class="modal-overlay"
+    @keyup.esc="!isLoading && closeModal()"
+  >
     <div class="modal-content" @click.stop>
-      <button class="close-icon" @click="closeModal" :disabled="isLoading">×</button>
-      <h2>{{ isVerificationMode ? t('security.verify2FA') : t('security.setup2FA') }}</h2>
-      
+      <button class="close-icon" @click="closeModal" :disabled="isLoading">
+        ×
+      </button>
+      <h2>
+        {{
+          isVerificationMode ? t('security.verify2FA') : t('security.setup2FA')
+        }}
+      </h2>
+
       <!-- Alert pour les messages d'erreur/succès -->
       <div v-if="alertMessage" :class="['alert', `alert-${alertType}`]">
         {{ alertMessage }}
@@ -14,7 +24,7 @@
         <img :src="`data:image/svg+xml;base64,${qrCode}`" alt="QR Code" />
         <p class="instructions">{{ t('security.scanQRCode') }}</p>
       </div>
-      
+
       <!-- Mode Vérification -->
       <template v-else-if="isVerificationMode">
         <p class="instructions">{{ t('security.enter2FACode') }}</p>
@@ -31,9 +41,9 @@
             @keyup.enter="isValidCode && verifyCode()"
             :disabled="isLoading"
           />
-          <button 
-            @click="verifyCode" 
-            class="verify-btn" 
+          <button
+            @click="verifyCode"
+            class="verify-btn"
             :disabled="!isValidCode || isLoading"
           >
             <span v-if="isLoading" class="loader"></span>
@@ -45,7 +55,12 @@
         </small>
       </template>
 
-      <button v-if="!isVerificationMode" class="close-btn" @click="closeModal" :disabled="isLoading">
+      <button
+        v-if="!isVerificationMode"
+        class="close-btn"
+        @click="closeModal"
+        :disabled="isLoading"
+      >
         {{ t('common.close') }}
       </button>
     </div>
@@ -70,7 +85,7 @@ const isLoading = ref(false)
 const alertMessage = ref('')
 const alertType = ref('info')
 const isVerificationMode = ref(false)
-const codeInput = ref(null)  // Référence pour l'input
+const codeInput = ref(null) // Référence pour l'input
 
 // Computed
 const isValidCode = computed(() => {
@@ -86,21 +101,22 @@ const validateInput = (event) => {
 // Gestion des erreurs API
 const handleApiError = async (error) => {
   isLoading.value = false
-  verificationCode.value = ''  // Vider le champ
+  verificationCode.value = '' // Vider le champ
   if (error.message === 'invalidCode') {
     alertMessage.value = t('security.invalidCode')
   } else {
-    alertMessage.value = t(`errors.${error.message}`) || t('errors.unknownError')
+    alertMessage.value =
+      t(`errors.${error.message}`) || t('errors.unknownError')
   }
   alertType.value = 'error'
-  
+
   // Attendre que le DOM soit mis à jour avec le message d'erreur
   await nextTick()
   // Remettre le focus sur l'input
   if (codeInput.value) {
     codeInput.value.focus()
   }
-  
+
   setTimeout(() => {
     alertMessage.value = ''
   }, 5000)
@@ -139,9 +155,9 @@ const openVerificationModal = async () => {
   verificationCode.value = ''
   alertMessage.value = ''
   alertType.value = 'info'
-  
-  setupEscapeListener()  // Ajouter l'écouteur
-  
+
+  setupEscapeListener() // Ajouter l'écouteur
+
   // Attendre que le DOM soit mis à jour
   await nextTick()
   // Mettre le focus sur l'input
@@ -158,13 +174,13 @@ const closeModal = () => {
     if (isVerificationMode.value) {
       eventBus.emit('2fa-cancelled')
     }
-    removeEscapeListener()  // Retirer l'écouteur
+    removeEscapeListener() // Retirer l'écouteur
   }
 }
 
 const verifyCode = async () => {
   if (!isValidCode.value || isLoading.value) return
-  
+
   isLoading.value = true
   try {
     if (isVerificationMode.value) {
@@ -175,9 +191,9 @@ const verifyCode = async () => {
       }
     } else {
       const response = await axios.post('/users/2fa/verify', {
-        token: verificationCode.value
+        token: verificationCode.value,
       })
-      
+
       if (response.status === 200) {
         alertMessage.value = t('security.setupSuccess')
         alertType.value = 'success'
@@ -248,7 +264,7 @@ onBeforeUnmount(() => {
 
 .verify-btn {
   padding: 0.5rem 1rem;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 4px;

@@ -55,7 +55,7 @@ function startGame() {
   playerScore.value = 0
   aiScore.value = 0
   winner.value = ''
-  
+
   // Start countdown
   gamePhase.value = 'countdown'
   launchGame()
@@ -66,10 +66,10 @@ function launchGame() {
     gameEngine.value = new GameEngine()
     aiController.value = new AIController()
   }
-  
+
   countdownValue.value = 3
   gamePhase.value = 'countdown'
-  
+
   const interval = setInterval(() => {
     countdownValue.value--
     if (countdownValue.value <= 0) {
@@ -105,7 +105,7 @@ function gameLoop() {
       // Pause pendant 1 seconde pour montrer le score
       gamePhase.value = 'score'
       if (scoreTimeout) clearTimeout(scoreTimeout)
-      
+
       scoreTimeout = setTimeout(() => {
         if (!isGameOver && gameEngine.value) {
           gamePhase.value = 'playing'
@@ -126,7 +126,12 @@ function gameLoop() {
   if (!canvas) return
 
   const ctx = canvas.getContext('2d')
-  gameEngine.value.drawGame(ctx, gamePhase.value, playerScore.value, aiScore.value)
+  gameEngine.value.drawGame(
+    ctx,
+    gamePhase.value,
+    playerScore.value,
+    aiScore.value
+  )
   if (gamePhase.value === 'playing') {
     animationId = requestAnimationFrame(gameLoop)
   }
@@ -141,7 +146,7 @@ async function endGame() {
     clearTimeout(scoreTimeout)
     scoreTimeout = null
   }
-  
+
   gamePhase.value = 'over'
   winner.value = playerScore.value > aiScore.value ? playerName.value : 'AI'
 
@@ -174,7 +179,7 @@ function resetGame() {
     clearTimeout(scoreTimeout)
     scoreTimeout = null
   }
-  
+
   gamePhase.value = 'menu'
   playerScore.value = 0
   aiScore.value = 0
@@ -218,7 +223,6 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  padding: 2rem;
   width: 100%;
   color: var(--text-color);
 }

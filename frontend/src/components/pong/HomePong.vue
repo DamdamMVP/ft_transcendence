@@ -39,7 +39,6 @@ const selectMode = (mode) => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
   min-height: 65vh;
   background: var(--background-color);
   color: var(--text-color);
