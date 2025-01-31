@@ -103,25 +103,29 @@
   "pong": {
     "tournament": {
       "title": "Mod Tournamantoù",
-      "description": "4 c'hoarier lec'hel"
+      "description": "4 c'hoarier lec'hel",
+      "nextMatch": "Kregiñ gant ar match da heul",
+      "enterName": "Lakait un anv"
     },
     "ai": {
       "title": "A-enep OA",
       "description": "1 a-enep 1 gant OA"
     },
     "local": {
-      "title": "A-enep lec'hel",
-      "description": "1 a-enep 1 lec'hel"
+      "title": "Mod Lec'hel",
+      "description": "2 c'hoarier lec'hel"
     },
     "game": {
-      "player1": "C'hoarier 1",
-      "player2": "C'hoarier 2",
-      "controls": "Kontrolloù",
-      "score": "Skor",
-      "enterName": "Lakait anv ar C'hoarier 2",
-      "startGame": "Kregiñ gant ar c'hoari",
-      "wins": "a c'hounez ar bartiad!",
-      "countdown": "Prest..."
+      "player": "C'hoarier",
+      "enterName": "Lakait an anv",
+      "startGame": "Kregiñ",
+      "ready": "Prest ?",
+      "countdown": "O kregiñ e",
+      "matchOver": "Match echu",
+      "winner": "Gourener",
+      "close": "Serriñ",
+      "wins": "a c'hounez !",
+      "controls": "Kontrolloù"
     }
   },
   "catch": {

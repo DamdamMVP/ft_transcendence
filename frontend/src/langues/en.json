@@ -108,25 +108,32 @@
   "pong": {
     "tournament": {
       "title": "Tournament Mode",
-      "description": "4 players local"
+      "description": "4 players local",
+      "nextMatch": "Start next match",
+      "enterName": "Enter a name"
     },
     "ai": {
       "title": "VS AI",
       "description": "1 vs 1 against AI"
     },
     "local": {
-      "title": "Local VS",
-      "description": "1 vs 1 local"
+      "title": "Local Mode",
+      "description": "2 players local"
     },
     "game": {
+      "player": "Player",
+      "enterName": "Enter name",
+      "startGame": "Start",
+      "ready": "Ready?",
+      "countdown": "Starting in",
+      "matchOver": "Game Over",
+      "winner": "Winner",
+      "close": "Close",
+      "wins": "wins!",
+      "controls": "Controls",
       "player1": "Player 1",
       "player2": "Player 2",
-      "controls": "Controls",
-      "score": "Score",
-      "enterName": "Enter Player 2 name",
-      "startGame": "Start game",
-      "wins": "wins the game!",
-      "countdown": "Ready..."
+      "score": "Score"
     }
   },
   "catch": {

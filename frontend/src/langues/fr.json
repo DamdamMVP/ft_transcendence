@@ -108,25 +108,40 @@
   "pong": {
     "tournament": {
       "title": "Mode Tournoi",
-      "description": "4 joueurs en local"
+      "description": "4 joueurs en local",
+      "nextMatch": "Lancer le prochain match",
+      "enterName": "Entrer un nom"
     },
     "ai": {
       "title": "VS IA",
       "description": "1 vs 1 contre l'IA"
     },
     "local": {
-      "title": "VS Local",
-      "description": "1 vs 1 en local"
+      "title": "Mode Local",
+      "description": "2 joueurs en local"
     },
     "game": {
+      "player": "Joueur",
+      "enterName": "Entrez le nom",
+      "startGame": "Commencer",
+      "ready": "Prêt ?",
+      "countdown": "Début dans",
+      "matchOver": "Partie terminée",
+      "winner": "Gagnant",
+      "close": "Fermer",
+      "wins": "gagne !",
+      "controls": "Contrôles",
       "player1": "Joueur 1",
       "player2": "Joueur 2",
-      "controls": "Contrôles",
       "score": "Score",
       "enterName": "Entrez le nom du Joueur 2",
       "startGame": "Commencer la partie",
       "wins": "remporte la partie !",
-      "countdown": "Prêt..."
+      "countdown": "Prêt...",
+      "matchOver": "Partie terminée",
+      "winner": "Gagnant",
+      "close": "Fermer",
+      "ready": "Prêt ?"
     }
   },
   "catch": {
