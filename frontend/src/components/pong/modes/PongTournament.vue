@@ -1,67 +1,48 @@
 <template>
   <div class="tournament-mode">
-    <h2>{{ t('pong.tournament.title') }}</h2>
+    <div class="controls-center">
+      <div v-if="tournamentWinner" class="winner-announcement">
+        <h3>{{ tournamentWinner }} {{ t('pong.tournament.wins') }}</h3>
+      </div>
+      <div v-else-if="gamePhase === 'tournament-tree'" class="next-match-info">
+        <h3>{{ t('pong.tournament.nextMatch') }}</h3>
+        <p>{{ currentMatch.player1 }} vs {{ currentMatch.player2 }}</p>
+      </div>
+      <button
+        v-if="
+          gamePhase === 'menu' ||
+          (gamePhase === 'tournament-tree' && !tournamentWinner)
+        "
+        @click="gamePhase === 'menu' ? startTournament() : startNextMatch()"
+        :disabled="gamePhase === 'menu' && !canStart"
+        class="next-button"
+      >
+        {{
+          gamePhase === 'menu'
+            ? t('pong.game.startGame')
+            : t('pong.tournament.nextMatch')
+        }}
+      </button>
+    </div>
 
-    <!-- Phase de saisie des noms -->
-    <div v-if="gamePhase === 'menu'" class="player-setup">
-      <div class="player-names">
-        <div v-for="index in 3" :key="index" class="player-entry">
-          <label>{{ t('pong.game.player') }} {{ index + 1 }}:</label>
+    <div v-if="gamePhase === 'menu' || gamePhase === 'tournament-tree'">
+      <div class="tournament-bracket">
+        <div class="match-box" v-for="(player, index) in players" :key="index">
           <input
+            v-if="gamePhase === 'menu'"
             v-model="players[index]"
             :placeholder="t('pong.tournament.enterName')"
           />
+          <span v-else>{{ getPlayerName(index) }}</span>
         </div>
-      </div>
-      <button @click="startTournament" :disabled="!canStart" class="button">
-        {{ t('pong.game.startGame') }}
-      </button>
-    </div>
-
-    <!-- Arbre du tournoi -->
-    <div
-      v-if="gamePhase === 'menu' || gamePhase === 'tournament-tree'"
-      class="tournament-tree"
-    >
-      <div class="round semi-finals">
-        <div class="match">
-          <div class="player">{{ getPlayerName(0) }}</div>
-          <div class="vs">VS</div>
-          <div class="player">{{ getPlayerName(1) }}</div>
-        </div>
-        <div class="match">
-          <div class="player">{{ getPlayerName(2) }}</div>
-          <div class="vs">VS</div>
-          <div class="player">{{ getPlayerName(3) }}</div>
-        </div>
-      </div>
-      <div class="round final">
-        <div class="match">
-          <div class="player">{{ winners[0] || '?' }}</div>
-          <div class="vs">VS</div>
-          <div class="player">{{ winners[1] || '?' }}</div>
-        </div>
-      </div>
-      <div class="winner-display" v-if="tournamentWinner">
-        <h3>{{ tournamentWinner }} {{ t('pong.game.wins') }}</h3>
+        <div class="match-box">{{ winners[0] || '?' }}</div>
+        <div class="match-box">{{ winners[1] || '?' }}</div>
+        <div class="match-box">{{ tournamentWinner || '?' }}</div>
       </div>
     </div>
 
-    <!-- Bouton pour lancer le prochain match -->
-    <div
-      v-if="gamePhase === 'tournament-tree' && !tournamentWinner"
-      class="next-match"
-    >
-      <button @click="startNextMatch" class="button">
-        {{ t('pong.tournament.nextMatch') }}
-      </button>
-      <div class="next-match-info">
-        {{ currentMatch.player1 }} vs {{ currentMatch.player2 }}
-      </div>
-    </div>
-
-    <!-- Le jeu -->
-    <div v-show="gamePhase === 'playing'" class="game-container">
+    <!-- Zone de jeu -->
+    <div v-else class="game-container">
       <GameCanvas
         ref="gameCanvasRef"
         :player1-name="currentMatch.player1"
@@ -71,7 +52,6 @@
         :game-phase="canvasPhase"
         :countdown-value="countdownValue"
         :winner="matchWinner"
-        @start-game="launchGame"
         @close-match="handleMatchEnd"
       />
     </div>
@@ -109,6 +89,7 @@ const countdownValue = ref(3)
 const player1Score = ref(0)
 const player2Score = ref(0)
 const matchWinner = ref('')
+let scoreTimeout = null
 
 let animationId = null
 
@@ -202,6 +183,18 @@ function gameLoop() {
     (player) => {
       if (player === 'player1') player1Score.value++
       else player2Score.value++
+
+      // Pause pendant 1 seconde pour montrer le score
+      canvasPhase.value = 'score'
+      if (scoreTimeout) clearTimeout(scoreTimeout)
+
+      scoreTimeout = setTimeout(() => {
+        if (!isGameOver && gameEngine.value) {
+          canvasPhase.value = 'playing'
+          gameEngine.value.launchBall()
+          gameLoop() // Relancer la boucle de jeu
+        }
+      }, 1000)
     }
   )
 
@@ -210,8 +203,16 @@ function gameLoop() {
     return
   }
 
-  gameEngine.value.drawGame(ctx)
-  animationId = requestAnimationFrame(gameLoop)
+  gameEngine.value.drawGame(
+    ctx,
+    canvasPhase.value,
+    player1Score.value,
+    player2Score.value
+  )
+
+  if (canvasPhase.value === 'playing') {
+    animationId = requestAnimationFrame(gameLoop)
+  }
 }
 
 function endMatch() {
@@ -219,6 +220,12 @@ function endMatch() {
     cancelAnimationFrame(animationId)
     animationId = null
   }
+
+  if (scoreTimeout) {
+    clearTimeout(scoreTimeout)
+    scoreTimeout = null
+  }
+
   canvasPhase.value = 'over'
   const winner =
     player1Score.value > player2Score.value
@@ -226,7 +233,8 @@ function endMatch() {
       : currentMatch.value.player2
   matchWinner.value = winner
 
-  if (currentMatch.value.round === 'semi') {
+  // Mettre à jour le tournoi
+  if (currentMatchIndex.value < 2) {
     winners.value[currentMatchIndex.value] = winner
   } else {
     tournamentWinner.value = winner
@@ -235,8 +243,15 @@ function endMatch() {
 
 function handleMatchEnd() {
   currentMatchIndex.value++
+
+  // Réinitialiser les scores
+  player1Score.value = 0
+  player2Score.value = 0
+  matchWinner.value = ''
+
   if (currentMatchIndex.value < 3) {
     gamePhase.value = 'tournament-tree'
+    canvasPhase.value = 'menu'
     setupNextMatch()
   } else {
     gamePhase.value = 'tournament-tree'
@@ -275,111 +290,132 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
   padding: 2rem;
-  width: 100%;
+  gap: 2rem;
 }
 
-.player-setup {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-  max-width: 600px;
-}
-
-.player-names {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.player-entry {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.player-entry input {
-  padding: 0.5rem;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
-  background: var(--background-color);
-  color: var(--text-color);
-}
-
-.tournament-tree {
+.controls-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  width: 100%;
-  max-width: 800px;
+  gap: 1rem;
 }
 
-.round {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  width: 100%;
-}
-
-.match {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
-  background: var(--background-color);
-  min-width: 200px;
-}
-
-.vs {
-  color: var(--primary-color);
+.winner-announcement {
+  font-size: 1.5rem;
   font-weight: bold;
-}
-
-.winner-display {
-  text-align: center;
-  margin-top: 2rem;
-  padding: 1rem;
-  border: 2px solid var(--success-color);
-  border-radius: 4px;
-  background: var(--background-color);
-}
-
-.next-match {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  margin: 1rem 0;
+  color: var(--primary-color);
 }
 
 .next-match-info {
   font-size: 1.2rem;
+  font-weight: bold;
   color: var(--primary-color);
+  text-align: center;
 }
 
-.button {
-  padding: 0.75rem 1.5rem;
+.next-match-info p {
+  font-size: 1rem;
+  font-weight: normal;
+  color: var(--text-color);
+}
+
+.tournament-bracket {
+  display: grid;
+  grid-template-columns: repeat(5, auto);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 1rem;
+  padding: 2rem;
+  margin: 0 auto;
+}
+
+/* Positionnement des boîtes dans la grille */
+.match-box:nth-child(1) {
+  grid-area: 1 / 1 / 2 / 2;
+}
+.match-box:nth-child(2) {
+  grid-area: 3 / 1 / 4 / 2;
+}
+.match-box:nth-child(3) {
+  grid-area: 5 / 1 / 6 / 2;
+}
+.match-box:nth-child(4) {
+  grid-area: 7 / 1 / 8 / 2;
+}
+
+.match-box:nth-child(5) {
+  grid-area: 2 / 3 / 3 / 4;
+}
+.match-box:nth-child(6) {
+  grid-area: 6 / 3 / 7 / 4;
+}
+
+.match-box:nth-child(7) {
+  grid-area: 4 / 5 / 5 / 6;
+}
+
+.match-box {
+  width: 200px;
+  height: 40px;
+  border: 2px solid var(--primary-color);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-color);
+  color: var(--text-color);
+  position: relative;
+}
+
+/* Connecteurs horizontaux */
+.match-box:nth-child(1)::after,
+.match-box:nth-child(2)::after,
+.match-box:nth-child(3)::after,
+.match-box:nth-child(4)::after,
+.match-box:nth-child(5)::after,
+.match-box:nth-child(6)::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: 2rem;
+  height: 2px;
+  background: var(--primary-color);
+  transform: translateY(-50%);
+}
+
+.match-box input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  text-align: center;
+  color: var(--text-color);
+  padding: 0 1rem;
+}
+
+.match-box input:focus {
+  outline: none;
+}
+
+.next-button {
+  margin-top: 2rem;
+  padding: 0.75rem 2rem;
   background: var(--primary-color);
   color: var(--text-color);
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
-  transition: background-color 0.2s;
 }
 
-.button:hover {
+.next-button:hover:not(:disabled) {
+  transform: translateY(-2px);
   background: var(--primary-hover-color);
 }
 
-.button:disabled {
-  background: var(--disabled-color);
+.next-button:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 

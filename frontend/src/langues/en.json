@@ -110,7 +110,8 @@
       "title": "Tournament Mode",
       "description": "4 players local",
       "nextMatch": "Start next match",
-      "enterName": "Enter a name"
+      "enterName": "Enter a name",
+      "wins": "win the tournament !"
     },
     "ai": {
       "title": "VS AI",

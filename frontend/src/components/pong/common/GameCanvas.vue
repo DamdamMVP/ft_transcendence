@@ -1,16 +1,21 @@
 <template>
   <div class="game-canvas-container">
-    <canvas ref="canvas" class="game-canvas" :width="canvasWidth" :height="canvasHeight"></canvas>
+    <canvas
+      ref="canvas"
+      class="game-canvas"
+      :width="canvasWidth"
+      :height="canvasHeight"
+    ></canvas>
 
     <!-- Scoreboard -->
     <div class="score-board">
       <div class="player">
-        <h3>{{ player1Name }}</h3>
+        <h3 class="name">{{ player1Name }}</h3>
         <p class="score">{{ player1Score }}</p>
         <p class="controls">{{ t('pong.game.controls') }}: F / S</p>
       </div>
       <div class="player">
-        <h3>{{ player2Name }}</h3>
+        <h3 class="name">{{ player2Name }}</h3>
         <p class="score">{{ player2Score }}</p>
         <p class="controls">{{ t('pong.game.controls') }}: ↑ / ↓</p>
       </div>
@@ -36,8 +41,10 @@
     <!-- Game over overlay -->
     <div v-if="gamePhase === 'over'" class="overlay">
       <div class="game-over">
-        <h3>{{ t('pong.game.gameOver') }}</h3>
-        <p>{{ t('pong.game.winner', { winner }) }}</p>
+        <h3 class="winner">{{ t('pong.game.winner') }} : {{ winner }}</h3>
+        <p class="score">
+          {{ t('pong.game.score') }}: {{ player1Score }} - {{ player2Score }}
+        </p>
         <button @click="$emit('close-match')" class="close-button">
           {{ t('pong.game.close') }}
         </button>
@@ -55,40 +62,40 @@ const { t } = useI18n()
 const props = defineProps({
   canvasWidth: {
     type: Number,
-    default: 800
+    default: 800,
   },
   canvasHeight: {
     type: Number,
-    default: 450
+    default: 450,
   },
   gamePhase: {
     type: String,
-    required: true
+    required: true,
   },
   countdownValue: {
     type: Number,
-    required: true
+    required: true,
   },
   winner: {
     type: String,
-    default: ''
+    default: '',
   },
   player1Name: {
     type: String,
-    required: true
+    required: true,
   },
   player2Name: {
     type: String,
-    required: true
+    required: true,
   },
   player1Score: {
     type: Number,
-    required: true
+    required: true,
   },
   player2Score: {
     type: Number,
-    required: true
-  }
+    required: true,
+  },
 })
 
 defineEmits(['start-game', 'close-match'])
@@ -100,12 +107,14 @@ onMounted(() => {
     canvas.value.focus()
   }
   const ctx = canvas.value.getContext('2d')
-  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--background-color')
+  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue(
+    '--background-color'
+  )
   ctx.fillRect(0, 0, props.canvasWidth, props.canvasHeight)
 })
 
 defineExpose({
-  canvas
+  canvas,
 })
 </script>
 
@@ -195,5 +204,23 @@ defineExpose({
 .start-button:hover,
 .close-button:hover {
   background: var(--primary-hover-color);
+}
+
+.name {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.winner {
+  color: var(--success-color);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.score {
+  color: var(--text-color);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
 }
 </style>

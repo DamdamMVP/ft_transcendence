@@ -105,7 +105,8 @@
       "title": "Mod Tournamantoù",
       "description": "4 c'hoarier lec'hel",
       "nextMatch": "Kregiñ gant ar match da heul",
-      "enterName": "Lakait un anv"
+      "enterName": "Lakait un anv",
+      "wins": "trec'hio c'houez !"
     },
     "ai": {
       "title": "A-enep OA",
