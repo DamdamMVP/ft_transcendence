@@ -51,7 +51,7 @@ const handleSignIn = async () => {
         return
       }
       
-      // Cas sans 2FA ou 2FA déjà validée
+      // Cas sans 2FA
       authStore.login(result.data.user, result.data.token)
       
       // Initialiser le WebSocket
