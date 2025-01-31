@@ -78,6 +78,8 @@ export function useAuth() {
         isAuthenticated.value = true
         requires2FA.value = false
         tempAuthToken.value = null
+        // Émettre un événement pour SignIn.vue
+        eventBus.emit('2fa-success', response.data)
         return { success: true, data: response.data }
       }
     } catch (err) {
