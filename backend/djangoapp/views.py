@@ -12,7 +12,12 @@ from rest_framework import status
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import UserStatus
-
+from django.conf import settings
+import requests
+import secrets
+import string
+import urllib.parse
+import json
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
