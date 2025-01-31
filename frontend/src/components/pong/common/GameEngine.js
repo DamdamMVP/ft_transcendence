@@ -50,6 +50,18 @@ export class GameEngine {
     this.lastPaddleTouched = null
   }
 
+  resetBall() {
+    // Reset ball position
+    this.gameState.ball.x = this.canvasWidth / 2
+    this.gameState.ball.y = this.canvasHeight / 2
+    this.gameState.ball.speedX = 0
+    this.gameState.ball.speedY = 0
+
+    // Reset paddle positions
+    this.gameState.player1.y = this.canvasHeight / 2 - this.gameState.player1.height / 2
+    this.gameState.player2.y = this.canvasHeight / 2 - this.gameState.player2.height / 2
+  }
+
   getRandomYNotCenter(barHeight) {
     const forbiddenMargin = 60
     const forbiddenMin = this.canvasHeight / 2 - forbiddenMargin
@@ -255,6 +267,7 @@ export class GameEngine {
       onPoint('player2')
       if (player2Score < this.WINNING_SCORE) {
         this.resetGameState()
+        this.resetBall()
         this.launchBall()
       }
     }
@@ -262,6 +275,7 @@ export class GameEngine {
       onPoint('player1')
       if (player1Score < this.WINNING_SCORE) {
         this.resetGameState()
+        this.resetBall()
         this.launchBall()
       }
     }
@@ -340,5 +354,18 @@ export class GameEngine {
     // player2
     if (key === 'ArrowUp') this.gameState.player2.upPressed = false
     if (key === 'ArrowDown') this.gameState.player2.downPressed = false
+  }
+
+  getBallState() {
+    return { ...this.gameState.ball }
+  }
+
+  getPlayer2State() {
+    return { ...this.gameState.player2 }
+  }
+
+  setPlayer2Input(up, down) {
+    this.gameState.player2.upPressed = up
+    this.gameState.player2.downPressed = down
   }
 }
