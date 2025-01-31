@@ -1,12 +1,10 @@
 <script setup>
-import { useAuthStore } from '../../stores/authStore'
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import axios from 'axios'
 import eventBus from '../../utils/eventBus'
 import { useRoute } from 'vue-router'
 
-const authStore = useAuthStore()
 const { t } = useI18n()
 const route = useRoute()
 const userHistory = ref([]) // Initialiser comme un tableau vide
@@ -17,6 +15,7 @@ const error = ref(null)
 // Récupérer les informations de l'utilisateur
 const fetchUserProfile = async () => {
   try {
+    loading.value = true
     const response = await axios.get(`/users/read/${route.params.id_user}`, {
       withCredentials: true,
     })
@@ -24,13 +23,14 @@ const fetchUserProfile = async () => {
   } catch (err) {
     console.error('Erreur lors de la récupération du profil:', err)
     error.value = err.message
+  } finally {
+    loading.value = false
   }
 }
 
 // Récupérer l'historique pour les stats
 const fetchHistory = async () => {
   try {
-    loading.value = true
     const response = await axios.get(
       `/users/histories/user/${route.params.id_user}`,
       {
@@ -43,10 +43,25 @@ const fetchHistory = async () => {
     console.error('Erreur lors de la récupération des stats:', err)
     error.value = err.message
     userHistory.value = [] // Réinitialiser à un tableau vide en cas d'erreur
-  } finally {
-    loading.value = false
   }
 }
+
+// Recharger les données quand l'ID change
+const reloadData = async () => {
+  error.value = null
+  await Promise.all([fetchUserProfile(), fetchHistory()])
+}
+
+// Observer les changements de route
+watch(
+  () => route.params.id_user,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      reloadData()
+    }
+  },
+  { immediate: true }
+)
 
 // Statistiques globales
 const stats = computed(() => {
@@ -82,10 +97,14 @@ const stats = computed(() => {
 
 // URL de la photo de profil
 const profilePhotoUrl = computed(() => {
-  if (profileUser.value?.profile_picture) {
-    return `${import.meta.env.VITE_API_BASE_URL}${profileUser.value.profile_picture}`
+  if (!profileUser.value?.profile_picture) {
+    return '/default-avatar.png'
   }
-  return '/default-avatar.png'
+  // S'assurer que l'URL est complète et à jour
+  const baseUrl = import.meta.env.VITE_API_BASE_URL.endsWith('/')
+    ? import.meta.env.VITE_API_BASE_URL.slice(0, -1)
+    : import.meta.env.VITE_API_BASE_URL
+  return `${baseUrl}${profileUser.value.profile_picture}`
 })
 
 // Mettre à jour l'historique quand un événement est reçu
@@ -95,8 +114,7 @@ const updateHistory = (newHistory) => {
 
 onMounted(async () => {
   try {
-    await fetchUserProfile()
-    await fetchHistory()
+    await reloadData()
     // S'abonner à l'événement de mise à jour
     eventBus.on('history-updated', updateHistory)
   } catch (err) {
@@ -119,11 +137,11 @@ onUnmounted(() => {
     </div>
     <div v-else class="profile-card">
       <h2 class="profile-name">
-        {{ profileUser?.username || 'Utilisateur' }}
+        {{ profileUser.username || 'Utilisateur' }}
       </h2>
       <img
         :src="profilePhotoUrl"
-        :alt="profileUser?.username || 'Profile Picture'"
+        :alt="profileUser.username || 'Profile Picture'"
         class="profile-picture"
       />
       <div class="stats-container">
