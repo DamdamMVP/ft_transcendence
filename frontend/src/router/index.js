@@ -103,6 +103,12 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = authStore.isAuthenticated
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
 
+  // Set dynamic page title
+  const pageTitle = to.name
+    ? `Golem - ${to.name.charAt(0).toUpperCase() + to.name.slice(1).replace('-', ' ')}`
+    : 'Golem'
+  document.title = pageTitle
+
   // Rediriger vers /pong si l'utilisateur est connecté et va sur la page d'accueil
   if (to.path === '/' && isAuthenticated) {
     next('/pong')
