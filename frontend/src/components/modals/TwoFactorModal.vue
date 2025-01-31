@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="modal-overlay">
+  <div v-if="show" class="modal-overlay" @keyup.esc="!isLoading && closeModal()">
     <div class="modal-content" @click.stop>
       <button class="close-icon" @click="closeModal" :disabled="isLoading">×</button>
       <h2>{{ isVerificationMode ? t('security.verify2FA') : t('security.setup2FA') }}</h2>
@@ -20,6 +20,7 @@
         <p class="instructions">{{ t('security.enter2FACode') }}</p>
         <div class="input-group">
           <input
+            ref="codeInput"
             type="text"
             v-model="verificationCode"
             placeholder=""
@@ -27,6 +28,7 @@
             maxlength="6"
             pattern="\d*"
             @input="validateInput"
+            @keyup.enter="isValidCode && verifyCode()"
             :disabled="isLoading"
           />
           <button 
@@ -51,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '../../composables/useAuth'
 import axios from 'axios'
@@ -68,6 +70,7 @@ const isLoading = ref(false)
 const alertMessage = ref('')
 const alertType = ref('info')
 const isVerificationMode = ref(false)
+const codeInput = ref(null)  // Référence pour l'input
 
 // Computed
 const isValidCode = computed(() => {
@@ -81,17 +84,42 @@ const validateInput = (event) => {
 }
 
 // Gestion des erreurs API
-const handleApiError = (error) => {
+const handleApiError = async (error) => {
   isLoading.value = false
+  verificationCode.value = ''  // Vider le champ
   if (error.message === 'invalidCode') {
     alertMessage.value = t('security.invalidCode')
   } else {
     alertMessage.value = t(`errors.${error.message}`) || t('errors.unknownError')
   }
   alertType.value = 'error'
+  
+  // Attendre que le DOM soit mis à jour avec le message d'erreur
+  await nextTick()
+  // Remettre le focus sur l'input
+  if (codeInput.value) {
+    codeInput.value.focus()
+  }
+  
   setTimeout(() => {
     alertMessage.value = ''
   }, 5000)
+}
+
+// Gestionnaire d'événement pour la touche Échap
+const handleEscape = (e) => {
+  if (e.key === 'Escape' && show.value && !isLoading.value) {
+    closeModal()
+  }
+}
+
+// Ajouter/retirer l'écouteur quand le modal s'ouvre/se ferme
+const setupEscapeListener = () => {
+  document.addEventListener('keyup', handleEscape)
+}
+
+const removeEscapeListener = () => {
+  document.removeEventListener('keyup', handleEscape)
 }
 
 // Ouvrir le modal avec le QR code
@@ -104,13 +132,22 @@ const openModal = (qrCodeData) => {
 }
 
 // Ouvrir le modal pour la vérification
-const openVerificationModal = () => {
+const openVerificationModal = async () => {
   show.value = true
   isVerificationMode.value = true
   qrCode.value = ''
   verificationCode.value = ''
   alertMessage.value = ''
   alertType.value = 'info'
+  
+  setupEscapeListener()  // Ajouter l'écouteur
+  
+  // Attendre que le DOM soit mis à jour
+  await nextTick()
+  // Mettre le focus sur l'input
+  if (codeInput.value) {
+    codeInput.value.focus()
+  }
 }
 
 const closeModal = () => {
@@ -121,6 +158,7 @@ const closeModal = () => {
     if (isVerificationMode.value) {
       eventBus.emit('2fa-cancelled')
     }
+    removeEscapeListener()  // Retirer l'écouteur
   }
 }
 
@@ -163,6 +201,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   eventBus.off('show-2fa-qr', openModal)
   eventBus.off('show-2fa-verification', openVerificationModal)
+  removeEscapeListener()
 })
 </script>
 
