@@ -131,7 +131,7 @@ def getData(request):
 @permission_classes([IsAuthenticated])
 def getUser(request, pk):
     try:
-        user = User.objects.get(id=pk)
+        user = request.user
         serializer = UserSerializer(user, many=False)
         return Response(serializer.data)
     except User.DoesNotExist:
@@ -168,7 +168,7 @@ def updateUser(request, pk):
         if int(request.user.id) != int(pk):  # Ensure both are integers
             return Response({'error': 'You can only update your own account.'}, status=403)
         
-        user = User.objects.get(id=pk)
+        user = request.user
         data = request.data
 
         # Only allow `username` and `email` fields to be updated
@@ -193,7 +193,7 @@ def updateUser(request, pk):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def deleteUser(request, pk):
-    user = User.objects.get(id=pk)
+    user = request.user
     user.delete()
     return Response({'message': 'User successfully deleted!'}, status=200)
 
@@ -201,8 +201,7 @@ def deleteUser(request, pk):
 @permission_classes([IsAuthenticated])
 def updateProfilePicture(request, pk):
     try:
-        user = User.objects.get(id=pk)
-
+        user = request.user
         if 'profile_picture' not in request.FILES:
             return Response({'error': 'No profile picture provided'}, status=400)
 
@@ -218,7 +217,7 @@ def updateProfilePicture(request, pk):
 @permission_classes([IsAuthenticated])
 def updatePassword(request, pk):
     try:
-        user = User.objects.get(id=pk)
+        user = request.user
         data = request.data
 
         if not check_password(data['old_password'], user.password):
@@ -242,7 +241,7 @@ def updatePassword(request, pk):
 @permission_classes([IsAuthenticated])
 def updateTheme(request, pk):
     try:
-        user = User.objects.get(id=pk)
+        user = request.user
         theme = request.data.get('theme')
         
         if theme not in ['dark', 'light', 'forest']:
