@@ -21,6 +21,5 @@ if [ -z "$DJANGO_SUPERUSER_USERNAME" ] || [ -z "$DJANGO_SUPERUSER_EMAIL" ] || [ 
 fi
 python3 manage.py createsuperuser --noinput || true
 echo ====================================
-
 echo "Starting Server..."
 python3 manage.py runserver 0.0.0.0:8000
