@@ -57,7 +57,6 @@
   </template>
 
 <script>
-import jerry from '../../assets/jerry.png'
 import gamian from '../../assets/gamian.png'
 import thomian from '../../assets/thomian.png'
 import damian from '../../assets/damian.png'
@@ -72,7 +71,7 @@ export default {
     const { t } = useI18n()
     return { authStore, t }
   },
-  name: 'CatAndMouseGame',
+  name: '42CatchGame',
   props: {
     playerUsername: {
       type: String,
@@ -93,7 +92,7 @@ export default {
   },
   data() {
     return {
-      jerryImage: jerry,
+      jerryImage: null,
       boardWidth: 960,
       boardHeight: 560,
       mousePos: { x: 40, y: 40 },
@@ -127,7 +126,7 @@ export default {
         thomian,
         damian
       }
-      return iconMap[this.playerIcon] || jerry
+      return iconMap[this.playerIcon] || null
     },
     mouseStyle() {
       return {
