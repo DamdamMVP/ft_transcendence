@@ -44,7 +44,6 @@ onMounted(async () => {
   justify-content: flex-start;
   align-items: center;
   min-height: 80vh;
-  width: 100%;
   margin: 0;
   padding: 2rem;
   background: var(--background-color);

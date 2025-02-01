@@ -108,51 +108,62 @@ onMounted(() => {
 <style scoped>
 .history-container {
   flex: 0 0 60%;
-  padding: 16px;
-  background-color: var(--background-color);
-  border-radius: 8px;
-  border: 1px solid #d9d9d9;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  background: var(--background-secondary-color);
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
   min-height: 60vh;
   max-height: 60vh;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(10px);
+  animation: fadeIn 0.6s ease;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-}
-
-.test-button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.test-button:hover {
-  background-color: var(--primary-color-dark);
+  margin-bottom: 2rem;
 }
 
 h2 {
   margin: 0;
-  font-size: 20px;
-  font-weight: bold;
-  color: var(--text-color);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  text-shadow: 0 0 15px var(--primary-shadow-color);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .loading,
 .error,
 .no-history {
   text-align: center;
-  padding: 20px;
+  padding: 2rem;
   color: var(--text-color);
+  font-size: 1.2rem;
 }
 
 .error {
@@ -162,77 +173,78 @@ h2 {
 .match-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
   overflow-y: auto;
-  padding-right: 8px;
+  padding-right: 1rem;
 }
 
 .match-card {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   align-items: center;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid #d9d9d9;
-  background-color: var(--background-color);
-  transition: transform 0.2s;
-}
-
-.match-card:hover {
-  transform: translateX(4px);
+  /* padding: 1rem; */
+  padding-left: 0.7rem;
+  padding-right: 0.7rem;
+  border-radius: 12px;
+  transition: transform 0.3s ease;
 }
 
 .win-card {
-  background-color: #e6ffed;
-  border-color: #33a852;
-  color: #33a852;
+  background-color: rgba(51, 168, 82, 0.2);
+  border: 2px solid #33a852;
 }
 
 .loose-card {
-  background-color: #ffe6e6;
-  border-color: #ff4d4d;
-  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.2);
+  border: 2px solid #ff4d4d;
 }
 
 .draw-card {
-  background-color: #f0f0f0;
-  border-color: #666666;
-  color: #666666;
+  background-color: rgba(102, 102, 102, 0.2);
+  border: 2px solid #666666;
+}
+
+.match-card:hover {
+  transform: translateX(8px);
 }
 
 .match-opponent {
-  font-size: 14px;
+  font-size: 1.1rem;
   font-weight: bold;
-  padding-right: 16px;
+  padding-right: 1rem;
+  color: var(--text-color);
 }
 
 .match-result {
-  font-size: 16px;
+  font-size: 1.1rem;
   text-align: center;
+  color: var(--text-color);
 }
 
 .match-date {
-  font-size: 12px;
-  color: var(--text-secondary-color);
+  font-size: 0.9rem;
+  color: var(--text-color);
+  opacity: 0.8;
   text-align: right;
-  white-space: nowrap;
 }
 
 .result-text {
   font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .score-text {
   font-weight: normal;
+  margin-left: 0.5rem;
 }
 
-/* Style de la scrollbar */
 .match-list::-webkit-scrollbar {
   width: 8px;
 }
 
 .match-list::-webkit-scrollbar-track {
-  background: var(--background-color-light);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
 
@@ -242,6 +254,29 @@ h2 {
 }
 
 .match-list::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color-dark);
+  background: var(--primary-hover-color);
+}
+
+@media (max-width: 768px) {
+  .history-container {
+    padding: 1rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .match-card {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .match-opponent,
+  .match-result,
+  .match-date {
+    padding: 0;
+    text-align: center;
+  }
 }
 </style>
