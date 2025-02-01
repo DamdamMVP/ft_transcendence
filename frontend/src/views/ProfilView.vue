@@ -3,7 +3,6 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 import ProfilLeft from '../components/profil/ProfilLeft.vue'
-import NavBarProfil from '../components/profil/NavBarProfil.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -29,7 +28,6 @@ onMounted(async () => {
 
 <template>
   <main v-if="userExists" class="profil-view">
-    <NavBarProfil />
     <div class="profil-content">
       <ProfilLeft />
       <router-view />

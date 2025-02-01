@@ -113,8 +113,8 @@ onMounted(() => {
   border-radius: 15px;
   border: 2px solid var(--primary-color);
   box-shadow: 0 8px 25px var(--primary-shadow-color);
-  min-height: 60vh;
-  max-height: 60vh;
+  min-height: 63vh;
+  max-height: 63vh;
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(10px);

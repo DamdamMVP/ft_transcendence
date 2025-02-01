@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import axios from 'axios'
 import eventBus from '../../utils/eventBus'
 import { useRoute } from 'vue-router'
+import NavBarProfil from '../../components/profil/NavBarProfil.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -130,6 +131,8 @@ onUnmounted(() => {
 </script>
 
 <template>
+	<div class="page-container">
+		<NavBarProfil class="nav-section" />
   <div class="profile-container">
     <div v-if="loading" class="loading">Chargement...</div>
     <div v-else-if="error" class="error">
@@ -164,89 +167,197 @@ onUnmounted(() => {
       </p>
     </div>
   </div>
+</div>
 </template>
 
 <style scoped>
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.nav-section {
+  margin: 0 auto;
+}
+
 .profile-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 0.6s ease;
 }
 
 .profile-card {
-  width: 250px;
-  padding: 16px;
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
-  background-color: var(--background-color);
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  padding: 2rem;
+  background: var(--background-secondary-color);
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
   text-align: center;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px var(--primary-shadow-color);
+}
+
+/* Effet de fond subtil */
+.profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at top right,
+    var(--primary-shadow-color) 0%,
+    transparent 70%
+  );
+  opacity: 0.1;
+  pointer-events: none;
 }
 
 .profile-picture {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  width: 100px;
-  height: 100px;
   object-fit: cover;
-  margin-bottom: 16px;
+  margin: 1rem auto;
+  border: 3px solid var(--primary-color);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+  transition: all 0.3s ease;
+}
+
+.profile-card:hover .profile-picture {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px var(--primary-shadow-color);
 }
 
 .profile-name {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: var(--text-color);
-}
-
-.profile-stats {
-  font-size: 16px;
-  color: var(--text-color);
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 1rem 0;
+  color: var(--primary-color);
+  text-shadow: 0 0 10px var(--primary-shadow-color);
 }
 
 .stats-container {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #d9d9d9;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--primary-color);
+  position: relative;
 }
 
 .stat-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
-  background-color: var(--background-color);
-  border-radius: 4px;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateX(8px);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
   color: var(--text-color);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .stat-value {
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 1.2rem;
+  text-shadow: 0 0 10px var(--primary-shadow-color);
 }
 
 .victories {
-  color: #33a852;
+  color: var(--success-color);
+  text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
 }
 
 .defeats {
-  color: #ff4d4d;
+  color: var(--error-color);
+  text-shadow: 0 0 10px rgba(231, 76, 60, 0.3);
+}
+
+.profile-stats {
+  font-size: 1.1rem;
+  color: var(--text-color);
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  transition: all 0.3s ease;
 }
 
 .loading,
 .error {
   text-align: center;
-  padding: 20px;
-  font-size: 16px;
+  padding: 2rem;
+  font-size: 1.2rem;
   color: var(--text-color);
+  animation: fadeIn 0.4s ease;
 }
 
 .error {
-  color: #ff4d4d;
+  color: var(--error-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .profile-card {
+    width: 90%;
+    padding: 1.5rem;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+  }
+
+  .profile-picture {
+    width: 100px;
+    height: 100px;
+  }
+
+  .stat-label {
+    font-size: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
 }
 </style>
