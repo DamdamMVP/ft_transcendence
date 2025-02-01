@@ -14,7 +14,7 @@
     "signup": "Inscription"
   },
   "login": {
-    "email": "Email",
+    "email": "Email ou pseudo",
     "password": "Mot de passe",
     "signIn": "Se connecter",
     "forgotPassword": "Mot de passe oublié?",

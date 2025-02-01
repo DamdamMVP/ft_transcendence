@@ -14,7 +14,7 @@
     "signup": "Sign Up"
   },
   "login": {
-    "email": "Email",
+    "email": "Email or Username",
     "password": "Password",
     "signIn": "Sign In",
     "forgotPassword": "Forgot Password?",
