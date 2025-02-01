@@ -346,7 +346,7 @@ export class GameEngine {
   handleKeyDown(e) {
     const key = e.key
     // player1
-    if (key.toLowerCase() === 'f') this.gameState.player1.upPressed = true
+    if (key.toLowerCase() === 'w') this.gameState.player1.upPressed = true
     if (key.toLowerCase() === 's') this.gameState.player1.downPressed = true
     // player2
     if (key === 'ArrowUp') this.gameState.player2.upPressed = true
@@ -356,7 +356,7 @@ export class GameEngine {
   handleKeyUp(e) {
     const key = e.key
     // player1
-    if (key.toLowerCase() === 'f') this.gameState.player1.upPressed = false
+    if (key.toLowerCase() === 'w') this.gameState.player1.upPressed = false
     if (key.toLowerCase() === 's') this.gameState.player1.downPressed = false
     // player2
     if (key === 'ArrowUp') this.gameState.player2.upPressed = false

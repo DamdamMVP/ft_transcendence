@@ -12,7 +12,7 @@
       <div class="player">
         <h3 class="name">{{ player1Name }}</h3>
         <p class="score">{{ player1Score }}</p>
-        <p class="controls">{{ t('pong.game.controls') }}: F / S</p>
+        <p class="controls">{{ t('pong.game.controls') }}: W / S</p>
       </div>
       <div class="player">
         <h3 class="name">{{ player2Name }}</h3>
