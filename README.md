@@ -75,4 +75,4 @@ cd ft_transcendence
 
 ## 🤝 Contribution
 
-- 👤 **Collaborateurs**: [@Blackbill1](https://github.com/Blackbill1) & [@BLQuatre](https://github.com/BLQuatre)
+- 👤 **Collaborateurs**: [@Polybiuss](https://github.com/Polybiuss) & [@BLQuatre](https://github.com/BLQuatre)
