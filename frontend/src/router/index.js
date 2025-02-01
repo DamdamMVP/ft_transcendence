@@ -10,7 +10,7 @@ import PongVsAI from '../components/pong/modes/PongVsAI.vue'
 import PongTournament from '../components/pong/modes/PongTournament.vue'
 import CatchView from '../views/CatchView.vue'
 import HomeCatch from '../components/catch/HomeCatch.vue'
-import CatchTomAndJerry from '../components/catch/modes/CatchTomAndJerry.vue'
+import CatchSetup from '../components/catch/modes/CatchSetup.vue'
 import CatchFortyTwo from '../components/catch/modes/42CatchSetup.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import { useAuthStore } from '../stores/authStore'
@@ -81,7 +81,7 @@ const router = createRouter({
         {
           path: 'tomandjerry',
           name: 'catch-tomandjerry',
-          component: CatchTomAndJerry,
+          component: CatchSetup,
         },
         {
           path: 'fortytwo',

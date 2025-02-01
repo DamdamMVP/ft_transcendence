@@ -28,7 +28,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
 
 export default {
-  name: 'CatchTomAndJerry',
+  name: 'CatchSetup',
   components: {
     CatchGame
   },
