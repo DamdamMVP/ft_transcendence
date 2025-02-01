@@ -79,6 +79,8 @@ cd ft_transcendence
 - 🕶️ Anonymiser votre compte
 - 🗑️ Supprimer votre compte
 
+![Affichage des paramètres](readme/settings.gif)
+
 ## 🤝 Contribution
 
 - 👤 **Collaborateurs**: [@Polybiuss](https://github.com/Polybiuss) & [@BLQuatre](https://github.com/BLQuatre)
