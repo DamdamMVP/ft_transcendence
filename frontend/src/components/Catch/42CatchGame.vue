@@ -119,7 +119,7 @@ export default {
       gameStarted: false,
       gameLoop: null,
       mouseSpeed: 12,
-      catSpeed: 12,
+      catSpeed: 1,
       catchDistance: 30,
       timeLeft: 40,
       timer: null,

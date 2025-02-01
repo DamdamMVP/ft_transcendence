@@ -13,7 +13,7 @@
         <button @click="setGuestUsername" class="submit-btn">{{ $t('catch.start') }}</button>
       </div>
     </div>
-    <CatchGame 
+    <FortyTwoCatchGame 
       v-else
       :player-username="authStore.user?.username || $t('catch.player1Default')"
       :guest-username="guestUsername"
@@ -23,14 +23,14 @@
 </template>
 
 <script>
-import CatchGame from '../CatchGame.vue'
+import FortyTwoCatchGame from '../42CatchGame.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
 
 export default {
   name: 'CatchFortyTwo',
   components: {
-    CatchGame
+    FortyTwoCatchGame
   },
   setup() {
     const authStore = useAuthStore()
