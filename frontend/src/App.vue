@@ -54,4 +54,23 @@ watch(
   padding: 0;
   background: var(--background-color);
 }
+
+  :root {
+  transition: all 0.3s ease;
+  min-height: 100vh;
+  background-image: var(--background-gradient);
+}
+
+body {
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+.card {
+  background-color: var(--background-color-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--box-shadow);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
 </style>
