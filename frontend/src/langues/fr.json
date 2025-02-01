@@ -106,7 +106,9 @@
   "chat": {
     "typemessage": "Écrivez votre message...",
     "send": "Envoyer",
-    "close": "Fermer"
+    "close": "Fermer",
+	"play": "Jouer",
+    "invite": "Viens jouer au Pong local avec moi !"
   },
   "stats": {
     "victories": "Victoires",

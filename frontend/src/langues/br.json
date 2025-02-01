@@ -98,7 +98,9 @@
   "chat": {
     "typemessage": "Skrivit ho kemennadenn...",
     "send": "Kas",
-    "close": "Serriñ"
+    "close": "Serriñ",
+	"play": "Jouer",
+    "invite": "Deuit da c'hoari Pong lec'hel ganin !"
   },
   "stats": {
     "victories": "Trec'hioù",

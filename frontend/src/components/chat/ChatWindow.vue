@@ -38,6 +38,9 @@
       <button @click="sendMessage" class="chat-window__send-btn">
         <span class="material-icons">{{ $t('chat.send') }}</span>
       </button>
+      <button @click="inviteToPlay" class="chat-window__invite-btn">
+        <span class="material-icons">{{ $t('chat.play') }}</span>
+      </button>
     </div>
   </div>
 </template>
@@ -46,6 +49,7 @@
 import { ref, onMounted, onUnmounted, watch, computed, nextTick } from 'vue'
 import { usePrivateChat } from '../../composables/usePrivateChat'
 import { useAuthStore } from '../../stores/authStore'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   friend: {
@@ -68,6 +72,7 @@ const {
   sendMessage: sendWebSocketMessage,
 } = usePrivateChat()
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 // Obtenir l'utilisateur actuel directement depuis le store
 const currentUser = computed(() => authStore.user)
@@ -120,6 +125,11 @@ const sendMessage = () => {
   if (success) {
     messageText.value = ''
   }
+}
+
+const inviteToPlay = () => {
+  messageText.value = t('chat.invite')
+  sendMessage()
 }
 
 // Initialiser la connexion WebSocket
@@ -281,7 +291,8 @@ watch(
 }
 
 .chat-window__close-btn,
-.chat-window__send-btn {
+.chat-window__send-btn,
+.chat-window__invite-btn {
   background: none;
   border: none;
   cursor: pointer;
@@ -290,7 +301,8 @@ watch(
 }
 
 .chat-window__close-btn:hover,
-.chat-window__send-btn:hover {
+.chat-window__send-btn:hover,
+.chat-window__invite-btn:hover {
   color: var(--primary-color);
 }
 </style>

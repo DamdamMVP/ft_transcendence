@@ -103,7 +103,9 @@
   "chat": {
     "typemessage": "Type your message...",
     "send": "Send",
-    "close": "Close"
+    "close": "Close",
+	"jouer": "Play",
+    "invite": "Come play local Pong with me!"
   },
   "stats": {
     "victories": "Victories",
