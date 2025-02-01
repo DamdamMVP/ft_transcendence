@@ -62,7 +62,7 @@ watch(
 }
 
 body {
-  color: var(--text-color);
+  /* color: var(--text-color); */
   background-color: var(--background-color);
 }
 

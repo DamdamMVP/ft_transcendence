@@ -158,7 +158,7 @@ h2, h3 {
   gap: 0.5rem;
   padding: 1rem 2rem;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
-  color: white;
+  color : --text-color;
   border: none;
   border-radius: 8px;
   cursor: pointer;
