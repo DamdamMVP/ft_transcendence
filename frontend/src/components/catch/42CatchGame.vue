@@ -61,12 +61,10 @@ import jerry from '../../assets/jerry.png'
 import gamian from '../../assets/gamian.png'
 import thomian from '../../assets/thomian.png'
 import damian from '../../assets/damian.png'
-import { useRoute } from 'vue-router'
-import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
-import eventBus from '../../utils/eventBus'
+
 
 export default {
   setup() {

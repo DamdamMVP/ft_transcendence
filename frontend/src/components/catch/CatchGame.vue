@@ -57,12 +57,9 @@
 <script>
 import jerry from '../../assets/jerry.png'
 import tom from '../../assets/tom.png'
-import { useRoute } from 'vue-router'
-import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
-import eventBus from '../../utils/eventBus'
 
 export default {
   setup() {
@@ -70,7 +67,7 @@ export default {
     const { t } = useI18n()
     return { authStore, t }
   },
-  name: 'CatAndMouseGame',
+  name: 'CatchGame',
   props: {
     playerUsername: {
       type: String,
