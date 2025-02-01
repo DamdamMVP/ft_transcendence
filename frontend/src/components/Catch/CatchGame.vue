@@ -1,81 +1,58 @@
 <template>
-  <div
-    class="game-container"
-    tabindex="0"
-    ref="gameContainer"
-    @keydown="handleKeyPress"
-    @keyup="handleKeyUp"
-  >
-    <div class="game-wrapper">
-      <div class="player-column">
-        <div class="player-name">{{ playerUsername }}</div>
-        <div v-if="gameStarted || gameOver" class="player-score">
-          {{ $t('catch.score') }}: {{ mouseScore }}
-        </div>
-      </div>
-      <div
-        class="game-board"
-        :class="{ blurred: !gameStarted || gameOver }"
-        :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }"
-      >
-        <img :src="jerryImage" class="mouse" :style="mouseStyle" />
-        <img :src="tomImage" class="cat" :style="catStyle" />
-        <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
-        <div
-          class="wall vertical"
-          :style="{
-            left: '240px',
-            top: '150px',
-            height: '240px',
-            width: '8px',
-          }"
-        ></div>
-        <div
-          class="wall vertical"
-          :style="{
-            left: '720px',
-            top: '150px',
-            height: '240px',
-            width: '8px',
-          }"
-        ></div>
-        <div v-if="isPaused" class="pause-message">
-          {{ $t('catch.capture') }} 🎯
-        </div>
-        <div v-if="!gameStarted || gameOver" class="overlay"></div>
-        <div v-if="!gameStarted || gameOver" class="start-message">
-          <div v-if="gameOver">
-            <div class="game-over-text">{{ $t('catch.gameOver') }}</div>
-            <div class="game-over-text">{{ winner }}</div>
-          </div>
-          <button @click="startCountdown" class="start-btn">
-            {{ $t('catch.newGame') }}
-          </button>
-          <div v-if="!gameStarted && !gameOver" class="controls-info">
-            <p>{{ $t('catch.mouseControls') }}: WSAD</p>
-            <p>{{ $t('catch.catControls') }}: {{ $t('catch.numpad') }} 8456</p>
-          </div>
-        </div>
-        <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
-      </div>
-      <div class="player-column">
-        <div class="player-name">{{ guestUsername }}</div>
-        <div v-if="gameStarted || gameOver" class="player-score">
-          {{ $t('catch.score') }}: {{ catScore }}
-        </div>
-      </div>
-    </div>
-    <div v-if="gameStarted" class="timer-container">
-      <div class="timer">
-        {{
-          gameOver
-            ? $t('catch.timeElapsed')
-            : $t('catch.timeRemaining', { time: timeLeft })
-        }}
-      </div>
-    </div>
-  </div>
-</template>
+	<div class="game-container" tabindex="0" ref="gameContainer" @keydown="handleKeyPress" @keyup="handleKeyUp">
+	  <div class="game-wrapper">
+		<!-- Colonne joueur 1 -->
+		<div class="player-column">
+		  <div class="player-name">{{ playerUsername }}</div>
+		  <div v-if="gameStarted || gameOver" class="player-score">
+			{{ $t('catch.score') }}: {{ mouseScore }}
+		  </div>
+		</div>
+		
+		<div class="game-board" :class="{ blurred: !gameStarted || gameOver }" :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
+		  <img :src="jerryImage" class="mouse" :style="mouseStyle" />
+		  <img :src="tomImage" class="cat" :style="catStyle" />
+		  <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
+		  <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
+		  <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
+		  <div v-if="isPaused" class="pause-message">
+			{{ $t('catch.capture') }} 🎯
+		  </div>
+		  <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
+		</div>
+  
+		<!-- Déplacé en dehors du game-board -->
+		<div v-if="!gameStarted || gameOver" class="overlay"></div>
+		<div v-if="!gameStarted || gameOver" class="start-message">
+		  <div v-if="gameOver">
+			<div class="game-over-text">{{ $t('catch.gameOver') }}</div>
+			<div class="game-over-text">{{ winner }}</div>
+		  </div>
+		  <button @click="startCountdown" class="start-btn">
+			{{ $t('catch.newGame') }}
+		  </button>
+		  <div v-if="!gameStarted && !gameOver" class="controls-info">
+			<p>{{ $t('catch.mouseControls') }}: WSAD</p>
+			<p>{{ $t('catch.catControls') }}: {{ $t('catch.numpad') }} 8456</p>
+		  </div>
+		</div>
+  
+		<!-- Colonne joueur 2 -->
+		<div class="player-column">
+		  <div class="player-name">{{ guestUsername }}</div>
+		  <div v-if="gameStarted || gameOver" class="player-score">
+			{{ $t('catch.score') }}: {{ catScore }}
+		  </div>
+		</div>
+	  </div>
+	  
+	  <div v-if="gameStarted" class="timer-container">
+		<div class="timer">
+		  {{ gameOver ? $t('catch.timeElapsed') : $t('catch.timeRemaining', { time: timeLeft }) }}
+		</div>
+	  </div>
+	</div>
+  </template>
 
 <script>
 import jerry from '../../assets/jerry.png'
@@ -448,6 +425,7 @@ export default {
   gap: 20px;
   padding: 20px;
   position: relative;
+  animation: fadeIn 0.6s ease;
 }
 
 .game-wrapper {
@@ -462,114 +440,92 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  animation: slideIn 0.6s ease;
 }
 
 .player-name {
   font-size: 24px;
-  font-weight: bold;
-  color: #2c3e50;
-  padding: 10px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 800;
+  color: var(--primary-color);
+  padding: 15px;
+  background: var(--surface-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
   min-width: 150px;
   text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.player-name:hover {
+  transform: translateY(-2px);
 }
 
 .player-score {
   font-size: 20px;
-  color: #2c3e50;
+  color: var(--text-color);
   font-weight: bold;
-  padding: 8px 15px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.game-info {
-  font-size: 24px;
-  font-weight: bold;
-  text-align: center;
-  margin-top: 20px;
-}
-
-.scores {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 10px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.player-score,
-.timer {
-  font-size: 18px;
-  color: #2c3e50;
-  font-weight: bold;
+  padding: 12px 20px;
+  background: var(--surface-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+  transition: all 0.3s ease;
 }
 
 .game-board {
   position: relative;
-  background-color: #f2ddc3;
-  background-image: linear-gradient(
-      90deg,
-      rgba(139, 69, 19, 0.02) 50%,
-      transparent 50%
-    ),
-    linear-gradient(90deg, rgba(139, 69, 19, 0.03) 50%, transparent 50%),
-    linear-gradient(90deg, transparent 50%, rgba(139, 69, 19, 0.04) 50%),
-    linear-gradient(90deg, transparent 50%, rgba(139, 69, 19, 0.05) 50%);
-  background-size: 13px, 29px, 37px, 53px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(101, 67, 33, 0.1);
+  background: linear-gradient(
+    135deg,
+    var(--background-color) 0%,
+    var(--background-secondary-color) 100%
+  );
+  border: 3px solid var(--primary-color);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px var(--primary-shadow-color);
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-.game-board.blurred .mouse,
-.game-board.blurred .cat,
-.game-board.blurred .cheese {
+.game-board.blurred {
   filter: blur(5px);
+  transform: scale(0.98);
 }
 
-.mouse,
-.cat {
+.mouse, .cat {
   position: absolute;
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   transform: translate(-50%, -50%);
-  transition: all 0.05s linear;
-  object-fit: contain;
-}
-
-.mouse {
-  z-index: 2;
-}
-
-.cat {
-  z-index: 1;
+  transition: all 0.05s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .cheese {
   position: absolute;
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 28px;
   user-select: none;
-  transition: all 0.05s linear;
+  transition: all 0.3s ease;
+  animation: float 3s ease-in-out infinite;
 }
 
-.game-over-text {
-  color: #e74c3c;
-  font-size: 24px;
-  margin-bottom: 10px;
-  font-weight: bold;
+.wall.vertical {
+  position: absolute;
+  background: linear-gradient(
+    to right,
+    var(--primary-color),
+    var(--primary-hover-color)
+  );
+  box-shadow: 
+    0 0 15px var(--primary-shadow-color),
+    inset 0 0 5px rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
 }
 
 .start-message {
@@ -578,61 +534,56 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  width: 100%;
+  width: 20%;
   z-index: 2;
+  animation: fadeIn 0.6s ease;
 }
 
 .start-btn {
-  background-color: #2ecc71;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
   color: white;
   border: none;
-  padding: 15px 30px;
-  border-radius: 5px;
+  padding: 15px 35px;
+  border-radius: 12px;
   font-size: 20px;
+  font-weight: 600;
   cursor: pointer;
   margin-bottom: 20px;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+  position: relative;
+  overflow: hidden;
 }
 
 .start-btn:hover {
-  background-color: #27ae60;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+}
+
+.start-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.start-btn:hover::after {
+  opacity: 1;
 }
 
 .controls-info {
   font-size: 16px;
-  color: #7f8c8d;
+  color: var(--text-color);
   margin-top: 20px;
-}
-
-.controls-info p {
-  margin: 5px 0;
-}
-
-.wall {
-  position: absolute;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.wall.horizontal {
-  height: 10px;
-  background-color: #34495e;
-  opacity: 0;
-}
-
-.wall.vertical {
-  width: 15px;
-  background-color: #c0392b;
-  background-image: linear-gradient(
-    0deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.2) 10%,
-    rgba(255, 255, 255, 0.1) 20%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  box-shadow:
-    2px 0 5px rgba(0, 0, 0, 0.1),
-    inset -1px 0 3px rgba(0, 0, 0, 0.2);
+  background: var(--surface-color);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
 .pause-message {
@@ -641,19 +592,10 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 48px;
-  color: #e74c3c;
+  color: var(--primary-color);
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 15px var(--primary-shadow-color);
   animation: bounce 0.5s ease infinite alternate;
-}
-
-@keyframes bounce {
-  from {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  to {
-    transform: translate(-50%, -50%) scale(1.1);
-  }
 }
 
 .countdown {
@@ -662,10 +604,97 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 72px;
-  color: #e74c3c;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  color: var(--primary-color);
+  font-weight: 800;
+  text-shadow: 0 0 20px var(--primary-shadow-color);
   animation: popIn 0.5s ease-out;
+}
+
+.timer {
+  font-size: 20px;
+  color: var(--primary-color);
+  font-weight: bold;
+  padding: 12px 25px;
+  background: var(--surface-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+}
+
+.game-over-text {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px var(--primary-shadow-color);
+  animation: fadeInScale 0.6s ease;
+  padding: 15px 30px;
+  background: var(--surface-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+}
+
+.start-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: var(--background-color);
+  padding: 30px;
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+  z-index: 100;
+  min-width: 300px;
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Ajuster le style du bouton pour qu'il s'aligne bien avec le message */
+.start-message .start-btn {
+  margin-top: 20px;
+  min-width: 200px;
+}
+
+/* Style pour le conteneur des textes de fin de partie */
+.game-over-text + .game-over-text {
+  margin-top: 10px;
+  font-size: 28px;
+  color: var(--text-color);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes popIn {
@@ -682,30 +711,29 @@ export default {
   }
 }
 
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  z-index: 1;
+@keyframes bounce {
+  from { transform: translate(-50%, -50%) scale(1); }
+  to { transform: translate(-50%, -50%) scale(1.1); }
 }
 
-.timer-container {
-  margin-top: 20px;
-  text-align: center;
-}
+@media (max-width: 768px) {
+  .game-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
 
-.timer {
-  font-size: 20px;
-  color: #e67e22;
-  font-weight: bold;
-  padding: 8px 20px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  .player-column {
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .player-name, .player-score {
+    font-size: 16px;
+    padding: 8px 15px;
+  }
+
+  .countdown {
+    font-size: 48px;
+  }
 }
 </style>
