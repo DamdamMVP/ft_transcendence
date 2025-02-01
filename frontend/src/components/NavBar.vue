@@ -39,15 +39,16 @@ const router = useRouter()
 <style scoped>
 .header {
   align-self: stretch;
-  padding: 32px 0;
-  margin: 0;
+  padding: 1.5rem 0;
   background: var(--background-color);
-  border-bottom: 1px solid var(--secondary-color);
+  border-bottom: 2px solid rgba(52, 152, 219, 0.2);
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 24px;
   box-sizing: border-box;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .logo-container {
@@ -63,6 +64,40 @@ const router = useRouter()
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+}
+
+.logo-border::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 12px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.logo-border:hover::after {
+  opacity: 0.2;
+  transform: scale(1.1);
+}
+
+.logo-border .nav-golem {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.logo-border:hover .nav-golem {
+  transform: scale(1.1);
 }
 
 .spacer {
@@ -72,43 +107,100 @@ const router = useRouter()
 .user-options {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   padding-right: 32px;
 }
 
 .nav-link {
   color: var(--text-color);
   text-decoration: none;
-  padding: 8px 16px;
+  padding: 0.8rem 1.5rem;
   border-radius: 8px;
-  transition: background-color 0.3s;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-color);
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 0.3s ease;
+  z-index: -1;
+  border-radius: 8px;
 }
 
 .nav-link:hover {
-  background-color: var(--primary-color);
-  color: var(--text-color);
+  color: white;
+  transform: translateY(-2px);
 }
 
-.logo-border .nav-golem {
-  width: 50px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-} 
+.nav-link:hover::before {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .settings-link {
   color: var(--text-color);
   text-decoration: none;
-  padding: 8px;
+  padding: 0.8rem;
   border-radius: 8px;
   display: flex;
   align-items: center;
-  transition: background-color 0.3s;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: transparent;
 }
 
 .settings-link:hover {
-  background-color: var(--primary-color);
-  color: var(--text-color);
+  background: var(--primary-color);
+  color: white;
+  transform: rotate(90deg);
+  box-shadow: 0 4px 15px var(--primary-shadow-color);
+}
+
+/* Animation pour le hover des liens */
+@keyframes linkHover {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem 0;
+  }
+
+  .logo-container {
+    padding-left: 16px;
+  }
+
+  .user-options {
+    padding-right: 16px;
+    gap: 8px;
+  }
+
+  .nav-link {
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+  }
+
+  .settings-link {
+    padding: 0.6rem;
+  }
 }
 </style>
