@@ -18,7 +18,7 @@
         :class="{ blurred: !gameStarted || gameOver }"
         :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }"
       >
-        <img :src="jerryImage" class="mouse" :style="mouseStyle" />
+        <img :src="playerIconImage" class="mouse" :style="mouseStyle" />
         <img :src="tomImage" class="cat" :style="catStyle" />
         <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
         <div
@@ -80,6 +80,9 @@
 <script>
 import jerry from '../../assets/jerry.png'
 import tom from '../../assets/tom.png'
+import gamian from '../../assets/gamian.png'
+import thomian from '../../assets/thomian.png'
+import damian from '../../assets/damian.png'
 import { useRoute } from 'vue-router'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
@@ -101,7 +104,15 @@ export default {
     },
     guestUsername: {
       type: String,
-      default: 'Invité',
+      required: true,
+    },
+    playerIcon: {
+      type: String,
+      default: 'gamian'
+    },
+    mode: {
+      type: String,
+      required: true,
     },
   },
   data() {
@@ -135,6 +146,14 @@ export default {
     }
   },
   computed: {
+    playerIconImage() {
+      const iconMap = {
+        gamian,
+        thomian,
+        damian
+      }
+      return iconMap[this.playerIcon] || jerry
+    },
     mouseStyle() {
       return {
         left: this.mousePos.x + 'px',

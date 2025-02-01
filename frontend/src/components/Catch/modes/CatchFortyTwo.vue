@@ -10,6 +10,20 @@
           :placeholder="$t('catch.player2Placeholder')"
           class="guest-input"
         />
+        <div class="icon-selection">
+          <h3>{{ $t('catch.selectPlayerIcon') }}</h3>
+          <div class="icon-options">
+            <div 
+              v-for="icon in icons" 
+              :key="icon"
+              class="icon-option"
+              :class="{ selected: selectedIcon === icon }"
+              @click="selectIcon(icon)"
+            >
+              <img :src="getIconPath(icon)" :alt="icon" />
+            </div>
+          </div>
+        </div>
         <button @click="setGuestUsername" class="submit-btn">{{ $t('catch.start') }}</button>
       </div>
     </div>
@@ -17,6 +31,7 @@
       v-else
       :player-username="authStore.user?.username || $t('catch.player1Default')"
       :guest-username="guestUsername"
+      :player-icon="selectedIcon"
       mode="fortytwo"
     />
   </div>
@@ -26,6 +41,9 @@
 import FortyTwoCatchGame from '../42CatchGame.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
+import gamian from '@/assets/gamian.png'
+import thomian from '@/assets/thomian.png'
+import damian from '@/assets/damian.png'
 
 export default {
   name: 'CatchFortyTwo',
@@ -36,6 +54,8 @@ export default {
     const authStore = useAuthStore()
     const guestUsername = ref(null)
     const guestInput = ref('')
+    const selectedIcon = ref('gamian')
+    const icons = ['gamian', 'thomian', 'damian']
 
     const setGuestUsername = () => {
       if (guestInput.value.trim()) {
@@ -43,11 +63,28 @@ export default {
       }
     }
 
+    const selectIcon = (icon) => {
+      selectedIcon.value = icon
+    }
+
+    const getIconPath = (icon) => {
+      const iconPaths = {
+        gamian,
+        thomian,
+        damian
+      }
+      return iconPaths[icon]
+    }
+
     return {
       authStore,
       guestUsername,
       guestInput,
-      setGuestUsername
+      setGuestUsername,
+      selectedIcon,
+      icons,
+      selectIcon,
+      getIconPath
     }
   }
 }
@@ -115,6 +152,46 @@ h2 {
   color: var(--text-color);
   text-align: center;
   box-sizing: border-box;
+}
+
+.icon-selection {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.icon-selection h3 {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+  font-size: 1.2rem;
+}
+
+.icon-options {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.icon-option {
+  cursor: pointer;
+  padding: 0.5rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.icon-option img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.icon-option.selected {
+  border-color: var(--primary-color);
+  background-color: var(--surface-hover-color);
+}
+
+.icon-option:hover {
+  background-color: var(--surface-hover-color);
 }
 
 .submit-btn {
