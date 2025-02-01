@@ -12,7 +12,9 @@ const router = useRouter()
   <div class="header">
     <div class="logo-container">
       <div class="logo-border">
-        <IconGolem style="color: var(--primary-color)" />
+        <router-link to="/pong" class="nav-golem">
+          <IconGolem style="color: var(--primary-color)" />
+        </router-link>
       </div>
     </div>
     <div class="spacer"></div>
@@ -86,6 +88,14 @@ const router = useRouter()
   background-color: var(--primary-color);
   color: var(--text-color);
 }
+
+.logo-border .nav-golem {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} 
 
 .settings-link {
   color: var(--text-color);
