@@ -15,7 +15,8 @@ const themes = {
     '--info-color': '#3498db',
     '--primary-hover-color': '#0056b3',
     '--error-hover-color': '#c0392b',
-    '--border-color': '#e0e0e0'
+    '--border-color': '#e0e0e0',
+	'--primary-shadow-color': 'rgba(0, 123, 255, 0.3)'
   },
   dark: {
     '--background-color': '#1a1a1a',
@@ -31,7 +32,8 @@ const themes = {
     '--info-color': '#3498db',
     '--primary-hover-color': '#2980b9',
     '--error-hover-color': '#c0392b',
-    '--border-color': '#404040'
+    '--border-color': '#404040',
+	'--primary-shadow-color': 'rgba(52, 152, 219, 0.3)'
   },
   forest: {
     '--background-color': '#2c3e50',
@@ -47,6 +49,7 @@ const themes = {
     '--info-color': '#2980b9',
     '--primary-hover-color': '#219a52',
     '--error-hover-color': '#962c22',
+	'--primary-shadow-color': 'rgba(39, 174, 96, 0.3)'
   },
 }
 

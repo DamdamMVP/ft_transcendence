@@ -120,20 +120,32 @@ const saveProfilePhoto = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 16px;
-  background: var(--background-color);
-  border-radius: 8px;
-  border: 1px solid var(--secondary-color);
+  gap: 2rem;
+  padding: 2rem;
+  background: var(--background-secondary-color);
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
   text-align: center;
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: fadeIn 0.6s ease;
+}
+
+.profile-section:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px var(--primary-shadow-color);
 }
 
 .profile-photo-container {
   position: relative;
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   margin: 0 auto;
   cursor: pointer;
+  border-radius: 50%;
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+  transition: all 0.3s ease;
 }
 
 .profile-photo {
@@ -141,7 +153,8 @@ const saveProfilePhoto = async () => {
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  transition: filter 0.3s ease;
+  border: 3px solid var(--primary-color);
+  transition: all 0.3s ease;
 }
 
 .photo-overlay {
@@ -150,56 +163,144 @@ const saveProfilePhoto = async () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(
+    135deg,
+    rgba(52, 152, 219, 0.9),
+    rgba(41, 128, 185, 0.9)
+  );
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+  transform: scale(0.9);
 }
 
 .photo-overlay span {
   color: white;
   text-align: center;
-  padding: 10px;
-  font-size: 14px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+}
+
+.profile-photo-container:hover {
+  transform: scale(1.05);
 }
 
 .profile-photo-container:hover .photo-overlay {
   opacity: 1;
+  transform: scale(1);
+}
+
+.profile-photo-container:hover .photo-overlay span {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .profile-photo-container:hover .profile-photo {
   filter: brightness(0.8);
+  transform: scale(0.95);
 }
 
 .save-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--primary-color);
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: bold;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.save-button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .save-button:hover {
-  background: var(--primary-hover-color);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+}
+
+.save-button:hover::before {
+  opacity: 1;
+}
+
+.save-button:active {
+  transform: translateY(-1px);
 }
 
 .save-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background: var(--text-secondary-color);
 }
 
 h3 {
-  color: var(--text-color);
+  color: var(--primary-color);
   margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px var(--primary-shadow-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .profile-section {
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .profile-photo-container {
+    width: 150px;
+    height: 150px;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  .save-button {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.9rem;
+  }
 }
 </style>
