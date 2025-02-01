@@ -1,4 +1,4 @@
-# 🌐 ft_trans
+# 🌐 ft_transcendance
 
 <div align="center">
   <img src="https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vue.js&logoColor=4FC08D" alt="Vue.js Badge">
@@ -14,26 +14,64 @@ Projet de l'école 42 Le Havre. Ce projet a pour but de jouer à Pong ainsi qu'�
 
 ### ✨ Fonctionnalités Principales
 
-- 🔍 **Jouer** : Lancez des parties de Pong ou Catch, en mode solo ou jusqu'à 4 joueurs.
-- 🌈 **Communication** : Discutez avec vos amis et organisez des parties.
+- 🎮 **Jouer** : Lancez des parties de Pong ou Catch, en mode solo ou jusqu'à 4 joueurs.
+- 💬 **Communication** : Discutez avec vos amis et organisez des parties.
 - 🔒 **Sécurité** : Connectez-vous de diverses manières, avec notamment la possibilité d'utiliser le 2FA.
 - 📈 **Statistiques** : Consultez vos statistiques de jeu ou celles de vos amis.
 
 ## 🔧 Installation & Configuration
 
-### 1. Cloner le Projet
+### 1. 🚀 Cloner le Projet
 
 ```bash
 git clone https://github.com/DamdamMVP/ft_transcendence.git
 cd ft_transcendence
 ```
 
-## 2. Commandes Principales
+## 2. 🛠️ Commandes Principales
 
 | Commande        | Action                                   |
 | --------------- | ---------------------------------------- |
 | `npm run dev`   | 🚀 Démarrage du serveur de développement |
 | `npm run build` | 🏗 Construction pour la production        |
+
+## 🌐 Le site
+
+### 1. 🏠 Accueil
+
+- 🔑 Connexion / Inscription
+- 🎓 Connexion avec l'API 42
+
+### 2. 🏓 Pong
+
+- 👥 Jouer en local 1vs1
+- 🤖 Jouer contre l'IA
+- 🏆 Jouer dans un tournoi
+
+### 3. 🎯 Catch
+
+- 👥 Jouer en local 1vs1
+- 🤖 Jouer contre l'IA
+
+### 4. 👤 Profil
+
+- 📋 Consulter votre profil
+- 📜 Consulter votre historique
+
+### 5. 💬 Chat
+
+- 👥 Afficher votre liste d'amis
+- 💬 Chatter avec vos amis en privé ou dans un canal public
+- ➕ Ajouter/Retirer/Bloquer des utilisateurs
+- 🎮 Inviter vos amis à jouer
+
+### 6. ⚙️ Paramètres
+
+- 🖊️ Modifier vos informations personnelles
+- 🚪 Déconnecter
+- 🔐 Activer/Désactiver la 2FA
+- 🕶️ Anonymiser votre compte
+- 🗑️ Supprimer votre compte
 
 ## 🤝 Contribution
 
