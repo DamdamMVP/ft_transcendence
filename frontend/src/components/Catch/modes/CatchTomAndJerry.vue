@@ -56,42 +56,47 @@ export default {
 <style scoped>
 .catch-game {
   width: 100%;
-  /* Supprimer height: 100vh car cela prend tout l'écran */
-  /* Remplacer position: fixed par position: absolute */
   position: absolute;
-  /* Ajuster le top pour laisser de l'espace pour la navbar */
-  top: var(--navbar-height, 60px); /* Utiliser la variable CSS de hauteur de navbar ou une valeur par défaut */
+  top: var(--navbar-height, 60px);
   left: 0;
   right: 0;
   bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--background-color);
+  background: transparent; /* Changé pour éviter les conflits */
+  overflow: auto;
 }
 
 .guest-form-container {
-  position: absolute;
-  /* Ajuster également le conteneur du formulaire */
-  top: 0;
+  position: fixed; /* Changé pour fixed pour couvrir tout l'écran */
+  top: var(--navbar-height, 100px);
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  background-color: var(--background-color);
+  background: linear-gradient(135deg,
+    var(--background-color) 0%,
+    var(--background-secondary-color) 100%
+  );
+  backdrop-filter: blur(5px);
 }
 
 .guest-form {
-  background-color: var(--surface-color);
-  padding: 2.5rem;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  background: var(--surface-color);
+  padding: 3rem;
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
   text-align: center;
-  max-width: 90%;
   width: 400px;
+  max-width: 90%;
+  animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 1001;
 }
 
 h1 {

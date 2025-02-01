@@ -93,122 +93,205 @@ export default {
 <style scoped>
 .catch-game {
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
+  position: absolute;
+  top: var(--navbar-height, 60px);
   left: 0;
   right: 0;
   bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--background-color);
+  background: transparent; /* Changé pour éviter les conflits */
+  overflow: auto;
 }
 
 .guest-form-container {
-  position: absolute;
-  top: 0;
+  position: fixed; /* Changé pour fixed pour couvrir tout l'écran */
+  top: var(--navbar-height, 100px);
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  background-color: var(--background-color);
+  background: linear-gradient(135deg,
+    var(--background-color) 0%,
+    var(--background-secondary-color) 100%
+  );
+  backdrop-filter: blur(5px);
 }
 
 .guest-form {
-  background-color: var(--surface-color);
-  padding: 2.5rem;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  background: var(--surface-color);
+  padding: 3rem;
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
   text-align: center;
-  max-width: 90%;
   width: 400px;
+  max-width: 90%;
+  animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  z-index: 1001;
 }
+
 
 h1 {
-  margin-bottom: 1.5rem;
   color: var(--primary-color);
-  font-size: 1.8rem;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 0 15px var(--primary-shadow-color);
+  animation: float 3s ease-in-out infinite;
 }
 
-h2 {
-  margin-bottom: 1.5rem;
-  font-size: 1.2rem;
+h2, h3 {
   color: var(--text-color);
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
 }
 
 .guest-input {
-  width: 100%;
-  padding: 0.8rem;
+  width: 80%;
+  padding: 1rem;
   margin: 1.5rem 0;
-  border: 2px solid var(--border-color);
-  border-radius: 5px;
+  border: 2px solid var(--primary-color);
+  border-radius: 12px;
   font-size: 1rem;
-  background-color: var(--input-background);
+  background: var(--surface-color);
   color: var(--text-color);
   text-align: center;
-  box-sizing: border-box;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px var(--primary-shadow-color);
+}
+
+.guest-input:focus {
+  outline: none;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
 }
 
 .icon-selection {
-  margin: 1.5rem 0;
-  text-align: center;
-}
-
-.icon-selection h3 {
-  margin-bottom: 1rem;
-  color: var(--text-color);
-  font-size: 1.2rem;
+  margin: 2rem 0;
 }
 
 .icon-options {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-top: 1rem;
 }
 
 .icon-option {
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.8rem;
   border: 2px solid transparent;
-  border-radius: 8px;
+  border-radius: 12px;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .icon-option img {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   object-fit: contain;
+  transition: transform 0.3s ease;
 }
 
 .icon-option.selected {
   border-color: var(--primary-color);
-  background-color: var(--surface-hover-color);
+  background: var(--background-secondary-color);
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
 }
 
 .icon-option:hover {
-  background-color: var(--surface-hover-color);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+}
+
+.icon-option:hover img {
+  transform: scale(1.1);
 }
 
 .submit-btn {
   width: 100%;
-  padding: 0.8rem;
-  margin-top: 1.5rem;
+  padding: 1rem;
   border: none;
-  border-radius: 5px;
-  background-color: var(--primary-color);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
   color: white;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
-  box-sizing: border-box;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-top: 2rem;
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
 }
 
 .submit-btn:hover {
-  background-color: var(--primary-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+  background: linear-gradient(135deg, var(--primary-hover-color), var(--primary-color));
+}
+
+.submit-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.submit-btn:hover::after {
+  opacity: 1;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .guest-form {
+    padding: 2rem;
+    width: 90%;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .icon-options {
+    gap: 1rem;
+  }
+
+  .icon-option img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .submit-btn {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
 }
 </style>
