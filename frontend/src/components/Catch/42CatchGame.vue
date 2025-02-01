@@ -11,10 +11,10 @@
         <div class="player-name">{{ playerUsername }}</div>
         <div class="scores-container">
           <div class="player-score">
-            Exam {{ mouseScore }}
+            Exam {{ formatScore(mouseScore) }}
           </div>
           <div class="player-score">
-            Pace {{ catScore }}
+            Pace {{(catScore) }}
           </div>
         </div>
       </div>
@@ -97,8 +97,8 @@ export default {
       mousePos: { x: 40, y: 40 },
       catPos: { x: 900, y: 500 },
       cheesePos: null,
-      mouseScore: 0,
-      catScore: 0,
+      mouseScore: 2,
+      catScore: 8,
       gameOver: false,
       gameStarted: false,
       gameLoop: null,
@@ -147,6 +147,9 @@ export default {
     },
   },
   methods: {
+    formatScore(score) {
+      return score < 10 ? `0${score}` : score
+    },
     handleKeyPress(event) {
       this.pressedKeys.add(event.key.toLowerCase())
     },
@@ -269,7 +272,7 @@ export default {
       const distance = Math.sqrt(dx * dx + dy * dy)
 
       if (distance < this.catchDistance) {
-        this.catScore++
+        this.catScore+=8
         if (this.isOvertime) {
           this.endGame('cat')
           return
@@ -303,7 +306,8 @@ export default {
 
       if (distance < 30) {
         this.mouseScore++;
-        if (this.isOvertime) {
+        if (this.mouseScore >= 7) {
+          this.mouseScore = 6;
           this.endGame('mouse');
           return;
         }
@@ -350,7 +354,7 @@ export default {
       if (winner === 'cat') {
         this.winner = `${this.guestUsername} gagne!`
       } else {
-        this.winner = `${this.playerUsername} gagne!`
+        this.winner = 'Félicitations, vous avez terminé le tronc commun !'
       }
 
       this.saveGameHistory()
@@ -359,8 +363,8 @@ export default {
       this.gameStarted = true
       this.mousePos = { x: 40, y: 40 }
       this.catPos = { x: 900, y: 500 }
-      this.mouseScore = 0
-      this.catScore = 0
+      this.mouseScore = 2
+      this.catScore = 8
       this.gameOver = false
       this.winner = ''
       this.pressedKeys.clear()
