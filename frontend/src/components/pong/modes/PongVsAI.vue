@@ -243,64 +243,194 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  min-height: 65vh;
   width: 100%;
-  color: var(--text-color);
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  background: var(--background-color);
 }
 
+/* Titre avec animation */
+h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 15px var(--primary-color);
+  animation: float 3s ease-in-out infinite;
+  position: relative;
+}
+
+/* Container du jeu avec effets */
 .game-container {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-}
-
-h2 {
-  color: var(--text-color);
-}
-
-.player-setup-overlay {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 2rem;
+  position: relative;
+  animation: fadeInUp 0.6s ease backwards;
+  border-radius: 15px;
+  overflow: hidden;
   background: var(--background-secondary-color);
-  border-radius: 10px;
   border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.bonus-option {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.game-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px var(--primary-shadow-color);
 }
 
-.bonus-option label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
+/* Animation pour le titre flottant */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-.bonus-option input[type="checkbox"] {
-  width: 1.2rem;
-  height: 1.2rem;
-  cursor: pointer;
+/* Animation d'apparition */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.start-button {
-  padding: 0.5rem 1.5rem;
-  background: var(--primary-color);
-  color: var(--text-color);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
+/* Effet de brillance */
+.game-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    var(--primary-color) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.game-container:hover::before {
+  opacity: 0.1;
+}
+
+/* Style pour le canvas du jeu */
+:deep(.game-canvas) {
+  border-radius: 12px;
   transition: all 0.3s ease;
 }
 
-.start-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px var(--primary-shadow-color);
+/* Styles pour les états de jeu */
+:deep(.countdown-overlay),
+:deep(.game-over-overlay) {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--background-secondary-color);
+  padding: 2rem;
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
+  text-align: center;
+  color: var(--text-color);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 25px var(--primary-shadow-color);
+  animation: fadeIn 0.4s ease;
 }
+
+:deep(.countdown-value) {
+  font-size: 4rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-shadow: 0 0 15px var(--primary-color);
+}
+
+:deep(.winner-announcement) {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
+:deep(.game-button) {
+  padding: 1rem 2.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin-top: 1rem;
+}
+
+:deep(.game-button:hover) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+}
+
+/* Score display */
+:deep(.score-display) {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-shadow: 0 0 10px var(--primary-shadow-color);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .game-container {
+    margin: 0 1rem;
+  }
+
+  :deep(.countdown-value) {
+    font-size: 3rem;
+  }
+
+  :deep(.winner-announcement) {
+    font-size: 1.5rem;
+  }
+
+  :deep(.game-button) {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+/* Animation de fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 </style>

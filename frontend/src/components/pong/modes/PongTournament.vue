@@ -435,24 +435,75 @@ onUnmounted(() => {
   margin: 0 auto;
 }
 
-.bonus-option {
-  margin: 1rem 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-.bonus-option label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  color: var(--text-color);
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.bonus-option input[type="checkbox"] {
-  width: 1.2rem;
-  height: 1.2rem;
-  cursor: pointer;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.tournament-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 65vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  background: var(--background-color);
+  animation: fadeIn 0.6s ease;
+}
+
+/* Contrôles centraux */
+.controls-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.winner-announcement {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  text-shadow: 0 0 15px var(--primary-color);
+  animation: float 3s ease-in-out infinite;
+  text-align: center;
+}
+
+.next-match-info {
+  text-align: center;
+  animation: fadeInUp 0.6s ease;
+}
+
+.next-match-info h3 {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px var(--primary-color);
 }
 </style>

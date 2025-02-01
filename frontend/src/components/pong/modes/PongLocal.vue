@@ -241,59 +241,186 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  min-height: 65vh;
   width: 100%;
-  color: var(--text-color);
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  background: var(--background-color);
 }
 
+/* Titre */
+h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 15px var(--primary-color);
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Container du jeu */
 .game-container {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+  position: relative;
+  animation: fadeInUp 0.6s ease backwards;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+  border: 2px solid var(--primary-color);
+  backdrop-filter: blur(10px);
 }
 
+/* Overlay de configuration des joueurs */
 .player-setup-overlay {
-  background: var(--background-color);
-  padding: 2rem;
-  border-radius: 8px;
+  background: var(--background-secondary-color);
+  padding: 3rem;
+  border-radius: 15px;
   border: 2px solid var(--primary-color);
   text-align: center;
   color: var(--text-color);
+  animation: fadeIn 0.4s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 25px var(--primary-shadow-color);
+}
+
+.player-setup-overlay h3 {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 2rem;
+  text-shadow: 0 0 10px var(--primary-color);
 }
 
 .player-input {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin: 1rem 0;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.player-input label {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  font-weight: 600;
 }
 
 .name-input {
-  padding: 0.5rem;
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
+  padding: 1rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
   background: var(--background-color);
   color: var(--text-color);
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.name-input:focus {
+  outline: none;
+  box-shadow: 0 0 15px var(--primary-shadow-color);
+  transform: translateY(-2px);
 }
 
 .start-button {
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2.5rem;
   background: var(--primary-color);
-  color: var(--text-color);
+  color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.2s;
+  font-size: 1.2rem;
+  font-weight: 600;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin-top: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.start-button:not(:disabled)::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .start-button:hover:not(:disabled) {
-  background: var(--primary-hover-color);
+  transform: translateY(-5px);
+  box-shadow: 0 5px 20px var(--primary-shadow-color);
+}
+
+.start-button:hover:not(:disabled)::before {
+  opacity: 1;
 }
 
 .start-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background: var(--text-secondary-color);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  h2 {
+    font-size: 2.5rem;
+  }
+
+  .player-setup-overlay {
+    padding: 2rem;
+  }
+
+  .player-setup-overlay h3 {
+    font-size: 1.5rem;
+  }
+
+  .start-button {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+  }
 }
 
 .bonus-option {
