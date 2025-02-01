@@ -21,51 +21,6 @@ from django.http import JsonResponse
 import jwt
 from datetime import datetime, timezone
 
-# class TokenRefreshMiddleware(MiddlewareMixin):
-#     def process_request(self, request):
-#         refresh_token = request.COOKIES.get('refresh_token')
-#         if not refresh_token:
-#             return None
-
-#         try:
-#             access_token = request.COOKIES.get('access_token')
-#             print("midleware alalala")
-#             if access_token:
-#                 try:
-#                     payload = jwt.decode(
-#                         access_token, 
-#                         settings.SECRET_KEY, 
-#                         algorithms=['HS256']
-#                     )
-#                     print('jai trouve un token')
-#                     exp = datetime.fromtimestamp(payload['exp'], tz=timezone.utc)
-#                     if exp > datetime.now(timezone.utc):
-#                         print("token not expired")
-#                         return None
-#                 except:
-#                     print("token expired")
-#                     pass
-
-#             # Rafraîchir le token
-#             refresh = request.COOKIES.get('refresh_token')
-#             access_token = str(refresh.access_token)
-
-#             response = JsonResponse({'status': 'token refreshed'})
-#             response.set_cookie(
-#                 key='access_token',
-#                 value=access_token,
-#                 max_age=90,
-#                 httponly=True,
-#                 secure=True,
-#                 samesite='None'
-#             )
-#             print("cookie refreshed")
-#             return response
-
-#         except Exception as e:
-#             return None
-
-
 class CookieJWTAuthentication(JWTAuthentication):
     def authenticate(self, request):
         # Get access token from cookies
