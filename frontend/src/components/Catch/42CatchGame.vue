@@ -358,8 +358,12 @@ export default {
 
       if (winner === 'cat') {
         this.winner = 'Vous avez été absorbé par le blackhole, c\'est dommage !'
+        this.mouseScore = 0
+        this.catScore = 1
       } else {
         this.winner = 'Félicitations, vous avez terminé le tronc commun !'
+        this.mouseScore = 1
+        this.catScore = 0
       }
 
       this.saveGameHistory()
