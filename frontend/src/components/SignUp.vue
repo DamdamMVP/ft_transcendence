@@ -9,6 +9,8 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const error = ref('')
+const showGdprModal = ref(false);
+const gdprConsent = ref(false);
 
 const { signUp } = useAuth()
 
@@ -16,6 +18,11 @@ const handleSignUp = async () => {
   if (password.value !== confirmPassword.value) {
     error.value = 'Les mots de passe ne correspondent pas'
     return
+  }
+
+  if (!gdprConsent.value) {
+	showGdprModal.value = true;
+	return;
   }
 
   try {
@@ -31,12 +38,22 @@ const handleSignUp = async () => {
     password.value = ''
     confirmPassword.value = ''
     error.value = ''
+    gdprConsent.value = false;
     
     emit('success')
     emit('switch-mode')
   } catch (err) {
     error.value = err.message
   }
+}
+const acceptGdpr = () => {
+  gdprConsent.value = true
+  showGdprModal.value = false
+  handleSignUp()
+}
+
+const declineGdpr = () => {
+  showGdprModal.value = false
 }
 </script>
 
@@ -94,6 +111,16 @@ const handleSignUp = async () => {
       <button class="submit-button" @click="handleSignUp">
         {{ $t('signup.signUp') }}
       </button>
+    </div>
+	<div v-if="showGdprModal" class="modal-backdrop">
+      <div class="modal">
+        <h2>{{ $t('gdpr.title') }}</h2>
+        <p>{{ $t('gdpr.message') }}</p>
+        <div class="modal-actions">
+			<button @click="acceptGdpr">{{ $t('gdpr.accept') }}</button>
+			<button @click="declineGdpr">{{ $t('gdpr.decline') }}</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -158,5 +185,57 @@ const handleSignUp = async () => {
 
 .submit-button:hover {
   background: #333;
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-actions button:first-child {
+  background: #1e1e1e;
+  color: white;
+}
+
+.modal-actions button:first-child:hover {
+  background: #333;
+}
+
+.modal-actions button:last-child {
+  background: #f8d7da;
+  color: #dc3545;
+}
+
+.modal-actions button:last-child:hover {
+  background: #f1b0b7;
 }
 </style>

@@ -173,5 +173,11 @@
     "unknownError": "Ur fazi dic'hortoz zo c'hoarvezet",
     "invalidCode": "Kod direizh",
     "invalidCredentials": "Titouroù dilesa direizh"
+  },
+  "gdpr": {
+    "title": "Aotreadur GDPR",
+    "message": "Pa grouit ur gont, e asantit da bolitikerezh GDPR hag e roit ho asant evit ma vo tremenet ho roadennoù personel. Ma na rit ket, ne vo ket krouet ho kont.",
+    "accept": "Asantiñ",
+    "decline": "Na asantiñ"
   }
 }
