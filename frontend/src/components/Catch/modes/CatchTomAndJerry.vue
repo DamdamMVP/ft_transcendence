@@ -70,23 +70,26 @@ export default {
 }
 
 .guest-form-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  height: 100vh;
-  width: 100%;
-  padding-top: 15vh;
+  align-items: center;
+  z-index: 1000;
+  background-color: var(--background-color);
 }
 
 .guest-form {
-  background: var(--background-secondary-color);
+  background-color: var(--surface-color);
   padding: 2rem;
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   text-align: center;
-  width: 100%;
-  max-width: 400px;
-  margin: 0 1rem;
+  max-width: 90%;
+  width: 400px;
 }
 
 h1 {
