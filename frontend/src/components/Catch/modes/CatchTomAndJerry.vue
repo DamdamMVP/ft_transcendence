@@ -1,14 +1,17 @@
 <template>
   <div class="catch-game">
-    <div v-if="!guestUsername" class="guest-form">
-      <h2>{{ $t('catch.enterGuestName') }}</h2>
-      <input 
-        v-model="guestInput" 
-        @keyup.enter="setGuestUsername"
-        :placeholder="$t('catch.player2Placeholder')"
-        class="guest-input"
-      />
-      <button @click="setGuestUsername" class="submit-btn">{{ $t('catch.start') }}</button>
+    <div v-if="!guestUsername" class="guest-form-container">
+      <div class="guest-form">
+        <h1>Attrape-moi si tu peux</h1>
+        <h2>{{ $t('catch.enterGuestName') }}</h2>
+        <input 
+          v-model="guestInput" 
+          @keyup.enter="setGuestUsername"
+          :placeholder="$t('catch.player2Placeholder')"
+          class="guest-input"
+        />
+        <button @click="setGuestUsername" class="submit-btn">{{ $t('catch.start') }}</button>
+      </div>
     </div>
     <CatchGame 
       v-else
@@ -52,56 +55,71 @@ export default {
 
 <style scoped>
 .catch-game {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   width: 100%;
+  height: 100vh;
+  background: var(--background-color);
+}
+
+.guest-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100vh;
+  width: 100%;
+  padding-top: 15vh;
 }
 
 .guest-form {
-  background-color: var(--background-color-secondary);
-  padding: 40px;
+  background: var(--background-secondary-color);
+  padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   text-align: center;
-  max-width: 400px;
   width: 100%;
-  margin: 0 auto;
-  box-sizing: border-box;
+  max-width: 400px;
+  margin: 0 1rem;
+}
+
+h1 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
 }
 
 h2 {
   color: var(--text-color);
-  margin-bottom: 20px;
-  font-size: 1.5em;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
 }
 
 .guest-input {
-  width: calc(100% - 24px);
-  padding: 12px;
-  margin: 0 auto 15px auto;
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
   border: 2px solid var(--border-color);
   border-radius: 6px;
-  font-size: 16px;
-  transition: all 0.3s;
-  box-sizing: border-box;
-  display: block;
-  background-color: var(--background-color);
+  background: var(--background-color);
   color: var(--text-color);
+  font-size: 1rem;
+}
+
+.guest-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
 }
 
 .submit-btn {
-  padding: 12px 24px;
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: white;
   border: none;
+  padding: 0.8rem 2rem;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: background 0.3s ease;
 }
 
 .submit-btn:hover {
-  background-color: var(--primary-color-dark);
+  background: var(--primary-hover-color);
 }
 </style>
