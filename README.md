@@ -55,6 +55,8 @@ cd ft_transcendence
 - 👥 Jouer en local 1vs1
 - 🤖 Jouer contre l'IA
 
+![Affichage du catch](readme/catch.gif)
+
 ### 4. 👤 Profil
 
 - 📋 Consulter votre profil
