@@ -7,10 +7,15 @@
     @keyup="handleKeyUp"
   >
     <div class="game-wrapper">
-      <div class="player-column">
+      <div class="left-container">
         <div class="player-name">{{ playerUsername }}</div>
-        <div v-if="gameStarted || gameOver" class="player-score">
-          {{ $t('catch.score') }}: {{ mouseScore }}
+        <div class="scores-container">
+          <div class="player-score">
+            Exam {{ mouseScore }}
+          </div>
+          <div class="player-score">
+            Pace {{ catScore }}
+          </div>
         </div>
       </div>
       <div
@@ -40,11 +45,8 @@
         </div>
         <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
       </div>
-      <div class="player-column">
+      <div class="player-info">
         <div class="player-name">{{ guestUsername }}</div>
-        <div v-if="gameStarted || gameOver" class="player-score">
-          {{ $t('catch.score') }}: {{ catScore }}
-        </div>
       </div>
     </div>
   </div>
@@ -408,10 +410,17 @@ export default {
   gap: 20px;
 }
 
-.player-column {
+.left-container {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  margin-right: 20px;
   align-items: center;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
@@ -427,14 +436,23 @@ export default {
   text-align: center;
 }
 
+.scores-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
 .player-score {
   font-size: 20px;
   color: #2c3e50;
   font-weight: bold;
-  padding: 8px 15px;
+  padding: 8px 6px;
   background-color: rgba(255, 255, 255, 0.9);
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 120px;
+  text-align: center;
 }
 
 .game-info {
@@ -442,23 +460,6 @@ export default {
   font-weight: bold;
   text-align: center;
   margin-top: 20px;
-}
-
-.scores {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.9);
-  padding: 10px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.player-score {
-  font-size: 18px;
-  color: #2c3e50;
-  font-weight: bold;
 }
 
 .game-board {
