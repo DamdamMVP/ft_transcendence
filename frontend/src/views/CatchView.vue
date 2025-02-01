@@ -9,7 +9,7 @@
   </template>
   
   <script setup>
-  import CatchGame from '@/components/catch/CatchGame.vue'
+  import CatchGame from '@/components/catch/modes/CatchGame.vue'
   import { useAuthStore } from '@/stores/authStore'
   import { useTheme } from '@/composables/useTheme'
   import { useI18n } from 'vue-i18n'
