@@ -11,7 +11,7 @@ import PongTournament from '../components/pong/modes/PongTournament.vue'
 import CatchView from '../views/CatchView.vue'
 import HomeCatch from '../components/catch/HomeCatch.vue'
 import CatchTomAndJerry from '../components/catch/modes/CatchTomAndJerry.vue'
-import CatchFortyTwo from '../components/catch/modes/CatchFortyTwo.vue'
+import CatchFortyTwo from '../components/catch/modes/42CatchSetup.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import { useAuthStore } from '../stores/authStore'
 
