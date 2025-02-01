@@ -272,10 +272,11 @@ export default {
       const distance = Math.sqrt(dx * dx + dy * dy)
 
       if (distance < this.catchDistance) {
-        this.catScore+=8
-        if (this.isOvertime) {
-          this.endGame('cat')
-          return
+        this.catScore += 8;
+        if (this.catScore >= 32) {
+          this.catScore = 24;
+          this.endGame('cat');
+          return;
         }
         this.isPaused = true
         this.resetPositions()
@@ -352,7 +353,7 @@ export default {
       }
 
       if (winner === 'cat') {
-        this.winner = `${this.guestUsername} gagne!`
+        this.winner = 'Vous avez été absorbé par le blackhole, c\'est dommage !'
       } else {
         this.winner = 'Félicitations, vous avez terminé le tronc commun !'
       }
