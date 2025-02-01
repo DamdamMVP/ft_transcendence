@@ -140,7 +140,8 @@
       "player4": "Joueur 4",
       "enterName": "Entrez un nom",
       "enterNames": "Entrez les noms",
-      "controls": "Contrôles"
+      "controls": "Contrôles",
+      "enableBonus": "Activer les bonus"
     }
   },
   "catch": {

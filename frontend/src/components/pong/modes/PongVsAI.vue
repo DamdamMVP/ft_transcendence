@@ -15,7 +15,27 @@
         :winner="winner"
         @start-game="startGame"
         @close-match="resetGame"
-      />
+      >
+        <template #menu-overlay>
+          <div class="player-setup-overlay">
+            <div class="bonus-option">
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="bonusModeEnabled"
+                />
+                {{ t('pong.game.enableBonus') }}
+              </label>
+            </div>
+            <button
+              @click="startGame"
+              class="start-button"
+            >
+              {{ t('pong.game.startGame') }}
+            </button>
+          </div>
+        </template>
+      </GameCanvas>
     </div>
   </div>
 </template>
@@ -41,6 +61,7 @@ const countdownValue = ref(3)
 const playerScore = ref(0)
 const aiScore = ref(0)
 const winner = ref('')
+const bonusModeEnabled = ref(false)
 
 // Player name
 const playerName = ref(authStore.user?.username || '')
@@ -50,7 +71,7 @@ let scoreTimeout = null
 
 function startGame() {
   // Reset game state
-  gameEngine.value = new GameEngine()
+  gameEngine.value = new GameEngine(undefined, undefined, bonusModeEnabled.value)
   aiController.value = new AIController()
   playerScore.value = 0
   aiScore.value = 0
@@ -63,7 +84,7 @@ function startGame() {
 
 function launchGame() {
   if (!gameEngine.value) {
-    gameEngine.value = new GameEngine()
+    gameEngine.value = new GameEngine(undefined, undefined, bonusModeEnabled.value)
     aiController.value = new AIController()
   }
 
@@ -235,5 +256,51 @@ onUnmounted(() => {
 
 h2 {
   color: var(--text-color);
+}
+
+.player-setup-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: var(--background-secondary-color);
+  border-radius: 10px;
+  border: 2px solid var(--primary-color);
+}
+
+.bonus-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bonus-option label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.bonus-option input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer;
+}
+
+.start-button {
+  padding: 0.5rem 1.5rem;
+  background: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px var(--primary-shadow-color);
 }
 </style>

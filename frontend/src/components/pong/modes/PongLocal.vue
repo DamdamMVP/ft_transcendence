@@ -28,6 +28,15 @@
                 class="name-input"
               />
             </div>
+            <div class="bonus-option">
+              <label>
+                <input
+                  type="checkbox"
+                  v-model="bonusModeEnabled"
+                />
+                {{ t('pong.game.enableBonus') }}
+              </label>
+            </div>
             <button
               @click="startGame"
               :disabled="!canStart"
@@ -61,6 +70,7 @@ const countdownValue = ref(3)
 const playerScore = ref(0)
 const player2Score = ref(0)
 const winner = ref('')
+const bonusModeEnabled = ref(false)
 
 // Player names
 const playerName = ref(authStore.user?.username || '')
@@ -76,7 +86,7 @@ let scoreTimeout = null
 function startGame() {
   if (!canStart.value) return
 
-  gameEngine.value = new GameEngine()
+  gameEngine.value = new GameEngine(undefined, undefined, bonusModeEnabled.value)
   gamePhase.value = 'countdown'
   launchGame()
 }
@@ -284,5 +294,25 @@ onUnmounted(() => {
 .start-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.bonus-option {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bonus-option label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.bonus-option input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer;
 }
 </style>

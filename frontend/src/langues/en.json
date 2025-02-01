@@ -139,7 +139,8 @@
       "controls": "Controls",
       "player1": "Player 1",
       "player2": "Player 2",
-      "score": "Score"
+      "score": "Score",
+      "enableBonus": "Enable bonus"
     }
   },
   "catch": {

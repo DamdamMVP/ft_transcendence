@@ -1,11 +1,12 @@
 export class GameEngine {
-  constructor(canvasWidth = 800, canvasHeight = 450) {
+  constructor(canvasWidth = 800, canvasHeight = 450, bonusMode = false) {
     this.canvasWidth = canvasWidth
     this.canvasHeight = canvasHeight
     this.WINNING_SCORE = 5
     this.INITIAL_BALL_SPEED = 4
     this.BALL_SPEED_INCREASE = 1.1
     this.MAX_BALL_SPEED = 10
+    this.bonusMode = bonusMode
 
     // Bonus constants
     this.BONUS_SPAWN_INTERVAL = 4000
@@ -197,24 +198,27 @@ export class GameEngine {
       this.gameState.player2.y += this.gameState.player2.speed
     }
 
-    // Spawn bonus
-    const now = Date.now()
-    if (now - this.gameState.lastBonusSpawnTime > this.BONUS_SPAWN_INTERVAL) {
-      this.spawnBonusBar()
-      this.gameState.lastBonusSpawnTime = now
-    }
+    // Bonus logic - only if bonusMode is enabled
+    if (this.bonusMode) {
+      // Spawn bonus
+      const now = Date.now()
+      if (now - this.gameState.lastBonusSpawnTime > this.BONUS_SPAWN_INTERVAL) {
+        this.spawnBonusBar()
+        this.gameState.lastBonusSpawnTime = now
+      }
 
-    // Check bonus collisions
-    for (let i = this.gameState.bonusBars.length - 1; i >= 0; i--) {
-      const bar = this.gameState.bonusBars[i]
-      if (
-        this.gameState.ball.x + this.gameState.ball.radius >= bar.x &&
-        this.gameState.ball.x - this.gameState.ball.radius <= bar.x + bar.width &&
-        this.gameState.ball.y + this.gameState.ball.radius >= bar.y &&
-        this.gameState.ball.y - this.gameState.ball.radius <= bar.y + bar.height
-      ) {
-        this.applyBonusEffect(bar.color)
-        this.gameState.bonusBars.splice(i, 1)
+      // Check bonus collisions
+      for (let i = this.gameState.bonusBars.length - 1; i >= 0; i--) {
+        const bar = this.gameState.bonusBars[i]
+        if (
+          this.gameState.ball.x + this.gameState.ball.radius >= bar.x &&
+          this.gameState.ball.x - this.gameState.ball.radius <= bar.x + bar.width &&
+          this.gameState.ball.y + this.gameState.ball.radius >= bar.y &&
+          this.gameState.ball.y - this.gameState.ball.radius <= bar.y + bar.height
+        ) {
+          this.applyBonusEffect(bar.color)
+          this.gameState.bonusBars.splice(i, 1)
+        }
       }
     }
 
@@ -310,11 +314,13 @@ export class GameEngine {
       this.gameState.player2.height
     )
 
-    // Draw bonus bars
-    this.gameState.bonusBars.forEach((bar) => {
-      ctx.fillStyle = bar.color
-      ctx.fillRect(bar.x, bar.y, bar.width, bar.height)
-    })
+    // Draw bonus bars only if bonusMode is enabled
+    if (this.bonusMode) {
+      this.gameState.bonusBars.forEach((bar) => {
+        ctx.fillStyle = bar.color
+        ctx.fillRect(bar.x, bar.y, bar.width, bar.height)
+      })
+    }
 
     // Draw ball
     ctx.beginPath()

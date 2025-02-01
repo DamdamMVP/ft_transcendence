@@ -8,6 +8,15 @@
         <h3>{{ t('pong.tournament.nextMatch') }}</h3>
         <p>{{ currentMatch.player1 }} vs {{ currentMatch.player2 }}</p>
       </div>
+      <div v-if="gamePhase === 'menu'" class="bonus-option">
+        <label>
+          <input
+            type="checkbox"
+            v-model="bonusModeEnabled"
+          />
+          {{ t('pong.game.enableBonus') }}
+        </label>
+      </div>
       <button
         v-if="
           gamePhase === 'menu' ||
@@ -81,6 +90,7 @@ const winners = ref(['', ''])
 const tournamentWinner = ref('')
 const currentMatchIndex = ref(0)
 const currentMatch = ref({ player1: '', player2: '', round: 'semi' })
+const bonusModeEnabled = ref(false)
 
 // État du jeu
 const gameCanvasRef = ref(null)
@@ -137,7 +147,7 @@ function startNextMatch() {
   nextTick(() => {
     const canvas = gameCanvasRef.value?.canvas
     if (canvas) {
-      gameEngine.value = new GameEngine(canvas.width, canvas.height)
+      gameEngine.value = new GameEngine(canvas.width, canvas.height, bonusModeEnabled.value)
       // Forcer une première frame pour s'assurer que tout est initialisé
       const ctx = canvas.getContext('2d')
       gameEngine.value.drawGame(ctx)
@@ -423,5 +433,26 @@ onUnmounted(() => {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
+}
+
+.bonus-option {
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bonus-option label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--text-color);
+}
+
+.bonus-option input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer;
 }
 </style>
