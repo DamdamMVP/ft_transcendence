@@ -42,6 +42,8 @@ cd ft_transcendence
 - 🔑 Connexion / Inscription
 - 🎓 Connexion avec l'API 42
 
+![Affichage du login](readme/login.gif)
+
 ### 2. 🏓 Pong
 
 - 👥 Jouer en local 1vs1
