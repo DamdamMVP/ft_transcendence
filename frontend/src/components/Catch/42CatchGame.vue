@@ -21,24 +21,6 @@
         <img :src="playerIconImage" class="mouse" :style="mouseStyle" />
         <img src="@/assets/blackhole.png" class="cat" :style="catStyle" />
         <img src="@/assets/succes.png" class="cheese" :style="cheeseStyle" />
-        <div
-          class="wall vertical"
-          :style="{
-            left: '240px',
-            top: '150px',
-            height: '240px',
-            width: '8px',
-          }"
-        ></div>
-        <div
-          class="wall vertical"
-          :style="{
-            left: '720px',
-            top: '150px',
-            height: '240px',
-            width: '8px',
-          }"
-        ></div>
         <div v-if="isPaused" class="pause-message">
           {{ $t('catch.capture') }} 🎯
         </div>
@@ -63,11 +45,6 @@
         <div v-if="gameStarted || gameOver" class="player-score">
           {{ $t('catch.score') }}: {{ catScore }}
         </div>
-      </div>
-    </div>
-    <div v-if="gameStarted" class="timer-container">
-      <div class="timer">
-        {{ gameOver ? $t('catch.timeElapsed') : '' }}
       </div>
     </div>
   </div>
@@ -175,17 +152,6 @@ export default {
       this.pressedKeys.delete(event.key.toLowerCase())
     },
     checkWallCollision(pos) {
-      const playerSize = 20
-      for (const wall of this.walls) {
-        if (
-          pos.x < wall.x + wall.width &&
-          pos.x + playerSize > wall.x &&
-          pos.y < wall.y + wall.height &&
-          pos.y + playerSize > wall.y
-        ) {
-          return true
-        }
-      }
       return false
     },
     updatePositions() {
@@ -369,7 +335,6 @@ export default {
     startGame() {
       this.spawnCheese()
       this.gameLoop = setInterval(this.updatePositions, 20)
-      this.timer = setInterval(this.updateTimer, 1000)
       this.$refs.gameContainer.focus()
     },
     endGame(winner) {
@@ -490,8 +455,7 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.player-score,
-.timer {
+.player-score {
   font-size: 18px;
   color: #2c3e50;
   font-weight: bold;
