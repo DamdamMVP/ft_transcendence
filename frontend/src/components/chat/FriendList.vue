@@ -206,6 +206,7 @@ const showNotification = (message, type = 'error') => {
   bottom: 20px;
   right: 20px;
   z-index: 1000;
+  animation: fadeIn 0.6s ease;
 }
 
 .message-icon {
@@ -218,7 +219,7 @@ const showNotification = (message, type = 'error') => {
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s;
+  transition: transform 0.2s, background-color 0.2s;
 }
 
 .message-icon:hover {
@@ -245,6 +246,7 @@ const showNotification = (message, type = 'error') => {
   justify-content: center;
   font-size: 12px;
   font-weight: bold;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .friend-list {
@@ -254,8 +256,14 @@ const showNotification = (message, type = 'error') => {
   width: 400px;
   background-color: var(--background-color);
   border: 1px solid var(--secondary-color);
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.friend-list--expanded {
+  max-height: 500px;
 }
 
 .friend-list__header {
@@ -266,7 +274,7 @@ const showNotification = (message, type = 'error') => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 8px 8px 0 0;
+  border-radius: 12px 12px 0 0;
 }
 
 .friend-list__title {
@@ -292,16 +300,19 @@ const showNotification = (message, type = 'error') => {
   color: white;
   cursor: pointer;
   padding: 8px;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
 .friend-list__add-btn:hover {
   background-color: var(--primary-hover-color);
+  transform: scale(1.05);
 }
 
 .friend-list__content {
   max-height: 400px;
   overflow-y: auto;
   padding: 10px;
+  animation: fadeIn 0.6s ease;
 }
 
 .friend-list__search input,
@@ -314,6 +325,12 @@ const showNotification = (message, type = 'error') => {
   background-color: var(--background-color);
   color: var(--text-color);
   box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.friend-list__search input:focus,
+.friend-list__add input:focus {
+  border-color: var(--primary-color);
 }
 
 .friend-list__friends {
@@ -323,7 +340,6 @@ const showNotification = (message, type = 'error') => {
 .friend-list__add {
   display: flex;
   gap: 8px;
-  padding-top: 10px;
 }
 
 .friend-list__add-icon {
@@ -334,5 +350,15 @@ const showNotification = (message, type = 'error') => {
 
 .friend-list__channels {
   padding: 0px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>
