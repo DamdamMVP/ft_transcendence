@@ -118,7 +118,8 @@ export default {
       gameOver: false,
       gameStarted: false,
       gameLoop: null,
-      moveSpeed: 12,
+      mouseSpeed: 12,
+      catSpeed: 12,
       catchDistance: 30,
       timeLeft: 40,
       timer: null,
@@ -190,26 +191,26 @@ export default {
       let mouseMove = { x: 0, y: 0 }
 
       if (this.pressedKeys.has('w')) {
-        newMouseY = Math.max(spriteSize, this.mousePos.y - this.moveSpeed)
-        mouseMove.y = -this.moveSpeed
+        newMouseY = Math.max(spriteSize, this.mousePos.y - this.mouseSpeed)
+        mouseMove.y = -this.mouseSpeed
       }
       if (this.pressedKeys.has('s')) {
         newMouseY = Math.min(
           this.boardHeight - spriteSize,
-          this.mousePos.y + this.moveSpeed
+          this.mousePos.y + this.mouseSpeed
         )
-        mouseMove.y = this.moveSpeed
+        mouseMove.y = this.mouseSpeed
       }
       if (this.pressedKeys.has('a')) {
-        newMouseX = Math.max(spriteSize, this.mousePos.x - this.moveSpeed)
-        mouseMove.x = -this.moveSpeed
+        newMouseX = Math.max(spriteSize, this.mousePos.x - this.mouseSpeed)
+        mouseMove.x = -this.mouseSpeed
       }
       if (this.pressedKeys.has('d')) {
         newMouseX = Math.min(
           this.boardWidth - spriteSize,
-          this.mousePos.x + this.moveSpeed
+          this.mousePos.x + this.mouseSpeed
         )
-        mouseMove.x = this.moveSpeed
+        mouseMove.x = this.mouseSpeed
       }
 
       let newCatX = this.catPos.x
@@ -217,26 +218,26 @@ export default {
       let catMove = { x: 0, y: 0 }
 
       if (this.pressedKeys.has('8')) {
-        newCatY = Math.max(spriteSize, this.catPos.y - this.moveSpeed)
-        catMove.y = -this.moveSpeed
+        newCatY = Math.max(spriteSize, this.catPos.y - this.catSpeed)
+        catMove.y = -this.catSpeed
       }
       if (this.pressedKeys.has('5')) {
         newCatY = Math.min(
           this.boardHeight - spriteSize,
-          this.catPos.y + this.moveSpeed
+          this.catPos.y + this.catSpeed
         )
-        catMove.y = this.moveSpeed
+        catMove.y = this.catSpeed
       }
       if (this.pressedKeys.has('4')) {
-        newCatX = Math.max(spriteSize, this.catPos.x - this.moveSpeed)
-        catMove.x = -this.moveSpeed
+        newCatX = Math.max(spriteSize, this.catPos.x - this.catSpeed)
+        catMove.x = -this.catSpeed
       }
       if (this.pressedKeys.has('6')) {
         newCatX = Math.min(
           this.boardWidth - spriteSize,
-          this.catPos.x + this.moveSpeed
+          this.catPos.x + this.catSpeed
         )
-        catMove.x = this.moveSpeed
+        catMove.x = this.catSpeed
       }
 
       if (!this.checkWallCollision({ x: newMouseX, y: newMouseY })) {
