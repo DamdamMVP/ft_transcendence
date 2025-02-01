@@ -495,6 +495,11 @@ export default {
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
+.cat {
+  width: 50px;
+  height: 50px;
+}
+
 .cheese {
   position: absolute;
   width: 35px;
