@@ -56,10 +56,11 @@ export default {
 <style scoped>
 .catch-game {
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
+  /* Supprimer height: 100vh car cela prend tout l'écran */
+  /* Remplacer position: fixed par position: absolute */
+  position: absolute;
+  /* Ajuster le top pour laisser de l'espace pour la navbar */
+  top: var(--navbar-height, 60px); /* Utiliser la variable CSS de hauteur de navbar ou une valeur par défaut */
   left: 0;
   right: 0;
   bottom: 0;
@@ -71,6 +72,7 @@ export default {
 
 .guest-form-container {
   position: absolute;
+  /* Ajuster également le conteneur du formulaire */
   top: 0;
   left: 0;
   width: 100%;
