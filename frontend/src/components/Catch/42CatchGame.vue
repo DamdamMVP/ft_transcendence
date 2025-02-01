@@ -24,7 +24,7 @@
         :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }"
       >
         <img :src="playerIconImage" class="mouse" :style="mouseStyle" />
-        <img src="@/assets/blackhole.png" class="cat" :style="catStyle" />
+        <img src="@/assets/blackhole.gif" class="cat" :style="catStyle" />
         <img src="@/assets/succes.png" class="cheese" :style="cheeseStyle" />
         <div v-if="isPaused" class="pause-message">
           {{ $t('catch.capture') }} 🎯
@@ -104,7 +104,7 @@ export default {
       gameLoop: null,
       mouseSpeed: 12,
       catSpeed: 1,
-      catchDistance: 30,
+      catchDistance: 40,
       timer: null,
       winner: '',
       pressedKeys: new Set(),
@@ -170,7 +170,7 @@ export default {
 
       let newMouseX = this.mousePos.x
       let newMouseY = this.mousePos.y
-      const spriteSize = 15
+      const spriteSize = 40
       let mouseMove = { x: 0, y: 0 }
 
       if (this.pressedKeys.has('w')) {
@@ -491,10 +491,11 @@ export default {
 }
 
 .mouse,
-.cat {
+.cat,
+.cheese {
   position: absolute;
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   transform: translate(-50%, -50%);
   transition: all 0.05s linear;
   object-fit: contain;
@@ -506,18 +507,6 @@ export default {
 
 .cat {
   z-index: 1;
-}
-
-.cheese {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  user-select: none;
-  transition: all 0.05s linear;
 }
 
 .game-over-text {
