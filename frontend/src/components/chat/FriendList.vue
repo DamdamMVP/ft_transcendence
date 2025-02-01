@@ -9,7 +9,7 @@
 
     <!-- Icône de message flottante -->
     <div class="message-icon" @click="toggleExpand">
-      <span class="material-icons">chat</span>
+      <span class="material-icons">🗪</span>
       <div v-if="onlineFriendsCount" class="online-badge">
         {{ onlineFriendsCount }}
       </div>

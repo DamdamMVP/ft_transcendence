@@ -91,18 +91,18 @@
     "chat": "Flapañ",
     "delete": "Dilemel",
     "icons": {
-      "chat": "flapañ",
-      "block": "stankañ",
-      "delete": "dilemel",
-      "profile": "profil"
+        "chat": "🗪",
+        "block": "🚫",
+        "delete": "🗑",
+        "profile": "👤"
     },
     "profile": "Ver perfil"
   },
   "chat": {
     "typemessage": "Skrivit ho kemennadenn...",
-    "send": "Kas",
+    "send": "ᯓ➤",
     "close": "Serriñ",
-	"play": "Jouer",
+	"play": "🎮",
     "invite": "Deuit da c'hoari Pong lec'hel ganin !"
   },
   "stats": {

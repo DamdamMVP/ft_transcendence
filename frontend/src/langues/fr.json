@@ -97,17 +97,17 @@
     "profile": "Voir le profil",
     "delete": "Supprimer",
     "icons": {
-      "chat": "chat",
-      "block": "bloquer",
-      "delete": "supprimer",
-      "profile": "profil"
+      "chat": "🗪",
+      "block": "🚫",
+      "delete": "🗑",
+      "profile": "👤"
     }
   },
   "chat": {
     "typemessage": "Écrivez votre message...",
-    "send": "Envoyer",
+    "send": "ᯓ➤",
     "close": "Fermer",
-	"play": "Jouer",
+	"play": "🎮",
     "invite": "Viens jouer au Pong local avec moi !"
   },
   "stats": {

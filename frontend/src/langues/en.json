@@ -97,17 +97,17 @@
     "profile": "View profile",
     "delete": "Delete",
     "icons": {
-      "chat": "chat",
-      "block": "block",
-      "delete": "delete",
-      "profile": "person"
+        "chat": "🗪",
+        "block": "🚫",
+        "delete": "🗑",
+        "profile": "👤"
     }
   },
   "chat": {
     "typemessage": "Type your message...",
-    "send": "Send",
+    "send": "ᯓ➤",
     "close": "Close",
-	"jouer": "Play",
+	"jouer": "🎮",
     "invite": "Come play local Pong with me!"
   },
   "stats": {
