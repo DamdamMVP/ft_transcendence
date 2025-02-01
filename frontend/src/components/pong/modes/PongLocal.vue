@@ -424,22 +424,23 @@ h2 {
 }
 
 .bonus-option {
-  margin: 1rem 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-.bonus-option label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
+  margin-top: 1rem;
+  animation: fadeInUp 0.6s ease;
 }
 
 .bonus-option input[type="checkbox"] {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.bonus-option label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
   cursor: pointer;
 }
 </style>

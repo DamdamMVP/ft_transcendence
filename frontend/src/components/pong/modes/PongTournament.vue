@@ -300,33 +300,46 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 65vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
   padding: 2rem;
-  gap: 2rem;
+  background: var(--background-color);
+  animation: fadeIn 0.6s ease;
 }
 
 .controls-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .winner-announcement {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 2.5rem;
+  font-weight: 800;
   color: var(--primary-color);
-}
-
-.next-match-info {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--primary-color);
+  text-shadow: 0 0 15px var(--primary-color);
+  animation: float 3s ease-in-out infinite;
   text-align: center;
 }
 
+.next-match-info {
+  text-align: center;
+  animation: fadeInUp 0.6s ease;
+}
+
+.next-match-info h3 {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
 .next-match-info p {
-  font-size: 1rem;
-  font-weight: normal;
+  font-size: 1.5rem;
   color: var(--text-color);
 }
 
@@ -337,6 +350,20 @@ onUnmounted(() => {
   gap: 1rem;
   padding: 2rem;
   margin: 0 auto;
+}
+
+.match-box {
+  width: 200px;
+  height: 40px;
+  border: 2px solid var(--primary-color);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-color);
+  color: var(--text-color);
+  position: relative;
+  animation: fadeInUp 0.6s ease;
 }
 
 /* Positionnement des boîtes dans la grille */
@@ -362,19 +389,6 @@ onUnmounted(() => {
 
 .match-box:nth-child(7) {
   grid-area: 4 / 5 / 5 / 6;
-}
-
-.match-box {
-  width: 200px;
-  height: 40px;
-  border: 2px solid var(--primary-color);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--background-color);
-  color: var(--text-color);
-  position: relative;
 }
 
 /* Connecteurs horizontaux */
@@ -417,11 +431,38 @@ onUnmounted(() => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.6s ease;
 }
 
 .next-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  background: var(--primary-hover-color);
+  transform: translateY(-8px) scale(1.02);
+  background: var(--background-hover-color);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+}
+
+.bonus-option {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+  animation: fadeInUp 0.6s ease;
+}
+
+.bonus-option input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+}
+
+.bonus-option label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
 }
 
 .next-button:disabled {
@@ -463,47 +504,5 @@ onUnmounted(() => {
   to {
     opacity: 1;
   }
-}
-.tournament-mode {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 65vh;
-  width: 100%;
-  position: relative;
-  overflow: hidden;
-  padding: 2rem;
-  background: var(--background-color);
-  animation: fadeIn 0.6s ease;
-}
-
-/* Contrôles centraux */
-.controls-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.winner-announcement {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: var(--primary-color);
-  text-shadow: 0 0 15px var(--primary-color);
-  animation: float 3s ease-in-out infinite;
-  text-align: center;
-}
-
-.next-match-info {
-  text-align: center;
-  animation: fadeInUp 0.6s ease;
-}
-
-.next-match-info h3 {
-  font-size: 2rem;
-  color: var(--primary-color);
-  margin-bottom: 1rem;
-  text-shadow: 0 0 10px var(--primary-color);
 }
 </style>

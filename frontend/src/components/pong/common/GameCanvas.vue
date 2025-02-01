@@ -124,7 +124,8 @@ defineExpose({
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  aspect-ratio: 16/9;
+  aspect-ratio: 16 / 9;
+  animation: fadeInUp 0.6s ease;
 }
 
 .game-canvas {
@@ -132,22 +133,37 @@ defineExpose({
   height: 100%;
   background: var(--background-color);
   border: 2px solid var(--primary-color);
-  border-radius: 4px;
+  border-radius: 10px;
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-canvas:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px var(--primary-shadow-color);
 }
 
 .score-board {
   display: flex;
   justify-content: space-around;
   margin-top: 20px;
+  animation: fadeInUp 0.6s ease backwards;
 }
 
 .player {
   text-align: center;
   width: 150px;
-  background: var(--background-color);
+  background: var(--background-secondary-color);
   padding: 10px;
-  border-radius: 6px;
+  border-radius: 10px;
   border: 1px solid var(--primary-color);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+  transition: transform 0.3s ease;
+}
+
+.player:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
 }
 
 .score {
@@ -170,22 +186,25 @@ defineExpose({
   justify-content: center;
   align-items: center;
   background: rgba(0, 0, 0, 0.7);
-  border-radius: 4px;
+  border-radius: 10px;
+  animation: fadeIn 0.6s ease;
 }
 
 .menu-content,
 .game-over {
-  background: var(--background-color);
+  background: var(--background-secondary-color);
   padding: 2rem;
-  border-radius: 8px;
+  border-radius: 10px;
   border: 2px solid var(--primary-color);
   text-align: center;
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
 }
 
 .countdown {
   font-size: 6rem;
   font-weight: bold;
   color: var(--primary-color);
+  text-shadow: 0 0 15px var(--primary-color);
 }
 
 .start-button,
@@ -194,16 +213,20 @@ defineExpose({
   background: var(--primary-color);
   color: var(--text-color);
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
   margin-top: 1rem;
-  transition: background-color 0.2s;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
 }
 
 .start-button:hover,
 .close-button:hover {
-  background: var(--primary-hover-color);
+  transform: translateY(-5px);
+  background: var(--background-hover-color);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
 }
 
 .name {
@@ -222,5 +245,35 @@ defineExpose({
   color: var(--text-color);
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 </style>
