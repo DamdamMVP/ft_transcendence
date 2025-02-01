@@ -48,6 +48,8 @@ cd ft_transcendence
 - 🤖 Jouer contre l'IA
 - 🏆 Jouer dans un tournoi
 
+![Affichage du pong](readme/pong.gif)
+
 ### 3. 🎯 Catch
 
 - 👥 Jouer en local 1vs1
