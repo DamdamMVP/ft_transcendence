@@ -84,7 +84,7 @@ export default {
 
 .guest-form {
   background-color: var(--surface-color);
-  padding: 2rem;
+  padding: 2.5rem;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   text-align: center;
@@ -93,45 +93,45 @@ export default {
 }
 
 h1 {
+  margin-bottom: 1.5rem;
   color: var(--primary-color);
   font-size: 1.8rem;
-  margin-bottom: 1.5rem;
 }
 
 h2 {
-  color: var(--text-color);
-  font-size: 1.2rem;
   margin-bottom: 1.5rem;
+  font-size: 1.2rem;
+  color: var(--text-color);
 }
 
 .guest-input {
   width: 100%;
   padding: 0.8rem;
-  margin-bottom: 1rem;
+  margin: 1.5rem 0;
   border: 2px solid var(--border-color);
-  border-radius: 6px;
-  background: var(--background-color);
-  color: var(--text-color);
+  border-radius: 5px;
   font-size: 1rem;
-}
-
-.guest-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
+  background-color: var(--input-background);
+  color: var(--text-color);
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .submit-btn {
-  background: var(--primary-color);
-  color: white;
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 1.5rem;
   border: none;
-  padding: 0.8rem 2rem;
-  border-radius: 6px;
+  border-radius: 5px;
+  background-color: var(--primary-color);
+  color: white;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background-color 0.2s;
+  box-sizing: border-box;
 }
 
 .submit-btn:hover {
-  background: var(--primary-hover-color);
+  background-color: var(--primary-color-hover);
 }
 </style>
