@@ -1,84 +1,87 @@
 <template>
-  <div class="catch-menu">
+  <div class="catch-home">
     <h1>CATCH</h1>
-    <div class="menu-container">
-      <router-link to="/catch/tomandjerry" class="menu-item">
-        <div class="menu-box">
-          <h2>Tom & Jerry</h2>
-          <p>Chat contre souris</p>
-        </div>
-      </router-link>
+    <div class="game-modes">
+      <button @click="selectMode('tomandjerry')" class="mode-button">
+        <h2>Tom & Jerry</h2>
+        <p>Chat contre souris</p>
+      </button>
 
-      <router-link to="/catch/fortytwo" class="menu-item">
-        <div class="menu-box">
-          <h2>42</h2>
-          <p>Version 42</p>
-        </div>
-      </router-link>
+      <button @click="selectMode('fortytwo')" class="mode-button">
+        <h2>42</h2>
+        <p>Version 42</p>
+      </button>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'HomeCatch'
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const selectedMode = ref(null)
+
+const selectMode = (mode) => {
+  selectedMode.value = mode
+  router.push(`/catch/${mode}`)
 }
 </script>
 
 <style scoped>
-.catch-menu {
+.catch-home {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background-color: #1a1a1a;
-  color: white;
+  min-height: 65vh;
+  background: var(--background-color);
+  color: var(--text-color);
   width: 100%;
 }
 
 h1 {
-  color: #3498db;
   font-size: 3rem;
   margin-bottom: 2rem;
+  color: var(--primary-color);
 }
 
-.menu-container {
-  display: flex;
+.game-modes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 2rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  padding: 0 2rem;
+  width: 100%;
+  max-width: 1200px;
+  justify-items: center;
 }
 
-.menu-item {
-  text-decoration: none;
-  color: white;
-}
-
-.menu-box {
-  background-color: #2c3e50;
-  border: 2px solid #3498db;
-  border-radius: 8px;
+.mode-button {
+  background: var(--background-secondary-color);
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
   padding: 2rem;
-  width: 250px;
-  text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.menu-box:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+  color: var(--text-color);
   cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  width: 100%;
+  max-width: 350px;
 }
 
-h2 {
+.mode-button:hover {
+  transform: translateY(-5px);
+  background: var(--background-hover-color);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+}
+
+.mode-button h2 {
   margin: 0 0 1rem 0;
-  color: #3498db;
+  color: var(--primary-color);
 }
 
-p {
+.mode-button p {
   margin: 0;
-  color: #95a5a6;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 </style>
