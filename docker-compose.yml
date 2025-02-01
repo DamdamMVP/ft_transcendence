@@ -24,11 +24,11 @@ services:
     ports:
       - '8000:8000'
     environment:
-      - PG_USER=postgres
-      - PG_PASSWORD=postgres
-      - PG_DB=postgres
-      - PG_PORT=5432
-      - PG_HOST=db
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_DB=${PG_DB}
+      - PG_PORT=${PG_PORT}
+      - PG_HOST=${PG_HOST}
       - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
@@ -48,9 +48,9 @@ services:
     container_name: db
     image: postgres:13
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - HOSTNAME=${HOSTNAME}
     ports:
       - '5432:5432'
