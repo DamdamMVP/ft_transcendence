@@ -146,6 +146,7 @@
   "catch": {
     "title": "Catch me if you can",
     "enterGuestName": "Enter second player's username",
+    "selectPlayerIcon": "Character selection (1st player)",
     "player2Placeholder": "Player 2 username",
     "player1Default": "Player 1",
     "start": "Start",

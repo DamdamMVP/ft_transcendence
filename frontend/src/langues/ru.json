@@ -162,6 +162,7 @@
   "catch": {
     "title": "Поймай меня, если сможешь",
     "enterGuestName": "Введите имя второго игрока",
+    "selectPlayerIcon": "Выбор персонажа (1-й игрок)",
     "player2Placeholder": "Имя игрока 2",
     "player1Default": "Игрок 1",
     "start": "Начать",

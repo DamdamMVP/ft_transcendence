@@ -138,6 +138,7 @@
   "catch": {
     "title": "Tap ac'hanon mar gellez",
     "enterGuestName": "Ebarzhit anv an eil c'hoarier",
+    "selectPlayerIcon": "Dibab personaj (1añ c'hoarier)",
     "player2Placeholder": "Anv c'hoarier 2",
     "player1Default": "C'hoarier 1",
     "start": "Kregiñ",
