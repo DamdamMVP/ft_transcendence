@@ -67,11 +67,7 @@
     </div>
     <div v-if="gameStarted" class="timer-container">
       <div class="timer">
-        {{
-          gameOver
-            ? $t('catch.timeElapsed')
-            : $t('catch.timeRemaining', { time: timeLeft })
-        }}
+        {{ gameOver ? $t('catch.timeElapsed') : '' }}
       </div>
     </div>
   </div>
@@ -130,7 +126,6 @@ export default {
       mouseSpeed: 12,
       catSpeed: 1,
       catchDistance: 30,
-      timeLeft: 40,
       timer: null,
       winner: '',
       pressedKeys: new Set(),
@@ -320,34 +315,32 @@ export default {
       }
     },
     spawnCheese() {
-      const margin = 30
-      let newPos
+      const margin = 30;
+      let newPos;
       do {
         newPos = {
           x: margin + Math.random() * (this.boardWidth - 2 * margin),
           y: margin + Math.random() * (this.boardHeight - 2 * margin),
-        }
-      } while (this.checkWallCollision(newPos))
+        };
+      } while (this.checkWallCollision(newPos));
 
-      this.cheesePos = newPos
+      this.cheesePos = newPos;
     },
     checkCheeseCollection() {
-      if (!this.cheesePos) return
+      if (!this.cheesePos) return;
 
-      const dx = this.mousePos.x - this.cheesePos.x
-      const dy = this.mousePos.y - this.cheesePos.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
+      const dx = this.mousePos.x - this.cheesePos.x;
+      const dy = this.mousePos.y - this.cheesePos.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
       if (distance < 30) {
-        this.mouseScore++
+        this.mouseScore++;
         if (this.isOvertime) {
-          this.endGame('mouse')
-          return
+          this.endGame('mouse');
+          return;
         }
-        this.cheesePos = null
-        setTimeout(() => {
-          this.spawnCheese()
-        }, 1500)
+        this.cheesePos = null;
+        this.spawnCheese();
       }
     },
     resetPositions() {
@@ -379,33 +372,12 @@ export default {
       this.timer = setInterval(this.updateTimer, 1000)
       this.$refs.gameContainer.focus()
     },
-    updateTimer() {
-      if (
-        this.timeLeft > 0 &&
-        !this.isPaused &&
-        this.gameStarted &&
-        this.countdown == null
-      ) {
-        this.timeLeft--
-      } else if (this.timeLeft <= 0 && !this.isPaused && this.gameStarted) {
-        if (this.mouseScore === this.catScore) {
-          this.isOvertime = true
-          this.winner = 'Prolongation! Premier point gagne!'
-        } else {
-          this.endGame(this.mouseScore > this.catScore ? 'mouse' : 'cat')
-        }
-      }
-    },
     endGame(winner) {
       this.gameStarted = false
       this.gameOver = true
       if (this.gameLoop) {
         clearInterval(this.gameLoop)
         this.gameLoop = null
-      }
-      if (this.timer) {
-        clearInterval(this.timer)
-        this.timer = null
       }
 
       if (winner === 'cat') {
@@ -422,7 +394,6 @@ export default {
       this.catPos = { x: 900, y: 500 }
       this.mouseScore = 0
       this.catScore = 0
-      this.timeLeft = 40
       this.gameOver = false
       this.winner = ''
       this.pressedKeys.clear()
@@ -447,9 +418,6 @@ export default {
   beforeDestroy() {
     if (this.gameLoop) {
       clearInterval(this.gameLoop)
-    }
-    if (this.timer) {
-      clearInterval(this.timer)
     }
     window.removeEventListener('keydown', this.handleKeyPress)
     window.removeEventListener('keyup', this.handleKeyUp)
