@@ -18,6 +18,7 @@ urlpatterns = [
     path('update_password/<str:pk>', views.updatePassword),
     path('update_language/<str:pk>', views.updateLanguage),
     path('update_theme/<str:pk>', views.updateTheme),
+    path('anonymise', views.anonymiseUser),
 
     path('histories', history.getHistories, name='get_histories'),
     path('histories/user/<int:user_id>', history.getUserHistory, name='get_user_history'),

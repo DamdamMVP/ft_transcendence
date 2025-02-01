@@ -26,6 +26,19 @@ def online_users(request):
     return Response({"online_users": list(online_users)}, status=200)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def anonymiseUser(request):
+    user = request.user
+    if not user:
+        return Response({"error": "User not found"}, status=404)
+    if user.username == "Anonymous":
+        return Response({"error": "User is already anonymized"}, status=400)
+    user.username = f"Anonymous_{user.id}"
+    user.email = f"anonymous_{user.id}@gmail.com"
+    user.save()
+    return Response({"message": "User anonymized successfully"}, status=200)
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

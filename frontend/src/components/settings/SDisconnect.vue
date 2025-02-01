@@ -9,6 +9,7 @@ const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
 const router = useRouter()
 const showDeleteConfirm = ref(false)
+const showAnonymizeConfirm = ref(false)
 
 const deleteAccount = async () => {
   try {
@@ -35,6 +36,30 @@ const deleteAccount = async () => {
   }
 }
 
+const anonymizeAccount = async () => {
+  try {
+    const response = await axios.post(
+      `/users/anonymise`,
+      { withCredentials: true }
+    )
+    if (response.data?.message === 'User anonymized successfully') {
+      emit('showNotification', {
+        message: 'Compte anonymisé avec succès',
+        type: 'success'
+      })
+      await authStore.logout()
+      showAnonymizeConfirm.value = false
+      router.push('/')
+    }
+  } catch (error) {
+    emit('showNotification', {
+      message: error.response?.data?.error || 'Erreur lors de l\'anonymisation du compte',
+      type: 'error'
+    })
+    showAnonymizeConfirm.value = false
+  }
+}
+
 const handleLogout = async () => {
   await authStore.logout()
   router.push('/')
@@ -45,6 +70,9 @@ const handleLogout = async () => {
   <div class="buttons-container">
     <button class="delete-button" @click="showDeleteConfirm = true">
       <i class="icon-delete"></i>{{ $t('settings.deleteAccount') }}
+    </button>
+    <button class="anonymize-button" @click="showAnonymizeConfirm = true">
+      <i class="icon-anonymize"></i>{{ $t('settings.anonymizeAccount') }}
     </button>
     <button class="logout-button" @click="handleLogout">
       <i class="icon-logout"></i>{{ $t('settings.logout') }}
@@ -67,6 +95,20 @@ const handleLogout = async () => {
       </div>
     </div>
   </div>
+  <div v-if="showAnonymizeConfirm" class="modal-overlay" @click="showAnonymizeConfirm = false">
+    <div class="modal-content" @click.stop>
+      <h3>{{ $t('settings.anonymizeAccount') }}</h3>
+      <p class="confirm-text">{{ $t('settings.anonymizeConfirm') }}</p>
+      <div class="modal-buttons">
+        <button class="anonymize-button" @click="anonymizeAccount">
+          {{ $t('settings.anonymizeAccountConfirm') }}
+        </button>
+        <button class="cancel-button" @click="showAnonymizeConfirm = false">
+          {{ $t('settings.cancel') }}
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -79,6 +121,7 @@ const handleLogout = async () => {
 }
 
 .delete-button,
+.anonymize-button,
 .logout-button,
 .cancel-button {
   min-width: 160px;
@@ -95,12 +138,14 @@ const handleLogout = async () => {
   gap: 8px;
 }
 
-.delete-button {
+.delete-button,
+.anonymize-button {
   background: var(--error-color);
   color: white;
 }
 
-.delete-button:hover {
+.delete-button:hover,
+.anonymize-button:hover {
   background: var(--error-hover-color);
 }
 

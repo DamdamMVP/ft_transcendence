@@ -76,6 +76,9 @@
     "deleteAccountConfirm": "Oui, supprimer mon compte",
     "cancel": "Annuler",
     "accountDeleted": "Compte supprimé avec succès",
+    "anonymizeAccount": "Anonymiser le compte",
+    "anonymizeAccountConfirm": "Oui, anonymiser mon compte",
+    "anonymizeConfirm": "Êtes-vous sûr de vouloir anonymiser votre compte ? cette action est irréversible.",
     "logout": "Se déconnecter",
     "enable2FA": "Activer la 2FA",
     "disable2FA": "Désactiver la 2FA",
@@ -193,5 +196,11 @@
     "unknownError": "Une erreur inattendue s'est produite",
     "invalidCode": "Code invalide",
     "invalidCredentials": "Identifiants invalides"
+  },
+  "gdpr": {
+    "title": "Consentement RGPD",
+    "message": "En créant un compte, vous acceptez notre politique RGPD et consentez au traitement de vos données personnelles. Sinon, votre compte ne sera pas créé.",
+    "accept": "Accepter",
+    "decline": "Refuser"
   }
 }
