@@ -52,7 +52,7 @@ class CookieJWTAuthentication(JWTAuthentication):
         response.set_cookie(
             key='access_token',
             value=access_token,
-            max_age=900,
+            max_age=3600 * 24,
             httponly=True,
             secure=True,
             samesite='None'
@@ -253,7 +253,7 @@ class TokenAuthMiddlewareHTTP(MiddlewareMixin):
                 httponly=True,
                 secure=not settings.DEBUG,  # True in production
                 samesite='None',
-                max_age=900  # 15 minutes, matching ACCESS_TOKEN_LIFETIME
+                max_age=3600 * 24  # 15 minutes, matching ACCESS_TOKEN_LIFETIME
             )
         
         return response

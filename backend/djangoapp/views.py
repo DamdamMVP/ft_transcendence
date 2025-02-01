@@ -70,7 +70,7 @@ def login(request):
             httponly=True,
             secure=True,
             samesite='None',
-            max_age=900 
+            max_age=3600 * 24  # 24 heures 
         )
         response.set_cookie(
             key='refresh_token',
@@ -78,7 +78,7 @@ def login(request):
             httponly=True,
             secure=True,
             samesite='None',
-            max_age=60 * 60 * 24 * 7  # 7 jours
+            max_age= 3600 * 24 * 7
         )
 
         return response
@@ -612,7 +612,7 @@ def fortytwo_callback(request):
     response.set_cookie(
         'access_token',
         access_token,
-        max_age=3600,
+        max_age=3600 * 24,
         httponly=True,
         samesite='Lax'
     )
