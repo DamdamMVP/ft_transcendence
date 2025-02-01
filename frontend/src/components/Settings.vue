@@ -60,46 +60,57 @@ const closeNotification = () => {
 .settings-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 2rem;
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2rem;
   color: var(--text-color);
+  animation: fadeIn 0.6s ease;
 }
 
 .setting-item {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  background: var(--background-color);
-  border-radius: 8px;
-  border: 1px solid var(--secondary-color);
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--background-secondary-color);
+  border-radius: 15px;
+  border: 2px solid var(--primary-color);
   width: 100%;
   box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 15px var(--primary-shadow-color);
+  backdrop-filter: blur(10px);
 }
 
-h2,
-h3 {
-  color: var(--text-color);
+.setting-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px var(--primary-shadow-color);
+}
+
+h2, h3 {
+  color: var(--primary-color);
   margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px var(--primary-shadow-color);
 }
 
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
   width: 100%;
   box-sizing: border-box;
 }
 
 .input-field {
-  padding: 8px 12px;
+  padding: 1rem;
   background: var(--background-color);
-  border: 2px solid var(--secondary-color);
-  border-radius: 4px;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
   color: var(--text-color);
-  font-size: 14px;
+  font-size: 1rem;
   transition: all 0.3s ease;
   width: 100%;
   box-sizing: border-box;
@@ -107,52 +118,100 @@ h3 {
 }
 
 .input-field:hover {
-  border-color: var(--primary-color);
+  border-color: var(--primary-hover-color);
+  box-shadow: 0 0 15px var(--primary-shadow-color);
 }
 
 .input-field:focus {
-  border-color: var(--info-color);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 20px var(--primary-shadow-color);
+  transform: translateY(-2px);
 }
 
 .select-field {
-  padding: 8px 12px;
+  padding: 1rem;
   background: var(--background-color);
-  border: 2px solid var(--secondary-color);
-  border-radius: 4px;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
   color: var(--text-color);
-  font-size: 14px;
+  font-size: 1rem;
   transition: all 0.3s ease;
   cursor: pointer;
 }
 
 .select-field:hover {
-  border-color: var(--primary-color);
+  border-color: var(--primary-hover-color);
+  box-shadow: 0 0 15px var(--primary-shadow-color);
 }
 
 .select-field:focus {
-  border-color: var(--info-color);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 20px var(--primary-shadow-color);
 }
 
 .save-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--primary-color);
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover-color));
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: bold;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-weight: 600;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
 }
 
 .save-button:hover {
-  background: var(--primary-hover-color);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px var(--primary-shadow-color);
+}
+
+.save-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 10px var(--primary-shadow-color);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .settings-container {
+    padding: 1rem;
+  }
+
+  .setting-item {
+    padding: 1rem;
+  }
+
+  h2, h3 {
+    font-size: 1.2rem;
+  }
+
+  .input-field,
+  .select-field,
+  .save-button {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
 }
 </style>
