@@ -9,12 +9,12 @@
 	  <div class="game-wrapper">
 		<div class="left-container">
 		  <div class="player-name">{{ playerUsername }}</div>
-		  <div class="scores-container">
+		  <div class="scores-container" v-if="gamePhase !== 'over'">
 			<div class="player-score">
 			  Exam {{ formatScore(mouseScore) }}
 			</div>
 			<div class="player-score">
-			  Pace {{ formatScore(catScore) }}
+			  Pace {{ (catScore) }}
 			</div>
 		  </div>
 		</div>
@@ -119,6 +119,7 @@ export default {
         { x: 240, y: 150, width: 8, height: 240 },
         { x: 720, y: 150, width: 8, height: 240 },
       ],
+      gamePhase: 'playing',
     }
   },
   computed: {
@@ -366,6 +367,7 @@ export default {
         this.catScore = 0
       }
 
+      this.gamePhase = 'over'
       this.saveGameHistory()
     },
     startNewGame() {
@@ -378,6 +380,7 @@ export default {
       this.winner = ''
       this.pressedKeys.clear()
       this.isOvertime = false
+      this.gamePhase = 'playing'
       this.startGame()
     },
     startCountdown() {
