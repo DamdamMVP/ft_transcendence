@@ -57,10 +57,10 @@
   </template>
 
 <script>
-import gamian from '../../assets/gamian.png'
-import thomian from '../../assets/thomian.png'
-import damian from '../../assets/damian.png'
-import { useAuthStore } from '../../stores/authStore'
+import gamian from '@/assets/gamian.png'
+import thomian from '@/assets/thomian.png'
+import damian from '@/assets/damian.png'
+import { useAuthStore } from '@/stores/authStore'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 

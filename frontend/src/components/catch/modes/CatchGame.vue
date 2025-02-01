@@ -55,9 +55,9 @@
   </template>
 
 <script>
-import jerry from '../../assets/jerry.png'
-import tom from '../../assets/tom.png'
-import { useAuthStore } from '../../stores/authStore'
+import jerry from '@/assets/jerry.png'
+import tom from '@/assets/tom.png'
+import { useAuthStore } from '@/stores/authStore'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 

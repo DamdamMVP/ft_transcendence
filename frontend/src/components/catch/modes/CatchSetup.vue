@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import CatchGame from '../modes/CatchGame.vue'
+import CatchGame from '@/components/catch/modes/CatchGame.vue'
 import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
 

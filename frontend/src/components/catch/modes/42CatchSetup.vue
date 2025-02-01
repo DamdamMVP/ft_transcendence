@@ -38,7 +38,7 @@
   </template>
   
   <script>
-  import FortyTwoCatchGame from '../modes/42CatchGame.vue'
+  import FortyTwoCatchGame from '@/components/catch/modes/42CatchGame.vue'
   import { useAuthStore } from '@/stores/authStore'
   import { ref } from 'vue'
   import gamian from '@/assets/gamian.png'
