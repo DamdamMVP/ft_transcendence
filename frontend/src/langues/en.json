@@ -157,7 +157,15 @@
     "catControls": "Cat",
     "numpad": "Numpad",
     "timeElapsed": "Time Elapsed",
-    "timeRemaining": "Time: {time}s"
+    "timeRemaining": "Time: {time}s",
+    "tomandjerry": {
+      "title": "Tom and Jerry",
+      "description": "Cat chases the mouse"
+    },
+    "fortytwo": {
+      "title": "42 Mode",
+      "description": "Special 42 mode"
+    }
   },
   "error": {
     "pageNotFound": "Page Not Found",

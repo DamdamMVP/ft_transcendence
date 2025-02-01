@@ -173,7 +173,15 @@
     "catControls": "Кот",
     "numpad": "Цифровая клавиатура",
     "timeElapsed": "Время истекло",
-    "timeRemaining": "Время: {time}с"
+    "timeRemaining": "Время: {time}с",
+    "tomandjerry": {
+      "title": "Том и Джерри",
+      "description": "Кот гонится за мышью"
+    },
+    "fortytwo": {
+      "title": "Режим 42",
+      "description": "Специальный режим 42"
+    }
   },
   "chat": {
     "typemessage": "Введите сообщение...",

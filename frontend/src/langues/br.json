@@ -149,7 +149,15 @@
     "catControls": "Kazh",
     "numpad": "Klavier niverel",
     "timeElapsed": "Amzer echu",
-    "timeRemaining": "Amzer: {time}s"
+    "timeRemaining": "Amzer: {time}s",
+    "tomandjerry": {
+      "title": "Tom ha Jerry",
+      "description": "Ar c'hazh a red war-lerc'h al logodenn"
+    },
+    "fortytwo": {
+      "title": "Mod 42",
+      "description": "Mod ispisial 42"
+    }
   },
   "error": {
     "pageNotFound": "Pajenn Nann Kavet",

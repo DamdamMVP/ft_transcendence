@@ -158,7 +158,15 @@
     "catControls": "Chat",
     "numpad": "Pavé numérique",
     "timeElapsed": "Temps écoulé",
-    "timeRemaining": "Temps: {time}s"
+    "timeRemaining": "Temps: {time}s",
+    "tomandjerry": {
+      "title": "Tom et Jerry",
+      "description": "Le chat poursuit la souris"
+    },
+    "fortytwo": {
+      "title": "42 Mode",
+      "description": "Mode spécial 42"
+    }
   },
   "error": {
     "pageNotFound": "Page Non Trouvée",

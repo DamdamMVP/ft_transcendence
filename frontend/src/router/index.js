@@ -9,6 +9,9 @@ import PongLocal from '../components/pong/modes/PongLocal.vue'
 import PongVsAI from '../components/pong/modes/PongVsAI.vue'
 import PongTournament from '../components/pong/modes/PongTournament.vue'
 import CatchView from '../views/CatchView.vue'
+import HomeCatch from '../components/Catch/HomeCatch.vue'
+import CatchTomAndJerry from '../components/Catch/modes/CatchTomAndJerry.vue'
+import CatchFortyTwo from '../components/Catch/modes/CatchFortyTwo.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import { useAuthStore } from '../stores/authStore'
 
@@ -67,23 +70,30 @@ const router = createRouter({
     },
     {
       path: '/catch',
-      name: 'catch',
       component: CatchView,
       meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'catch-home',
+          component: HomeCatch,
+        },
+        {
+          path: 'tomandjerry',
+          name: 'catch-tomandjerry',
+          component: CatchTomAndJerry,
+        },
+        {
+          path: 'fortytwo',
+          name: 'catch-fortytwo',
+          component: CatchFortyTwo,
+        },
+      ],
     },
     {
       path: '/auth-callback',
       name: 'AuthCallback',
       component: () => import('../views/AuthCallback.vue'),
-    },
-    {
-      path: '/404',
-      name: 'not-found',
-      component: NotFoundView,
-    },
-    {
-      path: '/:pathMatch(.*)*',
-      redirect: '/404',
     },
     {
       path: '/404',
