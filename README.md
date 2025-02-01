@@ -58,6 +58,8 @@ cd ft_transcendence
 - 📋 Consulter votre profil
 - 📜 Consulter votre historique
 
+![Affichage du profil](readme/profil.gif)
+
 ### 5. 💬 Chat
 
 - 👥 Afficher votre liste d'amis
