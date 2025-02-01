@@ -19,8 +19,8 @@
         :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }"
       >
         <img :src="playerIconImage" class="mouse" :style="mouseStyle" />
-        <img :src="tomImage" class="cat" :style="catStyle" />
-        <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
+        <img src="@/assets/blackhole.png" class="cat" :style="catStyle" />
+        <img src="@/assets/succes.png" class="cheese" :style="cheeseStyle" />
         <div
           class="wall vertical"
           :style="{
@@ -79,7 +79,6 @@
 
 <script>
 import jerry from '../../assets/jerry.png'
-import tom from '../../assets/tom.png'
 import gamian from '../../assets/gamian.png'
 import thomian from '../../assets/thomian.png'
 import damian from '../../assets/damian.png'
@@ -118,7 +117,6 @@ export default {
   data() {
     return {
       jerryImage: jerry,
-      tomImage: tom,
       boardWidth: 960,
       boardHeight: 560,
       mousePos: { x: 40, y: 40 },
