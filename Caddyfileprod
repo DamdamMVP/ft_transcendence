@@ -1,0 +1,37 @@
+localhost:443, {$HOSTNAME}:443 {
+    tls internal
+
+    # Frontend routes
+    handle {
+        handle /assets/* {
+            reverse_proxy frontend:80
+        }
+
+        # Frontend main route
+        handle /* {
+            reverse_proxy frontend:80
+        }
+    }
+
+    # Backend routes
+    # Static files
+    handle /static/* {
+        root * /static
+        file_server
+    }
+    handle /users/* {
+        reverse_proxy backend:8000
+    }
+    handle /admin/* {
+        reverse_proxy backend:8000
+    }
+    handle /media/* {
+        reverse_proxy backend:8000
+    }
+    handle /ws/status/* {
+        reverse_proxy backend:8000
+    }
+    handle /ws/chat/* {
+        reverse_proxy backend:8000
+    }
+}
