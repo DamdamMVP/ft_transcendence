@@ -844,18 +844,18 @@ export default {
 }
 
 .mouse-trail-dot {
-  background: radial-gradient(circle at center, #4a90e2 0%, rgba(74,144,226,0) 70%);
-  box-shadow: 
-    0 0 4px #4a90e2,
-    0 0 6px rgba(74,144,226,0.6),
-    inset 0 0 2px rgba(255,255,255,0.5);
-}
-
-.cat-trail-dot {
   background: radial-gradient(circle at center, #e25c4a 0%, rgba(226,92,74,0) 70%);
   box-shadow: 
     0 0 4px #e25c4a,
     0 0 6px rgba(226,92,74,0.6),
+    inset 0 0 2px rgba(255,255,255,0.5);
+}
+
+.cat-trail-dot {
+  background: radial-gradient(circle at center, #4a90e2 0%, rgba(74,144,226,0) 70%);
+  box-shadow: 
+    0 0 4px #4a90e2,
+    0 0 6px rgba(74,144,226,0.6),
     inset 0 0 2px rgba(255,255,255,0.5);
 }
 </style>
