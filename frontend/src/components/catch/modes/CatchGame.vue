@@ -282,13 +282,47 @@ export default {
     },
     spawnCheese() {
       const margin = 30
+      const minDistanceFromMouse = 300
+      const minDistanceFromCat = 200
+      const minDistanceFromWalls = 80
+      // Position des murs verticaux
+      const leftWallX = 240
+      const rightWallX = 720
+      
       let newPos
+      let distanceFromMouse
+      let distanceFromCat
+      let distanceFromLeftWall
+      let distanceFromRightWall
+      
       do {
         newPos = {
           x: margin + Math.random() * (this.boardWidth - 2 * margin),
           y: margin + Math.random() * (this.boardHeight - 2 * margin),
         }
-      } while (this.checkWallCollision(newPos))
+        
+        // Calculate distances from mouse and cat
+        distanceFromMouse = Math.sqrt(
+          Math.pow(newPos.x - this.mousePos.x, 2) + 
+          Math.pow(newPos.y - this.mousePos.y, 2)
+        )
+        
+        distanceFromCat = Math.sqrt(
+          Math.pow(newPos.x - this.catPos.x, 2) + 
+          Math.pow(newPos.y - this.catPos.y, 2)
+        )
+
+        // Calculate distances from middle walls
+        distanceFromLeftWall = Math.abs(newPos.x - leftWallX)
+        distanceFromRightWall = Math.abs(newPos.x - rightWallX)
+
+      } while (
+        this.checkWallCollision(newPos) || 
+        distanceFromMouse < minDistanceFromMouse ||
+        distanceFromCat < minDistanceFromCat ||
+        distanceFromLeftWall < minDistanceFromWalls ||
+        distanceFromRightWall < minDistanceFromWalls
+      )
 
       this.cheesePos = newPos
     },
