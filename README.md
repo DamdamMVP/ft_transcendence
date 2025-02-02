@@ -73,6 +73,8 @@ cd ft_transcendence
 - ➕ Ajouter/Retirer/Bloquer des utilisateurs
 - 🎮 Inviter vos amis à jouer
 
+![Affichage du chat](readme/chat.gif)
+
 ### 6. ⚙️ Paramètres
 
 - 🖊️ Modifier vos informations personnelles
