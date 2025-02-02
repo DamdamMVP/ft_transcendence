@@ -590,6 +590,8 @@ export default {
   font-weight: bold;
   text-shadow: 0 0 15px var(--primary-shadow-color);
   animation: bounce 0.5s ease infinite alternate;
+  white-space: pre-line;
+  text-align: center;
 }
 
 .countdown {
