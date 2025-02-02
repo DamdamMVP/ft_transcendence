@@ -288,7 +288,7 @@ onUnmounted(() => {
 .stat-value {
   font-weight: 700;
   font-size: 1.2rem;
-  text-shadow: 0 0 10px var(--primary-shadow-color);
+  color: var(--text-color);
 }
 
 .victories {
