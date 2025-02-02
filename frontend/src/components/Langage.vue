@@ -23,6 +23,7 @@ const onLanguageChange = (lang) => {
       <option value="en">English</option>
       <option value="ru">Русский</option>
       <option value="br">Brezhoneg</option>
+      <option value="it">Italiano</option>
     </select>
   </div>
 </template>

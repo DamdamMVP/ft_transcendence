@@ -15,6 +15,7 @@ const languages = [
   { code: 'en', name: 'English' },
   { code: 'ru', name: 'Русский' },
   { code: 'br', name: 'Brezhoneg' },
+  { code: 'it', name: 'Italiano' },
 ]
 
 const saveLanguage = async () => {

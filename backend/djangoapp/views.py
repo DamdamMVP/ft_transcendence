@@ -391,7 +391,7 @@ def updateLanguage(request, pk):
         user = User.objects.get(id=pk)
         language = request.data.get('language')
         
-        if language not in ['fr', 'en', 'ru', 'br']:
+        if language not in ['fr', 'en', 'ru', 'br', 'it']:
             return Response({'error': 'Invalid language'}, status=status.HTTP_400_BAD_REQUEST)
             
         user.language = language

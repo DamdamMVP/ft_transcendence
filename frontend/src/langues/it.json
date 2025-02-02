@@ -1,0 +1,218 @@
+{
+  "welcome": "Benvenuto sul tuo sito",
+  "navbar": {
+    "create": "Crea",
+    "connect": "Connetti",
+    "settings": "Impostazioni",
+    "pong": "Pong",
+    "catch": "Catch",
+    "profil": "Profilo",
+    "disconnect": "Disconnetti"
+  },
+  "auth": {
+    "login": "Accesso",
+    "signup": "Registrazione"
+  },
+  "login": {
+    "email": "Email o username",
+    "password": "Password",
+    "signIn": "Accedi",
+    "forgotPassword": "Password dimenticata?",
+    "goToProfil": "Vai al profilo",
+    "placeholders": {
+      "email": "Inserisci la tua email",
+      "password": "Inserisci la tua password"
+    },
+    "connectWith": "Accedi con"
+  },
+  "signup": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Conferma password",
+    "signUp": "Registrati",
+    "placeholders": {
+      "username": "Inserisci il tuo username",
+      "email": "Inserisci la tua email",
+      "password": "Inserisci la tua password",
+      "confirmPassword": "Conferma la tua password"
+    }
+  },
+  "history": {
+    "title": "Cronologia",
+    "win": "Vittoria",
+    "loose": "Sconfitta",
+    "draw": "Pareggio",
+    "addTest": "Aggiungi partita test",
+    "loading": "Caricamento cronologia...",
+    "error": "Errore nel recupero della cronologia",
+    "noGames": "Nessuna partita giocata finora"
+  },
+  "navbarProfil": {
+    "Pong": "Pong",
+    "Catch": "Catch",
+    "Settings": "Impostazioni"
+  },
+  "settings": {
+    "profilePhoto": "Foto profilo",
+    "username": "Username",
+    "password": "Password",
+    "language": "Lingua",
+    "theme": "Tema",
+    "themes": {
+      "light": "Chiaro",
+      "dark": "Scuro",
+      "forest": "Verde",
+      "coffee": "Caffè",
+      "neon": "Neon",
+      "mint": "Menta"
+    },
+    "deleteAccount": "Elimina account",
+    "save": "Salva",
+    "clickToChange": "Clicca per cambiare",
+    "passwordPlaceholders": {
+      "current": "Password attuale",
+      "new": "Nuova password",
+      "confirm": "Conferma nuova password"
+    },
+    "deleteConfirm": "Sei sicuro di voler eliminare il tuo account? Questa azione è irreversibile.",
+    "deleteAccountConfirm": "Sì, elimina il mio account",
+    "cancel": "Annulla",
+    "accountDeleted": "Account eliminato con successo",
+    "anonymizeAccount": "Anonimizza account",
+    "anonymizeAccountConfirm": "Sì, anonimizza il mio account",
+    "anonymizeConfirm": "Sei sicuro di voler anonimizzare il tuo account? Questa azione è irreversibile.",
+    "logout": "Disconnetti",
+    "enable2FA": "Attiva 2FA",
+    "disable2FA": "Disattiva 2FA",
+    "enterVerificationCode": "Inserisci il codice a 6 cifre",
+    "verify": "Verifica",
+    "scanQRCode": "Scansiona questo codice QR con la tua app di autenticazione (Google Authenticator, Authy, ecc.)"
+  },
+  "friendList": {
+    "title": "I miei amici",
+    "online": "online",
+    "search": "Cerca un amico",
+    "addFriend": "Aggiungi amico",
+    "block": "Blocca",
+    "unblock": "Sblocca",
+    "chat": "Chatta",
+    "profile": "Vedi profilo",
+    "delete": "Elimina",
+    "icons": {
+      "chat": "🗪",
+      "block": "🚫",
+      "delete": "🗑",
+      "profile": "👤"
+    }
+  },
+  "chat": {
+    "typemessage": "Scrivi il tuo messaggio...",
+    "send": "ᯓ➤",
+    "close": "Chiudi",
+    "play": "🎮",
+    "invite": "Vieni a giocare a Pong locale con me!"
+  },
+  "stats": {
+    "victories": "Vittorie",
+    "defeats": "Sconfitte",
+    "winRate": "Percentuale vittorie"
+  },
+  "pong": {
+    "local": {
+      "title": "Modalità Locale",
+      "description": "2 giocatori in locale"
+    },
+    "ai": {
+      "title": "VS IA",
+      "description": "1 vs 1 contro l'IA"
+    },
+    "tournament": {
+      "title": "Torneo",
+      "description": "4 giocatori in locale",
+      "enterName": "Inserisci un nome",
+      "nextMatch": "Prossima partita",
+      "wins": "vince il torneo!"
+    },
+    "game": {
+      "ready": "Pronto?",
+      "startGame": "Inizia",
+      "countdown": "Partenza in",
+      "gameOver": "Partita finita!",
+      "winner": "Vincitore: {winner}",
+      "close": "Chiudi",
+      "player": "Giocatore",
+      "player1": "Giocatore 1",
+      "player2": "Giocatore 2",
+      "player3": "Giocatore 3",
+      "player4": "Giocatore 4",
+      "enterName": "Inserisci un nome",
+      "enterNames": "Inserisci i nomi",
+      "controls": "Controlli",
+      "enableBonus": "Attiva bonus"
+    }
+  },
+  "catch": {
+    "title": "Prendimi se ci riesci",
+    "enterGuestName": "Inserisci username del secondo giocatore",
+    "selectPlayerIcon": "Scegli il personaggio (1° giocatore)",
+    "player1Default": "Giocatore 1",
+    "player2Default": "Giocatore 2",
+    "player2Placeholder": "Inserisci username",
+    "start": "Inizia",
+    "score": "Punteggio",
+    "timeRemaining": "Tempo rimanente: {time}s",
+    "timeElapsed": "Tempo scaduto",
+    "gameOver": "Partita finita",
+    "newGame": "Nuova partita",
+    "mouseControls": "Controlli topo",
+    "catControls": "Controlli gatto",
+    "numpad": "tastierino numerico",
+    "capture": "Catturato!",
+    "42capture": "Attenzione, il buco nero si avvicina!",
+    "victory": "ha vinto!",
+    "overtime": "Supplementari, il primo che segna vince la partita!",
+    "42victory": {
+      "lose": "Sei stato risucchiato dal buco nero, peccato!",
+      "win": "Congratulazioni, hai completato il tronc commun!"
+    },
+    "tomandjerry": {
+      "title": "Tom e Jerry",
+      "description": "Il gatto insegue il topo"
+    },
+    "fortytwo": {
+      "title": "Modalità 42",
+      "description": "Modalità speciale 42"
+    }
+  },
+  "error": {
+    "pageNotFound": "Pagina Non Trovata",
+    "pageNotFoundDesc": "La pagina che stai cercando non esiste o è stata spostata.",
+    "backToHome": "Torna alla Home"
+  },
+  "security": {
+    "setup2FA": "Configurazione autenticazione a due fattori",
+    "verify2FA": "Verifica autenticazione a due fattori",
+    "scanQRCode": "Scansiona questo codice QR con la tua app di autenticazione",
+    "enter2FACode": "Inserisci il codice a 6 cifre dalla tua app di autenticazione",
+    "enterCode": "Codice a 6 cifre",
+    "verify": "Verifica",
+    "codeFormat": "Il codice deve contenere 6 cifre",
+    "setupSuccess": "2FA configurato con successo",
+    "verifySuccess": "Codice verificato con successo",
+    "invalidCode": "Codice non valido",
+    "scanInstructions": "Scansiona il codice QR con la tua app di autenticazione (Google Authenticator, Authy, ecc.)"
+  },
+  "errors": {
+    "networkError": "Errore di connessione al server",
+    "unknownError": "Si è verificato un errore imprevisto",
+    "invalidCode": "Codice non valido",
+    "invalidCredentials": "Credenziali non valide"
+  },
+  "gdpr": {
+    "title": "Consenso GDPR",
+    "message": "Creando un account, accetti la nostra politica GDPR e acconsenti al trattamento dei tuoi dati personali. In caso contrario, il tuo account non verrà creato.",
+    "accept": "Accetta",
+    "decline": "Rifiuta"
+  }
+}
