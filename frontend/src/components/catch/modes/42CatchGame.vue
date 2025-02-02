@@ -291,13 +291,23 @@ export default {
     },
     spawnCheese() {
       const margin = 30;
+      const minDistanceFromCat = 200;
       let newPos;
+      let isValidPosition = false;
+
       do {
         newPos = {
           x: margin + Math.random() * (this.boardWidth - 2 * margin),
           y: margin + Math.random() * (this.boardHeight - 2 * margin),
         };
-      } while (this.checkWallCollision(newPos));
+
+        // Calculer la distance avec le chat
+        const dx = newPos.x - this.catPos.x;
+        const dy = newPos.y - this.catPos.y;
+        const distanceToCat = Math.sqrt(dx * dx + dy * dy);
+
+        isValidPosition = !this.checkWallCollision(newPos) && distanceToCat >= minDistanceFromCat;
+      } while (!isValidPosition);
 
       this.cheesePos = newPos;
     },
