@@ -49,17 +49,17 @@
 		  {{ $t('catch.newGame') }}
 		</button>
 		<div v-if="!gameStarted && !gameOver" class="controls-info">
-		  <p>{{ $t('catch.mouseControls') }}: WSAD</p>
-		  <p>{{ $t('catch.catControls') }}: {{ $t('catch.numpad') }} 8456</p>
+		  <p>{{ playerIcon }}: WSAD</p>
+		  <p>Black Hole: {{ $t('catch.numpad') }} 8456</p>
 		</div>
 	  </div>
 	</div>
   </template>
 
 <script>
-import gamian from '@/assets/gamian.png'
-import thomian from '@/assets/thomian.png'
-import damian from '@/assets/damian.png'
+import Gamian from '@/assets/Gamian.png'
+import Thomian from '@/assets/Thomian.png'
+import Damian from '@/assets/Damian.png'
 import { useAuthStore } from '@/stores/authStore'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
@@ -83,7 +83,7 @@ export default {
     },
     playerIcon: {
       type: String,
-      default: 'gamian'
+      required: true,
     },
     mode: {
       type: String,
@@ -122,9 +122,9 @@ export default {
   computed: {
     playerIconImage() {
       const iconMap = {
-        gamian,
-        thomian,
-        damian
+        Gamian,
+        Thomian,
+        Damian
       }
       return iconMap[this.playerIcon] || null
     },

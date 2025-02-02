@@ -41,9 +41,9 @@
   import FortyTwoCatchGame from '@/components/catch/modes/42CatchGame.vue'
   import { useAuthStore } from '@/stores/authStore'
   import { ref } from 'vue'
-  import gamian from '@/assets/gamian.png'
-  import thomian from '@/assets/thomian.png'
-  import damian from '@/assets/damian.png'
+  import Gamian from '@/assets/Gamian.png'
+  import Thomian from '@/assets/Thomian.png'
+  import Damian from '@/assets/Damian.png'
   
   export default {
 	name: 'CatchFortyTwo',
@@ -54,8 +54,8 @@
 	  const authStore = useAuthStore()
 	  const guestUsername = ref(null)
 	  const guestInput = ref('')
-	  const selectedIcon = ref('gamian')
-	  const icons = ['gamian', 'thomian', 'damian']
+	  const selectedIcon = ref('Gamian')
+	  const icons = ['Gamian', 'Thomian', 'Damian']
   
 	  const setGuestUsername = () => {
 		if (guestInput.value.trim()) {
@@ -69,9 +69,9 @@
   
 	  const getIconPath = (icon) => {
 		const iconPaths = {
-		  gamian,
-		  thomian,
-		  damian
+		  Gamian,
+		  Thomian,
+		  Damian
 		}
 		return iconPaths[icon]
 	  }
