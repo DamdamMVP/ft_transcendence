@@ -34,4 +34,7 @@ localhost:443, {$HOSTNAME}:443 {
     handle /ws/chat/* {
         reverse_proxy backend:8000
     }
+	handle /pong/ws/chat/* {
+         reverse_proxy backend:8000
+	}
 }

@@ -44,7 +44,7 @@ export function usePrivateChat() {
     }
 
     // Créer nouvelle connexion
-    const wsUrl = isGeneral ? 'ws/chat/general/' : `/ws/chat/${roomName}/`
+    const wsUrl = isGeneral ? '/ws/chat/general/' : `/ws/chat/${roomName}/`
     const ws = new WebSocket(wsUrl)
 
     ws.onopen = () => {
