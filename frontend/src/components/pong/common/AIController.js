@@ -1,7 +1,9 @@
 // Constantes IA
-const AI_UPDATE_INTERVAL = 1000 // vision 1 fois/s
-const IDLE_MOVEMENT_CHANCE = 0.07 // Chance de démarrer un mouvement inutile
-const IDLE_MOVEMENT_DURATION = 650 // Durée moyenne du mouvement en ms
+const AI_UPDATE_INTERVAL = 1000 
+const IDLE_MOVEMENT_CHANCE = 0.05 
+const IDLE_MOVEMENT_DURATION = 550 
+const MAX_AI_SPEED = 5 
+const MIN_AI_SPEED = 1
 
 export class AIController {
   constructor() {
@@ -14,7 +16,7 @@ export class AIController {
 
   predictBallPosition(ball, aiX) {
     const { x, y, speedX, speedY, radius } = ball
-    const canvasHeight = 400 // Hauteur standard du canvas
+    const canvasHeight = 500 
 
     if (speedX <= 0) {
       return canvasHeight / 2
@@ -43,7 +45,6 @@ export class AIController {
   update(ball, aiPaddle) {
     const now = Date.now()
 
-    // Gestion des mouvements d'attente
     if (!this.idleMovement && ball.speedX < 0 && Math.random() < IDLE_MOVEMENT_CHANCE) {
       this.idleMovement = {
         direction: Math.random() > 0.5 ? 'up' : 'down',
@@ -52,13 +53,11 @@ export class AIController {
       }
     }
 
-    // Mise à jour normale de l'IA
     if (now - this.lastUpdateTime >= AI_UPDATE_INTERVAL) {
       this.lastUpdateTime = now
       this.targetY = this.predictBallPosition(ball, aiPaddle.x)
     }
 
-    // Gestion des mouvements
     if (this.idleMovement && ball.speedX < 0) {
       if (now - this.idleMovement.startTime > this.idleMovement.duration) {
         this.idleMovement = null
@@ -69,16 +68,19 @@ export class AIController {
       }
     }
 
-    // Comportement normal
     const margin = 5
     const aiCenter = aiPaddle.y + aiPaddle.height / 2
-    
+    const distance = Math.abs(aiCenter - this.targetY)
+    const speed = Math.min(MAX_AI_SPEED, Math.max(MIN_AI_SPEED, distance / 10))
+
     if (aiCenter < this.targetY - margin) {
       this.upPressed = false
       this.downPressed = true
+      aiPaddle.speed = speed
     } else if (aiCenter > this.targetY + margin) {
       this.upPressed = true
       this.downPressed = false
+      aiPaddle.speed = speed
     } else {
       this.upPressed = false
       this.downPressed = false

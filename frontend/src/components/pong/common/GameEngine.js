@@ -302,7 +302,7 @@ export class GameEngine {
 	  // Draw paddles with gradient
 	  const paddleGradient = ctx.createLinearGradient(0, 0, this.canvasWidth, 0)
 	  paddleGradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--primary-color'))
-	  paddleGradient.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--accent-color'))
+	  paddleGradient.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--primary-color'))
 	  ctx.fillStyle = paddleGradient
 	  ctx.fillRect(
 		this.gameState.player1.x,
