@@ -15,6 +15,9 @@ export class GameEngine {
 	  this.BONUS_BAR_HEIGHT = 60
 	  this.INITIAL_PADDLE_HEIGHT = this.canvasHeight * 0.15
   
+	  // Trail constants
+	  this.TRAIL_LENGTH = 25
+  
 	  this.resetGameState()
 	}
   
@@ -46,6 +49,7 @@ export class GameEngine {
 		  radius: 8,
 		  speedX: 0,
 		  speedY: 0,
+		  trail: [],
 		},
 		bonusBars: [],
 		lastBonusSpawnTime: Date.now(),
@@ -59,6 +63,7 @@ export class GameEngine {
 	  this.gameState.ball.y = this.canvasHeight / 2
 	  this.gameState.ball.speedX = 0
 	  this.gameState.ball.speedY = 0
+	  this.gameState.ball.trail = []
   
 	  // Reset paddle positions
 	  this.gameState.player1.y = this.canvasHeight / 2 - this.gameState.player1.height / 2
@@ -226,6 +231,12 @@ export class GameEngine {
 	  let nextX = this.gameState.ball.x + this.gameState.ball.speedX
 	  let nextY = this.gameState.ball.y + this.gameState.ball.speedY
   
+	  // Add ball position to trail
+	  this.gameState.ball.trail.push({ x: this.gameState.ball.x, y: this.gameState.ball.y })
+	  if (this.gameState.ball.trail.length > this.TRAIL_LENGTH) {
+		this.gameState.ball.trail.shift()
+	  }
+  
 	  // Collisions with paddles
 	  // Player1
 	  if (
@@ -299,11 +310,8 @@ export class GameEngine {
 	  ctx.lineWidth = 2
 	  ctx.strokeRect(0, 0, this.canvasWidth, this.canvasHeight)
   
-	  // Draw paddles with gradient
-	  const paddleGradient = ctx.createLinearGradient(0, 0, this.canvasWidth, 0)
-	  paddleGradient.addColorStop(0, getComputedStyle(document.documentElement).getPropertyValue('--primary-color'))
-	  paddleGradient.addColorStop(1, getComputedStyle(document.documentElement).getPropertyValue('--primary-color'))
-	  ctx.fillStyle = paddleGradient
+	  // Draw paddles
+	  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
 	  ctx.fillRect(
 		this.gameState.player1.x,
 		this.gameState.player1.y,
@@ -321,22 +329,28 @@ export class GameEngine {
 	  if (this.bonusMode) {
 		this.gameState.bonusBars.forEach((bar) => {
 		  ctx.fillStyle = bar.color
-		  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-		  ctx.shadowBlur = 10
 		  ctx.fillRect(bar.x, bar.y, bar.width, bar.height)
-		  ctx.shadowBlur = 0
 		})
 	  }
   
-	  // Draw ball with shadow
+	  // Draw ball trail
+	  for (let i = 0; i < this.gameState.ball.trail.length; i++) {
+		const trailPart = this.gameState.ball.trail[i]
+		const alpha = (i + 1) / this.gameState.ball.trail.length
+		const radius = this.gameState.ball.radius * (alpha / 1.2) // Make the trail finer
+		ctx.beginPath()
+		ctx.arc(trailPart.x, trailPart.y, radius, 0, Math.PI * 2)
+		ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`
+		ctx.fill()
+		ctx.closePath()
+	  }
+  
+	  // Draw ball
 	  ctx.beginPath()
 	  ctx.arc(this.gameState.ball.x, this.gameState.ball.y, this.gameState.ball.radius, 0, Math.PI * 2)
 	  ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color')
-	  ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
-	  ctx.shadowBlur = 10
 	  ctx.fill()
 	  ctx.closePath()
-	  ctx.shadowBlur = 0
   
 	  // Si on est en phase de score, afficher le score au centre
 	  if (gamePhase === 'score') {
