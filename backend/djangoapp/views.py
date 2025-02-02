@@ -262,7 +262,7 @@ def updateTheme(request, pk):
         user = request.user
         theme = request.data.get('theme')
         
-        if theme not in ['dark', 'light', 'forest']:
+        if theme not in ['dark', 'light', 'forest', 'coffee', 'neon', 'mint']:
             return Response({'error': 'Invalid theme'}, status=status.HTTP_400_BAD_REQUEST)
             
         user.theme = theme
@@ -411,7 +411,7 @@ def updateTheme(request, pk):
         user = User.objects.get(id=pk)
         theme = request.data.get('theme')
         
-        if theme not in ['dark', 'light', 'forest']:
+        if theme not in ['dark', 'light', 'forest', 'coffee', 'neon', 'mint']:
             return Response({'error': 'Invalid theme'}, status=status.HTTP_400_BAD_REQUEST)
             
         user.theme = theme

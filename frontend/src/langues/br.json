@@ -57,7 +57,10 @@
     "themes": {
       "light": "Sklaer",
       "dark": "Teñval",
-      "forest": "Gwer"
+      "forest": "Gwer",
+      "coffee": "Kafe",
+      "neon": "Neon",
+      "mint": "Mint"
     },
     "deleteAccount": "Dilemel ar gont",
     "save": "Enrollañ",

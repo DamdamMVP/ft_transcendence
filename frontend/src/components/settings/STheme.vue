@@ -10,7 +10,7 @@ const { setTheme } = useTheme()
 
 const tempTheme = ref(authStore.user.theme)
 
-const themes = ['light', 'dark', 'forest']
+const themes = ['light', 'dark', 'forest', 'coffee', 'neon', 'mint']
 
 const saveTheme = async () => {
   if (tempTheme.value) {

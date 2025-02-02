@@ -62,7 +62,10 @@
     "themes": {
       "light": "Clair",
       "dark": "Sombre",
-      "forest": "Vert"
+      "forest": "Vert",
+	  "coffee": "Cafe",
+	  "neon": "Neon",
+	  "mint": "Menthe"
     },
     "deleteAccount": "Supprimer le compte",
     "save": "Sauvegarder",
