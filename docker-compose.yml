@@ -5,7 +5,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - '5173:5173'
+      - '8080:80'
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -33,9 +33,11 @@ services:
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - HOSTNAME=${HOSTNAME}
+      - DJANGO_SETTINGS_MODULE=djangotest.settings
 
     volumes:
       - ./backend/media:/app/media
+      - ./backend/staticfiles:/app/staticfiles
     depends_on:
       - db
 
@@ -65,15 +67,19 @@ services:
     env_file:
       - .env
     ports:
+      - '8081:80'
       - '8443:443'
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      - static_volume:/static
+      - media:/app/media
     depends_on:
       - frontend
       - backend
 
 volumes:
+  static_volume: {}
   pgdata: {}
   media: {}
   caddy_data: {}

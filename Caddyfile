@@ -4,17 +4,21 @@ localhost:443, {$HOSTNAME}:443 {
     # Frontend routes
     handle {
         handle /assets/* {
-            reverse_proxy frontend:5173
+            reverse_proxy frontend:80
         }
 
         # Frontend main route
         handle /* {
-            reverse_proxy frontend:5173
+            reverse_proxy frontend:80
         }
     }
 
     # Backend routes
-	
+	# Static files
+    handle /static/* {
+        root * /static
+        file_server
+    }
     handle /users/* {
         reverse_proxy backend:8000
     }

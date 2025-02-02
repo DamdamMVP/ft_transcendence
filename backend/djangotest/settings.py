@@ -252,3 +252,7 @@ CSRF_COOKIE_SECURE = False  # Set to True in production if HTTPS is used
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = False  # Set to True in production if HTTPS is used
 SESSION_COOKIE_HTTPONLY = True
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

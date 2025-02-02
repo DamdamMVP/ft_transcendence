@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       host: true,
-      port: 5173,
+      port: 80,
       strictPort: true,
       cors: true,
       allowedHosts: [env.VITE_HOSTNAME || 'localhost'] // Utilisez VITE_ comme préfixe
