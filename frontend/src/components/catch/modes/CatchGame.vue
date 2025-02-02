@@ -208,8 +208,12 @@ export default {
       return false
     },
     updatePositions() {
-      if (this.isPaused || this.showOvertimeMessage) return
-      if (this.gameOver || !this.gameStarted || this.countdown != null) return
+      if (this.isPaused || this.showOvertimeMessage || this.gameOver || !this.gameStarted || this.countdown != null) {
+        // Si le jeu est en pause, en overtime, terminé ou pas commencé, on efface les traînées
+        this.mouseTrail = []
+        this.catTrail = []
+        return
+      }
 
       const now = Date.now()
       
@@ -388,6 +392,8 @@ export default {
           return
         }
         this.cheesePos = null
+        this.mouseTrail = []
+        this.catTrail = []
         setTimeout(() => {
           this.spawnCheese()
         }, 1500)
@@ -429,6 +435,8 @@ export default {
         if (this.mouseScore === this.catScore) {
           this.isOvertime = true
           this.showOvertimeMessage = true
+          this.mouseTrail = []
+          this.catTrail = []
           setTimeout(() => {
             this.showOvertimeMessage = false
           }, 3000) // Le message disparaît après 3 secondes
@@ -440,6 +448,8 @@ export default {
     endGame(winner) {
       this.gameStarted = false
       this.gameOver = true
+      this.mouseTrail = []
+      this.catTrail = []
       if (this.gameLoop) {
         clearInterval(this.gameLoop)
         this.gameLoop = null
@@ -482,6 +492,13 @@ export default {
           })
         }
       }, 1000)
+    },
+    togglePause() {
+      this.isPaused = !this.isPaused
+      if (this.isPaused) {
+        this.mouseTrail = []
+        this.catTrail = []
+      }
     },
   },
   mounted() {},
