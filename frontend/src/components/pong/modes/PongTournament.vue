@@ -300,9 +300,10 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 65vh;
   overflow: hidden;
   padding: 2rem;
+  position: relative;
+  min-height: 80vh;
   background: var(--background-color);
   animation: fadeIn 0.6s ease;
   isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
