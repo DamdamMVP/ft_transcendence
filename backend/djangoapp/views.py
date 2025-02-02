@@ -110,7 +110,7 @@ def refresh_token(request):
             httponly=True,
             secure=True,
             samesite='Strict',
-            max_age=60 * 60 * 3  # 3 heures en secondes
+            max_age=60 * 60 * 24
         )
         return response
     except Exception as e:

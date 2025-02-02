@@ -67,6 +67,26 @@ class CookieJWTAuthentication(JWTAuthentication):
             return None
 
 
+class CookieMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        
+        custom_response = getattr(request, '_custom_response', None)
+        if custom_response:
+            response.set_cookie(
+                key=custom_response['cookie_name'],
+                value=custom_response['cookie_value'],
+                max_age=custom_response['max_age'],
+                httponly=custom_response['httponly'],
+                secure=custom_response['secure'],
+                samesite=custom_response['samesite']
+            )
+        print("cookie middleware")
+        return response
+
 
 User = get_user_model()
 
@@ -111,17 +131,6 @@ class TokenAuthMiddleware(BaseMiddleware):
 
         # Attach user to the scope
         scope["user"] = user
-
-        # NOTE: If you wanted to somehow send the new_access_token back to the client
-        # during the handshake, you'd have to add some handshake header or a
-        # custom protocol approach. Channels doesn't have a direct "set-cookie" concept
-        # for WebSocket upgrades. You might do something like:
-        #
-        # if new_access_token:
-        #     # Some advanced hack to modify an HTTP handshake response header
-        #     # But there's no simple built-in for that in Channels
-        #     pass
-
         # Continue with the connection
         return await super().__call__(scope, receive, send)
 
@@ -253,7 +262,7 @@ class TokenAuthMiddlewareHTTP(MiddlewareMixin):
                 httponly=True,
                 secure=not settings.DEBUG,  # True in production
                 samesite='None',
-                max_age=3600 * 24  # 15 minutes, matching ACCESS_TOKEN_LIFETIME
+                max_age=3600 * 24
             )
         
         return response

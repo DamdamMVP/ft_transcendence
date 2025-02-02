@@ -43,7 +43,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60 * 24),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,  # Renew refresh token on each use
     'BLACKLIST_AFTER_ROTATION': True,  # Invalidate old refresh tokens after rotation
@@ -91,7 +91,7 @@ CHANNEL_LAYERS = {
 
 
 MIDDLEWARE = [
-    # 'djangoapp.Midleware.TokenRefreshMiddleware',  # Use our middleware                  
+    'djangoapp.Midleware.CookieMiddleware',  # Use our middleware                  
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
