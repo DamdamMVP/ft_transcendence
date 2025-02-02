@@ -10,14 +10,14 @@
 ## 🚀 Présentation du Projet
 
 **ft_transcendence** avec [@Blackbill1](https://github.com/Blackbill1) & [@MoustacheDivine](https://github.com/MoustacheDivine)  
-Projet de l'école 42 Le Havre. Ce projet a pour but de jouer à Pong ainsi qu'à Catch. De nombreuses fonctionnalités sont implémentées pour faciliter la navigation et la communication entre les utilisateurs.
+Projet issu de l’école 42 Le Havre, cette initiative vise à créer une plateforme en ligne offrant la possibilité de jouer à différents jeux, de communiquer avec d’autres utilisateurs et bien plus encore. De nombreuses fonctionnalités sont intégrées afin de simplifier la navigation et de favoriser les échanges entre membres de la communauté, garantissant ainsi une expérience fluide et immersive.
 
 ### ✨ Fonctionnalités Principales
 
-- 🎮 **Jouer** : Lancez des parties de Pong ou Catch, en mode solo ou jusqu'à 4 joueurs.
-- 💬 **Communication** : Discutez avec vos amis et organisez des parties.
-- 🔒 **Sécurité** : Connectez-vous de diverses manières, avec notamment la possibilité d'utiliser le 2FA.
-- 📈 **Statistiques** : Consultez vos statistiques de jeu ou celles de vos amis.
+- 🎮 **Jouer** : Lancer des parties de Pong ou de Catch, en mode solo ou jusqu'à 4 joueurs.
+- 💬 **Communication** : Discuter avec vos amis et organisez des parties.
+- 🔒 **Sécurité** : Se connecter de diverses manières, avec notamment la possibilité d'utiliser le 2FA.
+- 📈 **Statistiques** : Consulter vos statistiques de jeu ou celles de vos amis.
 
 ## 🔧 Installation & Configuration
 
@@ -33,7 +33,7 @@ cd ft_transcendence
 | Commande        | Action                                   |
 | --------------- | ---------------------------------------- |
 | `npm run dev`   | 🚀 Démarrage du serveur de développement |
-| `npm run build` | 🏗 Construction pour la production        |
+| `npm run build` | 🏗 Construction pour la production       |
 
 ## 🌐 Le site
 
