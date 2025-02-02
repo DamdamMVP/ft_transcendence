@@ -1,61 +1,85 @@
 <template>
-	<div class="game-container" tabindex="0" ref="gameContainer" @keydown="handleKeyPress" @keyup="handleKeyUp">
-	  <div class="game-wrapper">
-		<!-- Colonne joueur 1 -->
-		<div class="player-column">
-		  <div class="player-name">{{ playerUsername }}</div>
-		  <div v-if="gameStarted || gameOver" class="player-score">
-			{{ $t('catch.score') }}: {{ mouseScore }}
-		  </div>
-		</div>
-		
-		<div class="game-board" :class="{ blurred: !gameStarted || gameOver }" :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
-		  <img :src="jerryImage" class="mouse" :style="mouseStyle" />
-		  <img :src="tomImage" class="cat" :style="catStyle" />
-		  <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
-		  <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
-		  <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
-		  <div v-if="isPaused" class="pause-message">
-			{{ $t('catch.capture') }} 🎯
-		  </div>
-		  <div v-if="isOvertime && showOvertimeMessage" class="pause-message center-message">
-			{{ $t('catch.overtime') }} 🔥
-		  </div>
-		  <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
-		</div>
+  <div class="game-container" tabindex="0" ref="gameContainer" @keydown="handleKeyPress" @keyup="handleKeyUp">
+    <div class="game-wrapper">
+      <!-- Colonne joueur 1 -->
+      <div class="player-column">
+        <div class="player-name">{{ playerUsername }}</div>
+        <div v-if="gameStarted || gameOver" class="player-score">
+          {{ $t('catch.score') }}: {{ mouseScore }}
+        </div>
+      </div>
+      
+      <div class="game-board" :class="{ blurred: !gameStarted || gameOver }" :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
+        <!-- Traînées des personnages -->
+        <div v-for="(pos, index) in mouseTrail" :key="'mouse-trail-' + index" 
+             class="trail-dot mouse-trail-dot" 
+             :style="{
+               left: pos.x + 'px',
+               top: pos.y + 'px',
+               opacity: (1 - index / mouseTrail.length) * 0.7,
+               transform: `scale(${1 - index / mouseTrail.length})`,
+               filter: `blur(${index * 0.15}px)`
+             }">
+          <div class="trail-inner"></div>
+        </div>
+        <div v-for="(pos, index) in catTrail" :key="'cat-trail-' + index" 
+             class="trail-dot cat-trail-dot" 
+             :style="{
+               left: pos.x + 'px',
+               top: pos.y + 'px',
+               opacity: (1 - index / catTrail.length) * 0.7,
+               transform: `scale(${1 - index / catTrail.length})`,
+               filter: `blur(${index * 0.15}px)`
+             }">
+          <div class="trail-inner"></div>
+        </div>
+        
+        <img :src="jerryImage" class="mouse" :style="mouseStyle" />
+        <img :src="tomImage" class="cat" :style="catStyle" />
+        <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
+        <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
+        <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
+        <div v-if="isPaused" class="pause-message">
+          {{ $t('catch.capture') }} 🎯
+        </div>
+        <div v-if="isOvertime && showOvertimeMessage" class="pause-message center-message">
+          {{ $t('catch.overtime') }} 🔥
+        </div>
+        <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
+      </div>
   
-		<!-- Déplacé en dehors du game-board -->
-		<div v-if="!gameStarted || gameOver" class="overlay"></div>
-		<div v-if="!gameStarted || gameOver" class="start-message">
-		  <div v-if="gameOver">
-			<div class="game-over-text">{{ $t('catch.gameOver') }}</div>
-			<div class="game-over-text">{{ winner }}</div>
-		  </div>
-		  <button @click="startCountdown" class="start-btn">
-			{{ $t('catch.newGame') }}
-		  </button>
-		  <div v-if="!gameStarted && !gameOver" class="controls-info">
-			<p>{{ $t('catch.mouseControls') }}: WSAD</p>
-			<p>{{ $t('catch.catControls') }}: {{ $t('catch.numpad') }} 8456</p>
-		  </div>
-		</div>
+      <!-- Déplacé en dehors du game-board -->
+      <div v-if="!gameStarted || gameOver" class="overlay"></div>
+      <div v-if="!gameStarted || gameOver" class="start-message">
+        <div v-if="gameOver">
+          <div class="game-over-text">{{ $t('catch.gameOver') }}</div>
+          <div class="game-over-text">{{ winner }}</div>
+        </div>
+        <button @click="startCountdown" class="start-btn">
+          {{ $t('catch.newGame') }}
+        </button>
+        <div v-if="!gameStarted && !gameOver" class="controls-info">
+          <p>{{ $t('catch.mouseControls') }}: WSAD</p>
+          <p>{{ $t('catch.catControls') }}: {{ $t('catch.numpad') }} 8456</p>
+        </div>
+      </div>
   
-		<!-- Colonne joueur 2 -->
-		<div class="player-column">
-		  <div class="player-name">{{ guestUsername }}</div>
-		  <div v-if="gameStarted || gameOver" class="player-score">
-			{{ $t('catch.score') }}: {{ catScore }}
-		  </div>
-		</div>
-	  </div>
-	  
-	  <div v-if="gameStarted" class="timer-container">
-		<div class="timer">
-		  {{ gameOver ? $t('catch.timeElapsed') : $t('catch.timeRemaining', { time: timeLeft }) }}
-		</div>
-	  </div>
-	</div>
-  </template>
+      <!-- Colonne joueur 2 -->
+      <div class="player-column">
+        <div class="player-name">{{ guestUsername }}</div>
+        <div v-if="gameStarted || gameOver" class="player-score">
+          {{ $t('catch.score') }}: {{ catScore }}
+        </div>
+      </div>
+    </div>
+    
+    <div v-if="gameStarted" class="timer-container">
+      <div class="timer">
+        {{ gameOver ? $t('catch.timeElapsed') : $t('catch.timeRemaining', { time: timeLeft }) }}
+      </div>
+    </div>
+  </div>
+</template>
 
 <script>
 import jerry from '@/assets/jerry.png'
@@ -89,6 +113,11 @@ export default {
       boardHeight: 560,
       mousePos: { x: 40, y: 40 },
       catPos: { x: 900, y: 500 },
+      mouseTrail: [],
+      catTrail: [],
+      trailLength: 12,
+      lastMouseMove: Date.now(),
+      lastCatMove: Date.now(),
       cheesePos: null,
       mouseScore: 0,
       catScore: 0,
@@ -180,12 +209,17 @@ export default {
     },
     updatePositions() {
       if (this.isPaused || this.showOvertimeMessage) return
-      if (
-        this.gameOver ||
-        !this.gameStarted ||
-        this.countdown != null
-      )
-        return
+      if (this.gameOver || !this.gameStarted || this.countdown != null) return
+
+      const now = Date.now()
+      
+      // Nettoyer les traînées si les personnages sont immobiles depuis un moment
+      if (now - this.lastMouseMove > 50 && this.mouseTrail.length > 0) {
+        this.mouseTrail.pop()
+      }
+      if (now - this.lastCatMove > 50 && this.catTrail.length > 0) {
+        this.catTrail.pop()
+      }
 
       let newMouseX = this.mousePos.x
       let newMouseY = this.mousePos.y
@@ -197,10 +231,7 @@ export default {
         mouseMove.y = -this.mouseSpeed
       }
       if (this.pressedKeys.has('s')) {
-        newMouseY = Math.min(
-          this.boardHeight - spriteSize,
-          this.mousePos.y + this.mouseSpeed
-        )
+        newMouseY = Math.min(this.boardHeight - spriteSize, this.mousePos.y + this.mouseSpeed)
         mouseMove.y = this.mouseSpeed
       }
       if (this.pressedKeys.has('a')) {
@@ -208,10 +239,7 @@ export default {
         mouseMove.x = -this.mouseSpeed
       }
       if (this.pressedKeys.has('d')) {
-        newMouseX = Math.min(
-          this.boardWidth - spriteSize,
-          this.mousePos.x + this.mouseSpeed
-        )
+        newMouseX = Math.min(this.boardWidth - spriteSize, this.mousePos.x + this.mouseSpeed)
         mouseMove.x = this.mouseSpeed
       }
 
@@ -224,10 +252,7 @@ export default {
         catMove.y = -this.catSpeed
       }
       if (this.pressedKeys.has('5')) {
-        newCatY = Math.min(
-          this.boardHeight - spriteSize,
-          this.catPos.y + this.catSpeed
-        )
+        newCatY = Math.min(this.boardHeight - spriteSize, this.catPos.y + this.catSpeed)
         catMove.y = this.catSpeed
       }
       if (this.pressedKeys.has('4')) {
@@ -235,34 +260,51 @@ export default {
         catMove.x = -this.catSpeed
       }
       if (this.pressedKeys.has('6')) {
-        newCatX = Math.min(
-          this.boardWidth - spriteSize,
-          this.catPos.x + this.catSpeed
-        )
+        newCatX = Math.min(this.boardWidth - spriteSize, this.catPos.x + this.catSpeed)
         catMove.x = this.catSpeed
       }
 
-      // Gestion des collisions pour la souris
+      // Mise à jour de la position de la souris
       const mouseCollision = this.checkWallCollision({ x: newMouseX, y: newMouseY })
       if (!mouseCollision) {
+        if (this.mousePos.x !== newMouseX || this.mousePos.y !== newMouseY) {
+          this.lastMouseMove = now
+          this.mouseTrail.unshift({
+            x: this.mousePos.x + 12,
+            y: this.mousePos.y + 12,
+            speed: Math.sqrt(Math.pow(mouseMove.x, 2) + Math.pow(mouseMove.y, 2))
+          })
+          if (this.mouseTrail.length > this.trailLength) {
+            this.mouseTrail.pop()
+          }
+        }
         this.mousePos = { x: newMouseX, y: newMouseY }
       } else if (mouseCollision.type === 'wall') {
-        // Effet de glissade : on garde le mouvement vertical mais on bloque le mouvement horizontal
         this.mousePos = {
-          x: mouseCollision.fromLeft ? this.mousePos.x : this.mousePos.x,  // Garder l'ancienne position X
-          y: newMouseY  // Permettre le mouvement vertical
+          x: mouseCollision.fromLeft ? this.mousePos.x : this.mousePos.x,
+          y: newMouseY
         }
       }
 
-      // Gestion des collisions pour le chat
+      // Mise à jour de la position du chat
       const catCollision = this.checkWallCollision({ x: newCatX, y: newCatY })
       if (!catCollision) {
+        if (this.catPos.x !== newCatX || this.catPos.y !== newCatY) {
+          this.lastCatMove = now
+          this.catTrail.unshift({
+            x: this.catPos.x + 12,
+            y: this.catPos.y + 12,
+            speed: Math.sqrt(Math.pow(catMove.x, 2) + Math.pow(catMove.y, 2))
+          })
+          if (this.catTrail.length > this.trailLength) {
+            this.catTrail.pop()
+          }
+        }
         this.catPos = { x: newCatX, y: newCatY }
       } else if (catCollision.type === 'wall') {
-        // Effet de glissade : on garde le mouvement vertical mais on bloque le mouvement horizontal
         this.catPos = {
-          x: catCollision.fromLeft ? this.catPos.x : this.catPos.x,  // Garder l'ancienne position X
-          y: newCatY  // Permettre le mouvement vertical
+          x: catCollision.fromLeft ? this.catPos.x : this.catPos.x,
+          y: newCatY
         }
       }
 
@@ -782,5 +824,38 @@ export default {
   .countdown {
     font-size: 48px;
   }
+}
+
+.trail-dot {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+
+.trail-inner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+}
+
+.mouse-trail-dot {
+  background: radial-gradient(circle at center, #4a90e2 0%, rgba(74,144,226,0) 70%);
+  box-shadow: 
+    0 0 4px #4a90e2,
+    0 0 6px rgba(74,144,226,0.6),
+    inset 0 0 2px rgba(255,255,255,0.5);
+}
+
+.cat-trail-dot {
+  background: radial-gradient(circle at center, #e25c4a 0%, rgba(226,92,74,0) 70%);
+  box-shadow: 
+    0 0 4px #e25c4a,
+    0 0 6px rgba(226,92,74,0.6),
+    inset 0 0 2px rgba(255,255,255,0.5);
 }
 </style>
