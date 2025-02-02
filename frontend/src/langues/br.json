@@ -148,14 +148,19 @@
     "player1Default": "C'hoarier 1",
     "start": "Kregiñ",
     "score": "Skor",
-    "capture": "Tapout",
+    "capture": "Tapet!",
+    "42capture": "Diwallit, an toull du a dosta!",
+    "victory": "en deus gounezet!",
+    "overtime": "Astenn-amzer, an hini kentañ da skoriñ a c'hounez ar c'hoari!",
+    "42victory": {
+      "lose": "Sunet oc'h bet gant an toull du, re fall!",
+      "win": "Gourc'hemennoù, echuet ho peus ar c'hentañ bloavezh!"
+    },
+    "mouseControls": "Kontrolloù logodenn",
+    "catControls": "Kontrolloù kazh",
+    "numpad": "klavienn niverel",
     "gameOver": "Echu eo ar c'hoari",
     "newGame": "C'hoari nevez",
-    "mouseControls": "Logodenn",
-    "catControls": "Kazh",
-    "numpad": "Klavier niverel",
-    "timeElapsed": "Amzer echu",
-    "timeRemaining": "Amzer: {time}s",
     "tomandjerry": {
       "title": "Tom ha Jerry",
       "description": "Ar c'hazh a red war-lerc'h al logodenn"

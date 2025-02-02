@@ -164,7 +164,14 @@
     "numpad": "Numpad",
     "timeElapsed": "Time Elapsed",
     "timeRemaining": "Time: {time}s",
+    "capture": "Captured!",
+    "42capture": "Watch out, the blackhole is getting closer!",
+    "victory": "has won!",
     "overtime": "Overtime, the first to score wins the game!",
+    "42victory": {
+      "lose": "You've been absorbed by the blackhole, too bad!",
+      "win": "Congratulations, you've completed the common core!"
+    },
     "tomandjerry": {
       "title": "Tom and Jerry",
       "description": "Cat chases the mouse"
