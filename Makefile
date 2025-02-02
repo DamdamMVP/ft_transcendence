@@ -1,47 +1,59 @@
 NAME = ft_transcendence
+# Par défaut, l'environnement est "dev" (développement). Pour la production, utilisez ENV=prod.
+ENV ?= dev
+
+# Si l'environnement est prod, on charge le fichier d'override production.
+ifeq ($(ENV),prod)
+  DC = docker-compose -f docker-compose.yml -f docker-compose.prod.yml
+else
+  DC = docker-compose -f docker-compose.yml
+endif
 
 all: build
 
-prod:
-	@echo "Building Docker production containers..."
-	docker compose -f docker-compose.prod.yml up --build
-
 build:
-	@echo "Building Docker containers..."
-	docker-compose up --build
+	@echo "Building Docker containers for $(ENV) environment..."
+	$(DC) up --build
 
 up:
-	@echo "Starting Docker containers..."
-	docker-compose up -d
+	@echo "Starting Docker containers for $(ENV) environment..."
+	$(DC) up -d
 
 down:
-	@echo "Stopping Docker containers..."
-	docker-compose down
+	@echo "Stopping Docker containers for $(ENV) environment..."
+	$(DC) down
 
 clean: down
-	@echo "Cleaning project containers and images..."
-	docker-compose down --rmi local
+	@echo "Cleaning project containers and images for $(ENV) environment..."
+	$(DC) down --rmi local
 
-fclean:
-	@echo "Full cleanup..."
-	docker-compose down -v --rmi all
+fclean: down
+	@echo "Full cleanup for $(ENV) environment..."
+	$(DC) down -v --rmi all
 	@echo "Cleaning media folder..."
 	find backend/media -type f ! -name 'default.jpg' -delete
 
-re: fclean all
+re: fclean build
 	@echo "Waiting for database to be ready..."
 	sleep 5
 	@echo "Applying migrations..."
-	docker-compose exec -T djangoapp python manage.py migrate
+	$(DC) exec -T djangoapp python manage.py migrate
 
 ps:
-	docker-compose ps
+	$(DC) ps
 
 logs:
-	docker-compose logs
+	$(DC) logs
 
 db:
 	@echo "Connecting to database..."
-	docker-compose exec db psql -U postgres
+	$(DC) exec db psql -U postgres
 
-.PHONY: all build up down clean fclean re ps logs db prod
+# Cibles pour lancer en production ou en développement
+prod:
+	$(MAKE) ENV=prod all
+
+dev:
+	$(MAKE) ENV=dev all
+
+.PHONY: all build up down clean fclean re ps logs db prod dev
