@@ -28,7 +28,7 @@
                left: pos.x + 'px',
                top: pos.y + 'px',
                opacity: (1 - index / catTrail.length) * 0.7,
-               transform: `scale(${1 - index / mouseTrail.length})`,
+               transform: `scale(${1 - index / catTrail.length})`,
                filter: `blur(${index * 0.15}px)`
              }">
           <div class="trail-inner"></div>
@@ -144,14 +144,14 @@ export default {
   computed: {
     mouseStyle() {
       return {
-        left: (this.mousePos.x + 35/2) + 'px',
-        top: (this.mousePos.y + 35/2) + 'px',
+        left: (this.mousePos.x + 17.5) + 'px',
+        top: (this.mousePos.y + 17.5) + 'px',
       }
     },
     catStyle() {
       return {
-        left: (this.catPos.x + 35/2) + 'px',
-        top: (this.catPos.y + 35/2) + 'px',
+        left: (this.catPos.x + 17.5) + 'px',
+        top: (this.catPos.y + 17.5) + 'px',
       }
     },
     cheeseStyle() {
@@ -259,8 +259,8 @@ export default {
         if (this.mousePos.x !== newMouseX || this.mousePos.y !== newMouseY) {
           this.lastMouseMove = now
           this.mouseTrail.unshift({
-            x: this.mousePos.x + spriteSize/2,
-            y: this.mousePos.y + spriteSize/2,
+            x: this.mousePos.x + 17.5,
+            y: this.mousePos.y + 17.5,
             speed: Math.sqrt(Math.pow(mouseMove.x, 2) + Math.pow(mouseMove.y, 2))
           })
           if (this.mouseTrail.length > this.trailLength) {
@@ -303,8 +303,8 @@ export default {
         if (this.catPos.x !== newCatX || this.catPos.y !== newCatY) {
           this.lastCatMove = now
           this.catTrail.unshift({
-            x: this.catPos.x + spriteSize/2,
-            y: this.catPos.y + spriteSize/2,
+            x: this.catPos.x + 17.5,
+            y: this.catPos.y + 17.5,
             speed: Math.sqrt(Math.pow(catMove.x, 2) + Math.pow(catMove.y, 2))
           })
           if (this.catTrail.length > this.trailLength) {
