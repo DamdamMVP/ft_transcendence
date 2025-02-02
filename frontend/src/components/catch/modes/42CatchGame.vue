@@ -272,8 +272,9 @@ export default {
       const dx = this.mousePos.x - this.catPos.x
       const dy = this.mousePos.y - this.catPos.y
       const distance = Math.sqrt(dx * dx + dy * dy)
+      const hitboxSize = spriteSize * 0.8
 
-      if (distance < this.catchDistance) {
+      if (distance < hitboxSize) {
         this.catScore += 8;
         if (this.catScore >= 32) {
           this.catScore = 24;
@@ -306,8 +307,9 @@ export default {
       const dx = this.mousePos.x - this.cheesePos.x;
       const dy = this.mousePos.y - this.cheesePos.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
+      const cheeseHitbox = 50;
 
-      if (distance < 30) {
+      if (distance < cheeseHitbox) {
         this.mouseScore++;
         if (this.mouseScore >= 7) {
           this.mouseScore = 6;
@@ -485,22 +487,22 @@ export default {
 
 .mouse, .cat {
   position: absolute;
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
   transform: translate(-50%, -50%);
   transition: all 0.05s cubic-bezier(0.4, 0, 0.2, 1);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .cat {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
 }
 
 .cheese {
   position: absolute;
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
