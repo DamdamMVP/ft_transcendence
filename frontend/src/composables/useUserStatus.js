@@ -45,34 +45,45 @@ export function useUserStatus() {
     socket = new WebSocket('/ws/status/')
 
     socket.onopen = () => {
-      console.log('WebSocket connected')
-      fetchOnlineUsers()
-    }
+		console.log('WebSocket connected')
+		fetchOnlineUsers()
+		// Envoyer un heartbeat régulier
+		setInterval(() => {
+		  if (socket?.readyState === WebSocket.OPEN) {
+			socket.send(JSON.stringify({ type: 'heartbeat' }))
+		  }
+		}, 10000)
+	  }
 
-    socket.onmessage = (event) => {
+	socket.onmessage = (event) => {
 		try {
-			const data = JSON.parse(event.data)
-			console.log('WebSocket message received:', data)
+		  const data = JSON.parse(event.data)
+		  console.log('WebSocket message received:', data)
+	  
+		  if (data.type === 'user_status') {
+			// Créez un nouveau Set pour déclencher la réactivité
+			const updatedUsers = new Set(onlineUsers.value)
 			
-			if (data.type === 'user_status') {
-				console.log('Processing user status update:', data)
-				
-				if (data.is_online) {
-					onlineUsers.value.add(data.user_id)
-				} else {
-					onlineUsers.value.delete(data.user_id)
-				}
-				
-				const friendStore = useFriendStore()
-				friendStore.updateFriendStatus(data.user_id, data.is_online)
-				
-				console.log('Updated online users after WebSocket message:', 
-					Array.from(onlineUsers.value))
+			if (data.is_online) {
+			  updatedUsers.add(data.user_id)
+			} else {
+			  updatedUsers.delete(data.user_id)
 			}
+	  
+			// Remplacement complet du Set
+			onlineUsers.value = updatedUsers
+	  
+			// Mise à jour reactive du store
+			const friendStore = useFriendStore()
+			friendStore.updateFriendStatus(data.user_id, data.is_online)
+	  
+			// Forcer une mise à jour de l'interface si nécessaire
+			friendStore.friends = [...friendStore.friends]
+		  }
 		} catch (error) {
-			console.error('Error processing WebSocket message:', error)
+		  console.error('Error processing WebSocket message:', error)
 		}
-    }
+	  }
 
     socket.onclose = (event) => {
       console.log('WebSocket closed:', event)
