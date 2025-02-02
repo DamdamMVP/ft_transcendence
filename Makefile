@@ -2,6 +2,10 @@ NAME = ft_transcendence
 
 all: build
 
+prod:
+	@echo "Building Docker production containers..."
+	docker compose -f docker-compose.prod.yml up --build
+
 build:
 	@echo "Building Docker containers..."
 	docker-compose up --build
@@ -40,4 +44,4 @@ db:
 	@echo "Connecting to database..."
 	docker-compose exec db psql -U postgres
 
-.PHONY: all build up down clean fclean re ps logs db
+.PHONY: all build up down clean fclean re ps logs db prod

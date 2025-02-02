@@ -1,18 +1,21 @@
 services:
   frontend:
     container_name: frontend
+    env_file:
+      - .env
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_BASE_URL: ${VITE_BASE_URL}
+    environment:
+      - VITE_HOSTNAME=${HOSTNAME}
+      - VITE_BASE_URL=${VITE_BASE_URL}
     ports:
-      - '5173:5173'
+      - '8080:80'
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - VITE_HOSTNAME=${HOSTNAME}
-      - VITE_BASE_URL=${BASE_URL}
     depends_on:
       - backend
 
@@ -33,9 +36,11 @@ services:
       - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
       - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
       - HOSTNAME=${HOSTNAME}
+      - DJANGO_SETTINGS_MODULE=djangotest.settings
 
     volumes:
       - ./backend/media:/app/media
+      - ./backend/staticfiles:/app/staticfiles
     depends_on:
       - db
 
@@ -61,19 +66,23 @@ services:
     container_name: caddy
     build:
       context: .
-      dockerfile: Dockerfile.caddy
+      dockerfile: Dockerfile.caddy.prod
     env_file:
       - .env
     ports:
+      - '8081:80'
       - '8443:443'
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      - static_volume:/static
+      - media:/app/media
     depends_on:
       - frontend
       - backend
 
 volumes:
+  static_volume: {}
   pgdata: {}
   media: {}
   caddy_data: {}
