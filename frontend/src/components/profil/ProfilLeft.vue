@@ -102,9 +102,9 @@ const profilePhotoUrl = computed(() => {
     return '/default-avatar.png'
   }
   // S'assurer que l'URL est complète et à jour
-  const baseUrl = import.meta.env.VITE_API_BASE_URL.endsWith('/')
-    ? import.meta.env.VITE_API_BASE_URL.slice(0, -1)
-    : import.meta.env.VITE_API_BASE_URL
+  const baseUrl = 'https://c2r2p6:8443/'
+    ? 'https://c2r2p6:8443/'.slice(0, -1)
+    : 'https://c2r2p6:8443/'
   return `${baseUrl}${profileUser.value.profile_picture}`
 })
 

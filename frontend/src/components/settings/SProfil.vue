@@ -15,7 +15,7 @@ const profilePhotoUrl = computed(() => {
     return URL.createObjectURL(selectedFile.value)
   }
   return authStore.user?.profile_picture
-    ? `${import.meta.env.VITE_API_BASE_URL}${authStore.user.profile_picture}`
+    ? `https://c2r2p6:8443${authStore.user.profile_picture}`
     : null
 })
 
