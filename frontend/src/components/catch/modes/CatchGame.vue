@@ -141,18 +141,40 @@ export default {
       this.pressedKeys.delete(event.key.toLowerCase())
     },
     checkWallCollision(pos) {
-      const playerSize = 20
+      const playerSize = 25
+      const collisionMargin = 5
+
+      // Vérifier les collisions avec les murs verticaux (avec effet de rebond)
       for (const wall of this.walls) {
-        if (
-          pos.x < wall.x + wall.width &&
-          pos.x + playerSize > wall.x &&
-          pos.y < wall.y + wall.height &&
-          pos.y + playerSize > wall.y
-        ) {
-          return true
+        const wallBox = {
+          left: wall.x - collisionMargin,
+          right: wall.x + wall.width + collisionMargin,
+          top: wall.y,
+          bottom: wall.y + wall.height
+        }
+
+        const playerBox = {
+          left: pos.x,
+          right: pos.x + playerSize,
+          top: pos.y,
+          bottom: pos.y + playerSize
+        }
+
+        if (playerBox.right > wallBox.left && 
+            playerBox.left < wallBox.right && 
+            playerBox.bottom > wallBox.top && 
+            playerBox.top < wallBox.bottom) {
+          return 'wall'  // Collision avec un mur central
         }
       }
-      return false
+
+      // Vérifier les collisions avec les bords du plateau (sans effet de rebond)
+      if (pos.x < 0 || pos.x + playerSize > this.boardWidth || 
+          pos.y < 0 || pos.y + playerSize > this.boardHeight) {
+        return 'border'  // Collision avec un bord
+      }
+
+      return false  // Pas de collision
     },
     updatePositions() {
       if (this.isPaused || this.showOvertimeMessage) return
@@ -218,9 +240,12 @@ export default {
         catMove.x = this.catSpeed
       }
 
-      if (!this.checkWallCollision({ x: newMouseX, y: newMouseY })) {
+      // Gestion des collisions pour la souris
+      const mouseCollision = this.checkWallCollision({ x: newMouseX, y: newMouseY })
+      if (!mouseCollision) {
         this.mousePos = { x: newMouseX, y: newMouseY }
-      } else {
+      } else if (mouseCollision === 'wall') {
+        // Effet de rebond uniquement pour les murs centraux
         this.mousePos = {
           x: Math.max(
             spriteSize,
@@ -239,9 +264,12 @@ export default {
         }
       }
 
-      if (!this.checkWallCollision({ x: newCatX, y: newCatY })) {
+      // Gestion des collisions pour le chat
+      const catCollision = this.checkWallCollision({ x: newCatX, y: newCatY })
+      if (!catCollision) {
         this.catPos = { x: newCatX, y: newCatY }
-      } else {
+      } else if (catCollision === 'wall') {
+        // Effet de rebond uniquement pour les murs centraux
         this.catPos = {
           x: Math.max(
             spriteSize,
