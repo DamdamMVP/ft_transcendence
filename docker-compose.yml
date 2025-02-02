@@ -1,18 +1,22 @@
 services:
   frontend:
     container_name: frontend
+    env_file:
+      - .env
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_BASE_URL: ${VITE_BASE_URL}
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_HOSTNAME=${HOSTNAME}
+      - VITE_BASE_URL=${VITE_BASE_URL}
     ports:
       - '8080:80'
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - VITE_HOSTNAME=${HOSTNAME}
-      - VITE_API_BASE_URL=${BASE_URL}
     depends_on:
       - backend
 

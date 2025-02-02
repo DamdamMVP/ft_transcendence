@@ -1,6 +1,9 @@
 # Build stage
 FROM node:20-alpine as build
 
+
+ARG VITE_BASE_URL
+RUN echo "Building with VITE_BASE_URL=$VITE_BASE_URL"
 WORKDIR /app
 
 # Copy package files
@@ -11,7 +14,7 @@ RUN npm ci
 
 # Copy source code
 COPY . .
-
+ENV VITE_BASE_URL=$VITE_BASE_URL
 # Build the application
 RUN npm run build
 

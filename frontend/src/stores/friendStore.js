@@ -132,7 +132,7 @@ export const useFriendStore = defineStore('friend', () => {
         console.log('User blocked successfully')
         // Mettre à jour la liste des utilisateurs bloqués
         const blockedResponse = await axios.get(
-          `https://c2r2p6:8443/users/list_blocked`,
+          `${import.meta.env.VITE_BASE_URL}users/list_blocked`,
           {
             withCredentials: true,
             headers: {

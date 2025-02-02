@@ -29,7 +29,8 @@ export default defineConfig(({ mode }) => {
     },
     // Exposer les variables d'environnement au client
     define: {
-      'process.env.HOSTNAME': JSON.stringify(env.VITE_HOSTNAME)
+      'process.env.HOSTNAME': JSON.stringify(env.VITE_HOSTNAME),
+	  'import.meta.env.VITE_BASE_URL': JSON.stringify(env.VITE_BASE_URL)
     }
   }
 })
