@@ -166,6 +166,13 @@
     "catControls": "Contrôles chat",
     "numpad": "pavé numérique",
     "capture": "Capturé!",
+    "42capture": "Attention, le blackhole se rapproche !",
+    "victory": "a gagné!",
+    "overtime": "Prolongations, le 1er qui marque gagne la partie!",
+    "42victory": {
+      "lose": "Vous avez été absorbé par le blackhole, c'est dommage !",
+      "win": "Félicitations, vous avez terminé le tronc commun !"
+    },
     "tomandjerry": {
       "title": "Tom et Jerry",
       "description": "Le chat poursuit la souris"

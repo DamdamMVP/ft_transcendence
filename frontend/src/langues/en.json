@@ -164,6 +164,7 @@
     "numpad": "Numpad",
     "timeElapsed": "Time Elapsed",
     "timeRemaining": "Time: {time}s",
+    "overtime": "Overtime, the first to score wins the game!",
     "tomandjerry": {
       "title": "Tom and Jerry",
       "description": "Cat chases the mouse"

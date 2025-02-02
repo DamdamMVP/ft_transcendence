@@ -18,6 +18,9 @@
 		  <div v-if="isPaused" class="pause-message">
 			{{ $t('catch.capture') }} 🎯
 		  </div>
+		  <div v-if="isOvertime && showOvertimeMessage" class="pause-message">
+			{{ $t('catch.overtime') }}
+		  </div>
 		  <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
 		</div>
   
@@ -102,6 +105,7 @@ export default {
       isPaused: false,
       countdown: 0,
       isOvertime: false,
+      showOvertimeMessage: false,
       walls: [
         { x: 240, y: 150, width: 8, height: 240 },
         { x: 720, y: 150, width: 8, height: 240 },
@@ -151,9 +155,9 @@ export default {
       return false
     },
     updatePositions() {
+      if (this.isPaused || this.showOvertimeMessage) return
       if (
         this.gameOver ||
-        this.isPaused ||
         !this.gameStarted ||
         this.countdown != null
       )
@@ -337,17 +341,15 @@ export default {
       this.$refs.gameContainer.focus()
     },
     updateTimer() {
-      if (
-        this.timeLeft > 0 &&
-        !this.isPaused &&
-        this.gameStarted &&
-        this.countdown == null
-      ) {
+      if (this.timeLeft > 0 && !this.isPaused && this.gameStarted) {
         this.timeLeft--
       } else if (this.timeLeft <= 0 && !this.isPaused && this.gameStarted) {
         if (this.mouseScore === this.catScore) {
           this.isOvertime = true
-          this.winner = 'Prolongation! Premier point gagne!'
+          this.showOvertimeMessage = true
+          setTimeout(() => {
+            this.showOvertimeMessage = false
+          }, 3000) // Le message disparaît après 3 secondes
         } else {
           this.endGame(this.mouseScore > this.catScore ? 'mouse' : 'cat')
         }
@@ -366,9 +368,9 @@ export default {
       }
 
       if (winner === 'cat') {
-        this.winner = `${this.guestUsername} gagne!`
+        this.winner = `${this.guestUsername} ${this.$t('catch.victory')}`
       } else {
-        this.winner = `${this.playerUsername} gagne!`
+        this.winner = `${this.playerUsername} ${this.$t('catch.victory')}`
       }
 
       this.saveGameHistory()

@@ -28,7 +28,7 @@
 		  <img src="@/assets/blackhole.gif" class="cat" :style="catStyle" />
 		  <img src="@/assets/succes.png" class="cheese" :style="cheeseStyle" />
 		  <div v-if="isPaused" class="pause-message">
-			{{ $t('catch.capture') }} 🎯
+			{{ $t('catch.42capture') }} 🕳️
 		  </div>
 		  <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
 		</div>
@@ -355,11 +355,11 @@ export default {
       }
 
       if (winner === 'cat') {
-        this.winner = 'Vous avez été absorbé par le blackhole, c\'est dommage !'
+        this.winner = this.$t('catch.42victory.lose')
         this.mouseScore = 0
         this.catScore = 1
       } else {
-        this.winner = 'Félicitations, vous avez terminé le tronc commun !'
+        this.winner = this.$t('catch.42victory.win')
         this.mouseScore = 1
         this.catScore = 0
       }

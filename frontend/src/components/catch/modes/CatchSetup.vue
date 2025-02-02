@@ -2,7 +2,7 @@
   <div class="catch-game">
     <div v-if="!guestUsername" class="guest-form-container">
       <div class="guest-form">
-        <h1>Attrape-moi si tu peux</h1>
+        <h1>{{ $t('catch.title') }}</h1>
         <h2>{{ $t('catch.enterGuestName') }}</h2>
         <input 
           v-model="guestInput" 
