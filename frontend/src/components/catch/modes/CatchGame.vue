@@ -18,8 +18,8 @@
 		  <div v-if="isPaused" class="pause-message">
 			{{ $t('catch.capture') }} 🎯
 		  </div>
-		  <div v-if="isOvertime && showOvertimeMessage" class="pause-message">
-			{{ $t('catch.overtime') }}
+		  <div v-if="isOvertime && showOvertimeMessage" class="pause-message center-message">
+			{{ $t('catch.overtime') }} 🔥
 		  </div>
 		  <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
 		</div>
@@ -595,6 +595,14 @@ export default {
   font-weight: bold;
   text-shadow: 0 0 15px var(--primary-shadow-color);
   animation: bounce 0.5s ease infinite alternate;
+}
+
+.center-message {
+  left: 480px;
+  width: 440px;
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 36px;
 }
 
 .countdown {
