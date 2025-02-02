@@ -301,7 +301,6 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   min-height: 65vh;
-  width: 100%;
   position: relative;
   overflow: hidden;
   padding: 2rem;

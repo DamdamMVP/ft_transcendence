@@ -242,7 +242,6 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   min-height: 65vh;
-  width: 100%;
   position: relative;
   overflow: hidden;
   padding: 2rem;
@@ -307,7 +306,7 @@ h2 {
 }
 
 .name-input {
-  padding: 1rem;
+  padding: 1rem 0rem;
   border: 2px solid var(--primary-color);
   border-radius: 8px;
   background: var(--background-color);
