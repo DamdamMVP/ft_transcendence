@@ -144,7 +144,7 @@ export default {
       const playerSize = 25
       const collisionMargin = 5
 
-      // Vérifier les collisions avec les murs verticaux (avec effet de rebond)
+      // Vérifier les collisions avec les murs verticaux (avec effet de glissade)
       for (const wall of this.walls) {
         const wallBox = {
           left: wall.x - collisionMargin,
@@ -164,17 +164,19 @@ export default {
             playerBox.left < wallBox.right && 
             playerBox.bottom > wallBox.top && 
             playerBox.top < wallBox.bottom) {
-          return 'wall'  // Collision avec un mur central
+          // Déterminer de quel côté du mur on est
+          const fromLeft = Math.abs(playerBox.right - wallBox.left) < Math.abs(playerBox.left - wallBox.right)
+          return { type: 'wall', fromLeft }
         }
       }
 
-      // Vérifier les collisions avec les bords du plateau (sans effet de rebond)
+      // Vérifier les collisions avec les bords du plateau (sans effet de glissade)
       if (pos.x < 0 || pos.x + playerSize > this.boardWidth || 
           pos.y < 0 || pos.y + playerSize > this.boardHeight) {
-        return 'border'  // Collision avec un bord
+        return { type: 'border' }
       }
 
-      return false  // Pas de collision
+      return false
     },
     updatePositions() {
       if (this.isPaused || this.showOvertimeMessage) return
@@ -244,23 +246,11 @@ export default {
       const mouseCollision = this.checkWallCollision({ x: newMouseX, y: newMouseY })
       if (!mouseCollision) {
         this.mousePos = { x: newMouseX, y: newMouseY }
-      } else if (mouseCollision === 'wall') {
-        // Effet de rebond uniquement pour les murs centraux
+      } else if (mouseCollision.type === 'wall') {
+        // Effet de glissade : on garde le mouvement vertical mais on bloque le mouvement horizontal
         this.mousePos = {
-          x: Math.max(
-            spriteSize,
-            Math.min(
-              this.mousePos.x - mouseMove.x * 3.5,
-              this.boardWidth - spriteSize
-            )
-          ),
-          y: Math.max(
-            spriteSize,
-            Math.min(
-              this.mousePos.y - mouseMove.y * 3.5,
-              this.boardHeight - spriteSize
-            )
-          ),
+          x: mouseCollision.fromLeft ? this.mousePos.x : this.mousePos.x,  // Garder l'ancienne position X
+          y: newMouseY  // Permettre le mouvement vertical
         }
       }
 
@@ -268,23 +258,11 @@ export default {
       const catCollision = this.checkWallCollision({ x: newCatX, y: newCatY })
       if (!catCollision) {
         this.catPos = { x: newCatX, y: newCatY }
-      } else if (catCollision === 'wall') {
-        // Effet de rebond uniquement pour les murs centraux
+      } else if (catCollision.type === 'wall') {
+        // Effet de glissade : on garde le mouvement vertical mais on bloque le mouvement horizontal
         this.catPos = {
-          x: Math.max(
-            spriteSize,
-            Math.min(
-              this.catPos.x - catMove.x * 3.5,
-              this.boardWidth - spriteSize
-            )
-          ),
-          y: Math.max(
-            spriteSize,
-            Math.min(
-              this.catPos.y - catMove.y * 3.5,
-              this.boardHeight - spriteSize
-            )
-          ),
+          x: catCollision.fromLeft ? this.catPos.x : this.catPos.x,  // Garder l'ancienne position X
+          y: newCatY  // Permettre le mouvement vertical
         }
       }
 
