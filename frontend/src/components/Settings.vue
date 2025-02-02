@@ -58,6 +58,7 @@ const closeNotification = () => {
 
 <style scoped>
 .settings-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -66,6 +67,45 @@ const closeNotification = () => {
   padding: 2rem;
   color: var(--text-color);
   animation: fadeIn 0.6s ease;
+  isolation: isolate;
+  min-height: 100vh; 
+}
+
+.settings-container::before {
+  content: '';
+  position: absolute; 
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%); 
+  width: 100vw;
+  height: 100%;
+  background: radial-gradient(
+    circle at top right,
+    var(--primary-shadow-color) 0%,
+    transparent 70%
+  );
+  opacity: 0.15;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.settings-container::after {
+  content: '';
+  position: absolute; 
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    transparent 100%
+  );
+  opacity: 0.05;
+  backdrop-filter: blur(100px);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .setting-item {

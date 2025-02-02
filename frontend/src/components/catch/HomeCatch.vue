@@ -33,18 +33,57 @@
   </script>
   
   <style scoped>
-  .catch-home {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	min-height: 65vh;
-	background: var(--background-color);
-	color: var(--text-color);
-	width: 100%;
-	position: relative;
-	overflow: hidden;
-  }
+.catch-home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 65vh;
+  background: var(--background-color);
+  color: var(--text-color);
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
+}
+
+/* Ajout des pseudo-éléments pour le fond */
+.catch-home::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: radial-gradient(
+    circle at top right,
+    var(--primary-shadow-color) 0%,
+    transparent 70%
+  );
+  opacity: 0.15;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.catch-home::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    transparent 100%
+  );
+  opacity: 0.05;
+  backdrop-filter: blur(100px);
+  z-index: -1;
+  pointer-events: none;
+}
   
   .title {
 	font-size: 4.5rem;

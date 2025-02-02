@@ -301,11 +301,49 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   min-height: 65vh;
-  position: relative;
   overflow: hidden;
   padding: 2rem;
   background: var(--background-color);
   animation: fadeIn 0.6s ease;
+  isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
+}
+
+/* Ajout des pseudo-éléments pour le fond */
+.tournament-mode::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: radial-gradient(
+    circle at top right,
+    var(--primary-shadow-color) 0%,
+    transparent 70%
+  );
+  opacity: 0.15;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.tournament-mode::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    transparent 100%
+  );
+  opacity: 0.05;
+  backdrop-filter: blur(100px);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .controls-center {
