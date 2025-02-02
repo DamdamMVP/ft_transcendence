@@ -28,7 +28,7 @@
                left: pos.x + 'px',
                top: pos.y + 'px',
                opacity: (1 - index / catTrail.length) * 0.7,
-               transform: `scale(${1 - index / catTrail.length})`,
+               transform: `scale(${1 - index / mouseTrail.length})`,
                filter: `blur(${index * 0.15}px)`
              }">
           <div class="trail-inner"></div>
@@ -37,8 +37,8 @@
         <img :src="jerryImage" class="mouse" :style="mouseStyle" />
         <img :src="tomImage" class="cat" :style="catStyle" />
         <div v-if="cheesePos" class="cheese" :style="cheeseStyle">🧀</div>
-        <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '8px' }"></div>
-        <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '8px' }"></div>
+        <div class="wall vertical" :style="{ left: '240px', top: '150px', height: '240px', width: '50px' }"></div>
+        <div class="wall vertical" :style="{ left: '720px', top: '150px', height: '240px', width: '50px' }"></div>
         <div v-if="isPaused" class="pause-message">
           {{ $t('catch.capture') }} 🎯
         </div>
@@ -136,22 +136,22 @@ export default {
       isOvertime: false,
       showOvertimeMessage: false,
       walls: [
-        { x: 240, y: 150, width: 8, height: 240 },
-        { x: 720, y: 150, width: 8, height: 240 },
+        { x: 240, y: 150, width: 50, height: 240 },
+        { x: 720, y: 150, width: 50, height: 240 },
       ],
     }
   },
   computed: {
     mouseStyle() {
       return {
-        left: this.mousePos.x + 'px',
-        top: this.mousePos.y + 'px',
+        left: (this.mousePos.x + 35/2) + 'px',
+        top: (this.mousePos.y + 35/2) + 'px',
       }
     },
     catStyle() {
       return {
-        left: this.catPos.x + 'px',
-        top: this.catPos.y + 'px',
+        left: (this.catPos.x + 35/2) + 'px',
+        top: (this.catPos.y + 35/2) + 'px',
       }
     },
     cheeseStyle() {
@@ -170,18 +170,19 @@ export default {
       this.pressedKeys.delete(event.key.toLowerCase())
     },
     checkWallCollision(pos) {
-      const playerSize = 25
-      const collisionMargin = 5
+      const playerSize = 35
+      const offset = playerSize / 2
 
-      // Vérifier les collisions avec les murs verticaux (avec effet de glissade)
+      // Vérifier les collisions avec les murs verticaux (tuyaux)
       for (const wall of this.walls) {
         const wallBox = {
-          left: wall.x - collisionMargin,
-          right: wall.x + wall.width + collisionMargin,
+          left: wall.x,
+          right: wall.x + wall.width,
           top: wall.y,
           bottom: wall.y + wall.height
         }
 
+        // Ajuster la hitbox en fonction du décalage visuel
         const playerBox = {
           left: pos.x,
           right: pos.x + playerSize,
@@ -189,17 +190,23 @@ export default {
           bottom: pos.y + playerSize
         }
 
-        if (playerBox.right > wallBox.left && 
-            playerBox.left < wallBox.right && 
-            playerBox.bottom > wallBox.top && 
-            playerBox.top < wallBox.bottom) {
-          // Déterminer de quel côté du mur on est
-          const fromLeft = Math.abs(playerBox.right - wallBox.left) < Math.abs(playerBox.left - wallBox.right)
-          return { type: 'wall', fromLeft }
+        // Vérifier si le joueur est dans la zone verticale du tuyau
+        const inVerticalRange = playerBox.bottom > wallBox.top && playerBox.top < wallBox.bottom
+
+        // Vérifier si le joueur essaie d'entrer par les côtés
+        if (inVerticalRange) {
+          // Collision avec le côté gauche du tuyau
+          if (playerBox.right > wallBox.left && playerBox.left < wallBox.left) {
+            return { type: 'wall', fromLeft: true, wallX: wall.x }
+          }
+          // Collision avec le côté droit du tuyau
+          if (playerBox.left < wallBox.right && playerBox.right > wallBox.right) {
+            return { type: 'wall', fromLeft: false, wallX: wall.x + wall.width }
+          }
         }
       }
 
-      // Vérifier les collisions avec les bords du plateau (sans effet de glissade)
+      // Vérifier les collisions avec les bords du plateau
       if (pos.x < 0 || pos.x + playerSize > this.boardWidth || 
           pos.y < 0 || pos.y + playerSize > this.boardHeight) {
         return { type: 'border' }
@@ -209,7 +216,6 @@ export default {
     },
     updatePositions() {
       if (this.isPaused || this.showOvertimeMessage || this.gameOver || !this.gameStarted || this.countdown != null) {
-        // Si le jeu est en pause, en overtime, terminé ou pas commencé, on efface les traînées
         this.mouseTrail = []
         this.catTrail = []
         return
@@ -217,7 +223,6 @@ export default {
 
       const now = Date.now()
       
-      // Nettoyer les traînées si les personnages sont immobiles depuis un moment
       if (now - this.lastMouseMove > 50 && this.mouseTrail.length > 0) {
         this.mouseTrail.pop()
       }
@@ -227,11 +232,12 @@ export default {
 
       let newMouseX = this.mousePos.x
       let newMouseY = this.mousePos.y
-      const spriteSize = 15
+      const spriteSize = 35
       let mouseMove = { x: 0, y: 0 }
 
+      // Mise à jour des positions avec collision type tuyau
       if (this.pressedKeys.has('w')) {
-        newMouseY = Math.max(spriteSize, this.mousePos.y - this.mouseSpeed)
+        newMouseY = Math.max(0, this.mousePos.y - this.mouseSpeed)
         mouseMove.y = -this.mouseSpeed
       }
       if (this.pressedKeys.has('s')) {
@@ -239,33 +245,12 @@ export default {
         mouseMove.y = this.mouseSpeed
       }
       if (this.pressedKeys.has('a')) {
-        newMouseX = Math.max(spriteSize, this.mousePos.x - this.mouseSpeed)
+        newMouseX = Math.max(0, this.mousePos.x - this.mouseSpeed)
         mouseMove.x = -this.mouseSpeed
       }
       if (this.pressedKeys.has('d')) {
         newMouseX = Math.min(this.boardWidth - spriteSize, this.mousePos.x + this.mouseSpeed)
         mouseMove.x = this.mouseSpeed
-      }
-
-      let newCatX = this.catPos.x
-      let newCatY = this.catPos.y
-      let catMove = { x: 0, y: 0 }
-
-      if (this.pressedKeys.has('8')) {
-        newCatY = Math.max(spriteSize, this.catPos.y - this.catSpeed)
-        catMove.y = -this.catSpeed
-      }
-      if (this.pressedKeys.has('5')) {
-        newCatY = Math.min(this.boardHeight - spriteSize, this.catPos.y + this.catSpeed)
-        catMove.y = this.catSpeed
-      }
-      if (this.pressedKeys.has('4')) {
-        newCatX = Math.max(spriteSize, this.catPos.x - this.catSpeed)
-        catMove.x = -this.catSpeed
-      }
-      if (this.pressedKeys.has('6')) {
-        newCatX = Math.min(this.boardWidth - spriteSize, this.catPos.x + this.catSpeed)
-        catMove.x = this.catSpeed
       }
 
       // Mise à jour de la position de la souris
@@ -274,8 +259,8 @@ export default {
         if (this.mousePos.x !== newMouseX || this.mousePos.y !== newMouseY) {
           this.lastMouseMove = now
           this.mouseTrail.unshift({
-            x: this.mousePos.x + 12,
-            y: this.mousePos.y + 12,
+            x: this.mousePos.x + spriteSize/2,
+            y: this.mousePos.y + spriteSize/2,
             speed: Math.sqrt(Math.pow(mouseMove.x, 2) + Math.pow(mouseMove.y, 2))
           })
           if (this.mouseTrail.length > this.trailLength) {
@@ -284,10 +269,32 @@ export default {
         }
         this.mousePos = { x: newMouseX, y: newMouseY }
       } else if (mouseCollision.type === 'wall') {
+        // Ajuster la position en fonction du mur
         this.mousePos = {
-          x: mouseCollision.fromLeft ? this.mousePos.x : this.mousePos.x,
+          x: mouseCollision.fromLeft ? mouseCollision.wallX - playerSize : mouseCollision.wallX,
           y: newMouseY
         }
+      }
+
+      let newCatX = this.catPos.x
+      let newCatY = this.catPos.y
+      let catMove = { x: 0, y: 0 }
+
+      if (this.pressedKeys.has('8')) {
+        newCatY = Math.max(0, this.catPos.y - this.catSpeed)
+        catMove.y = -this.catSpeed
+      }
+      if (this.pressedKeys.has('5')) {
+        newCatY = Math.min(this.boardHeight - spriteSize, this.catPos.y + this.catSpeed)
+        catMove.y = this.catSpeed
+      }
+      if (this.pressedKeys.has('4')) {
+        newCatX = Math.max(0, this.catPos.x - this.catSpeed)
+        catMove.x = -this.catSpeed
+      }
+      if (this.pressedKeys.has('6')) {
+        newCatX = Math.min(this.boardWidth - spriteSize, this.catPos.x + this.catSpeed)
+        catMove.x = this.catSpeed
       }
 
       // Mise à jour de la position du chat
@@ -296,8 +303,8 @@ export default {
         if (this.catPos.x !== newCatX || this.catPos.y !== newCatY) {
           this.lastCatMove = now
           this.catTrail.unshift({
-            x: this.catPos.x + 12,
-            y: this.catPos.y + 12,
+            x: this.catPos.x + spriteSize/2,
+            y: this.catPos.y + spriteSize/2,
             speed: Math.sqrt(Math.pow(catMove.x, 2) + Math.pow(catMove.y, 2))
           })
           if (this.catTrail.length > this.trailLength) {
@@ -306,8 +313,9 @@ export default {
         }
         this.catPos = { x: newCatX, y: newCatY }
       } else if (catCollision.type === 'wall') {
+        // Ajuster la position en fonction du mur
         this.catPos = {
-          x: catCollision.fromLeft ? this.catPos.x : this.catPos.x,
+          x: catCollision.fromLeft ? catCollision.wallX - playerSize : catCollision.wallX,
           y: newCatY
         }
       }
@@ -613,17 +621,20 @@ export default {
   animation: float 3s ease-in-out infinite;
 }
 
-.wall.vertical {
+.wall {
   position: absolute;
-  background: linear-gradient(
-    to right,
-    var(--primary-color),
-    var(--primary-hover-color)
+  background: linear-gradient(90deg, 
+    rgba(169, 169, 169, 0.2) 0%,
+    rgba(169, 169, 169, 0.8) 50%,
+    rgba(169, 169, 169, 0.2) 100%
   );
-  box-shadow: 
-    0 0 15px var(--primary-shadow-color),
-    inset 0 0 5px rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(169, 169, 169, 0.5);
+}
+
+.wall.vertical {
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+  border-right: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .start-message {
