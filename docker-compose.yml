@@ -9,7 +9,6 @@ services:
       args:
         VITE_BASE_URL: ${VITE_BASE_URL}
     environment:
-      - CHOKIDAR_USEPOLLING=true
       - VITE_HOSTNAME=${HOSTNAME}
       - VITE_BASE_URL=${VITE_BASE_URL}
     ports:

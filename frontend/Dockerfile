@@ -14,6 +14,7 @@ RUN npm ci
 
 # Copy source code
 COPY . .
+
 ENV VITE_BASE_URL=$VITE_BASE_URL
 # Build the application
 RUN npm run build
