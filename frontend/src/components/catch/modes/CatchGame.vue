@@ -127,7 +127,7 @@ export default {
       mouseSpeed: 12,
       catSpeed: 12,
       catchDistance: 30,
-      timeLeft: 3,
+      timeLeft: 40,
       timer: null,
       winner: '',
       pressedKeys: new Set(),
@@ -478,7 +478,7 @@ export default {
       this.catPos = { x: 900, y: 500 }
       this.mouseScore = 0
       this.catScore = 0
-      this.timeLeft = 3
+      this.timeLeft = 40
       this.gameOver = false
       this.winner = ''
       this.pressedKeys.clear()

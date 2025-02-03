@@ -426,6 +426,7 @@ export default {
   padding: 20px;
   position: relative;
   animation: fadeIn 0.6s ease;
+  outline: none;
 }
 
 .game-wrapper {
