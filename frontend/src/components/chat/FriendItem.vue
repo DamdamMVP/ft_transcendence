@@ -61,9 +61,9 @@ const isOnline = computed(() => {
 })
 
 const goToProfile = async (friend) => {
-  // Si on est déjà sur un profil, on force le rechargement
+  // If we are already on a profile, we force a reload
   if (router.currentRoute.value.name === 'profil') {
-    await router.push('/') // On redirige d'abord vers la home
+    await router.push('/')
   }
   router.push(`/${friend.id}/profil`)
 }

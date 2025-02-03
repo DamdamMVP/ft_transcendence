@@ -74,13 +74,8 @@ const {
 const authStore = useAuthStore()
 const { t } = useI18n()
 
-// Obtenir l'utilisateur actuel directement depuis le store
 const currentUser = computed(() => authStore.user)
-
-// Détermine si c'est le canal général
 const isGeneralChannel = computed(() => props.friend.isChannel)
-
-// Obtient le nom d'affichage approprié
 const displayName = computed(() =>
   isGeneralChannel.value ? '#general' : props.friend.username
 )
@@ -132,7 +127,7 @@ const inviteToPlay = () => {
   sendMessage()
 }
 
-// Initialiser la connexion WebSocket
+// Init websocket
 let ws = null
 
 onMounted(() => {

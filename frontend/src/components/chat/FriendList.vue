@@ -158,7 +158,6 @@ const closeChat = () => {
 
 const handleSendMessage = (message) => {
   console.log('Message envoyé:', message)
-  // Ici vous pourrez ajouter la logique pour envoyer le message via l'API
 }
 
 const blockUser = async (friend) => {
@@ -352,7 +351,6 @@ const showNotification = (message, type = 'error') => {
   padding: 0px;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
