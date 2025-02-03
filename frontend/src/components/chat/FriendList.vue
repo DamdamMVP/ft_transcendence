@@ -23,7 +23,7 @@
     >
       <div class="friend-list__header" @click="toggleExpand">
         <div class="friend-list__title">
-          {{ $t('friendList.title') }}
+          {{ t('friendList.title') }}
           <span class="friend-list__count">({{ onlineFriendsCount }})</span>
         </div>
       </div>
@@ -33,7 +33,7 @@
           <input
             type="text"
             v-model="searchQuery"
-            :placeholder="$t('friendList.search')"
+            :placeholder="t('friendList.search')"
           />
         </div>
 
@@ -56,13 +56,13 @@
           <input
             type="text"
             v-model="newFriendUsername"
-            :placeholder="$t('friendList.addFriend')"
+            :placeholder="t('friendList.addFriend')"
             @keyup.enter="addFriend"
           />
           <button
             @click="addFriend"
             class="friend-list__add-btn"
-            :title="$t('friendList.addFriend')"
+            :title="t('friendList.addFriend')"
           >
             <AddFriendIcon class="friend-list__add-icon" />
           </button>
@@ -86,12 +86,14 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import { useFriendStore } from '../../stores/friendStore'
 import { useUserStatus } from '../../composables/useUserStatus'
+import { useI18n } from 'vue-i18n'
 import AddFriendIcon from '../icons/AddFriendIcon.vue'
 import FriendItem from './FriendItem.vue'
 import GeneralChannel from './GeneralChannel.vue'
 import Notification from '../Notification.vue'
 import ChatWindow from './ChatWindow.vue'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 const friendStore = useFriendStore()
 const { onlineUsers } = useUserStatus()
@@ -158,7 +160,7 @@ const handleSendMessage = (message) => {
 const blockUser = async (friend) => {
   try {
     await friendStore.blockUser(friend.username)
-    showNotification($t('friends.notifications.userBlocked'), 'success')
+    showNotification(t('friends.notifications.userBlocked'), 'success')
   } catch (error) {
     showNotification(error.message, 'error')
   }
@@ -167,7 +169,7 @@ const blockUser = async (friend) => {
 const deleteFriend = async (friend) => {
   try {
     await friendStore.removeFriend(friend.username)
-    showNotification($t('friends.notifications.friendRemoved'), 'success')
+    showNotification(t('friends.notifications.friendRemoved'), 'success')
   } catch (error) {
     showNotification(error.message, 'error')
   }
@@ -178,7 +180,7 @@ const addFriend = async () => {
     try {
       await friendStore.addFriend(newFriendUsername.value.trim())
       newFriendUsername.value = ''
-      showNotification($t('friends.notifications.friendAdded'), 'success')
+      showNotification(t('friends.notifications.friendAdded'), 'success')
     } catch (error) {
       showNotification(error.message, 'error')
     }

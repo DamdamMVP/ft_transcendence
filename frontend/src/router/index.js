@@ -108,7 +108,7 @@ const router = createRouter({
 })
 
 // Navigation guard
-router.beforeEach((to, next) => {
+router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
   const isAuthenticated = authStore.isAuthenticated
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
