@@ -38,7 +38,7 @@
 		</div>
 	  </div>
   
-	  <!-- Déplacé en dehors du game-board -->
+	  <!-- Moved outside of game-board -->
 	  <div v-if="!gameStarted || gameOver" class="overlay"></div>
 	  <div v-if="!gameStarted || gameOver" class="start-message">
 		<div v-if="gameOver">
@@ -301,7 +301,7 @@ export default {
           y: margin + Math.random() * (this.boardHeight - 2 * margin),
         };
 
-        // Calculer la distance avec le chat
+        // Calculate distance to cat
         const dx = newPos.x - this.catPos.x;
         const dy = newPos.y - this.catPos.y;
         const distanceToCat = Math.sqrt(dx * dx + dy * dy);
@@ -672,13 +672,13 @@ export default {
   }
 }
 
-/* Ajuster le style du bouton pour qu'il s'aligne bien avec le message */
+/* Adjust button style to align with message */
 .start-message .start-btn {
   margin-top: 20px;
   min-width: 200px;
 }
 
-/* Style pour le conteneur des textes de fin de partie */
+/* Style for game over text container */
 .game-over-text + .game-over-text {
   margin-top: 10px;
   font-size: 28px;

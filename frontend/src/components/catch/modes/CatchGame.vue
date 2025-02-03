@@ -1,7 +1,7 @@
 <template>
   <div class="game-container" tabindex="0" ref="gameContainer" @keydown="handleKeyPress" @keyup="handleKeyUp">
     <div class="game-wrapper">
-      <!-- Colonne joueur 1 -->
+      <!-- Player 1 column -->
       <div class="player-column">
         <div class="player-name">{{ playerUsername }}</div>
         <div v-if="gameStarted || gameOver" class="player-score">
@@ -10,7 +10,7 @@
       </div>
       
       <div class="game-board" :class="{ blurred: !gameStarted || gameOver }" :style="{ width: boardWidth + 'px', height: boardHeight + 'px' }">
-        <!-- Traînées des personnages -->
+        <!-- Character trails -->
         <div v-for="(pos, index) in mouseTrail" :key="'mouse-trail-' + index" 
              class="trail-dot mouse-trail-dot" 
              :style="{
@@ -48,7 +48,7 @@
         <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
       </div>
   
-      <!-- Déplacé en dehors du game-board -->
+      <!-- Moved outside of game-board -->
       <div v-if="!gameStarted || gameOver" class="overlay"></div>
       <div v-if="!gameStarted || gameOver" class="start-message">
         <div v-if="gameOver">
@@ -64,7 +64,7 @@
         </div>
       </div>
   
-      <!-- Colonne joueur 2 -->
+      <!-- Player 2 column -->
       <div class="player-column">
         <div class="player-name">{{ guestUsername }}</div>
         <div v-if="gameStarted || gameOver" class="player-score">
@@ -98,11 +98,11 @@ export default {
   props: {
     playerUsername: {
       type: String,
-      default: 'Joueur',
+      default: 'Player',
     },
     guestUsername: {
       type: String,
-      default: 'Invité',
+      default: 'Guest',
     },
   },
   data() {
@@ -173,7 +173,7 @@ export default {
       const playerSize = 25
       const collisionMargin = 5
 
-      // Vérifier les collisions avec les murs verticaux (avec effet de glissade)
+      // Check collisions with vertical walls (with sliding effect)
       for (const wall of this.walls) {
         const wallBox = {
           left: wall.x - collisionMargin,
@@ -193,13 +193,13 @@ export default {
             playerBox.left < wallBox.right && 
             playerBox.bottom > wallBox.top && 
             playerBox.top < wallBox.bottom) {
-          // Déterminer de quel côté du mur on est
+          // Determine which side of the wall we're on
           const fromLeft = Math.abs(playerBox.right - wallBox.left) < Math.abs(playerBox.left - wallBox.right)
           return { type: 'wall', fromLeft }
         }
       }
 
-      // Vérifier les collisions avec les bords du plateau (sans effet de glissade)
+      // Check collisions with board edges (without sliding effect)
       if (pos.x < 0 || pos.x + playerSize > this.boardWidth || 
           pos.y < 0 || pos.y + playerSize > this.boardHeight) {
         return { type: 'border' }
@@ -209,7 +209,7 @@ export default {
     },
     updatePositions() {
       if (this.isPaused || this.showOvertimeMessage || this.gameOver || !this.gameStarted || this.countdown != null) {
-        // Si le jeu est en pause, en overtime, terminé ou pas commencé, on efface les traînées
+        // If game is paused, in overtime, finished or not started, clear the trails
         this.mouseTrail = []
         this.catTrail = []
         return
@@ -217,7 +217,7 @@ export default {
 
       const now = Date.now()
       
-      // Nettoyer les traînées si les personnages sont immobiles depuis un moment
+      // Clean trails if characters are immobile for a while
       if (now - this.lastMouseMove > 50 && this.mouseTrail.length > 0) {
         this.mouseTrail.pop()
       }
@@ -268,7 +268,7 @@ export default {
         catMove.x = this.catSpeed
       }
 
-      // Mise à jour de la position de la souris
+      // Update mouse position
       const mouseCollision = this.checkWallCollision({ x: newMouseX, y: newMouseY })
       if (!mouseCollision) {
         if (this.mousePos.x !== newMouseX || this.mousePos.y !== newMouseY) {
@@ -284,14 +284,14 @@ export default {
         }
         this.mousePos = { x: newMouseX, y: newMouseY }
       } else if (mouseCollision.type === 'wall') {
-        // Empêcher complètement le passage à travers les murs
+        // Prevent passing through walls completely
         this.mousePos = {
           x: mouseCollision.fromLeft ? newMouseX - 30 : newMouseX + 30,
           y: newMouseY
         }
       }
 
-      // Mise à jour de la position du chat
+      // Update cat position
       const catCollision = this.checkWallCollision({ x: newCatX, y: newCatY })
       if (!catCollision) {
         if (this.catPos.x !== newCatX || this.catPos.y !== newCatY) {
@@ -307,7 +307,7 @@ export default {
         }
         this.catPos = { x: newCatX, y: newCatY }
       } else if (catCollision.type === 'wall') {
-        // Empêcher complètement le passage à travers les murs
+        // Prevent passing through walls completely
         this.catPos = {
           x: catCollision.fromLeft ? newCatX - 30 : newCatX + 30,
           y: newCatY
@@ -339,7 +339,7 @@ export default {
       const minDistanceFromMouse = 300
       const minDistanceFromCat = 200
       const minDistanceFromWalls = 80
-      // Position des murs verticaux
+      // Position of vertical walls
       const leftWallX = 240
       const rightWallX = 720
       
@@ -775,13 +775,13 @@ export default {
   }
 }
 
-/* Ajuster le style du bouton pour qu'il s'aligne bien avec le message */
+/* Adjust button style to align with message */
 .start-message .start-btn {
   margin-top: 20px;
   min-width: 200px;
 }
 
-/* Style pour le conteneur des textes de fin de partie */
+/* Style for game over text container */
 .game-over-text + .game-over-text {
   margin-top: 10px;
   font-size: 28px;

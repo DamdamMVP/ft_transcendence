@@ -44,10 +44,9 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
+  isolation: isolate;
 }
 
-/* Ajout des pseudo-éléments pour le fond */
 .catch-home::before {
   content: '';
   position: absolute;

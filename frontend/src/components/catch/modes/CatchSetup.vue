@@ -64,13 +64,13 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: transparent; /* Changé pour éviter les conflits */
+  background: transparent;
   overflow: auto;
 }
 
 .guest-form-container {
-  position: fixed; /* Changé pour fixed pour couvrir tout l'écran */
-  top: var(--navbar-height, 100px);
+  position: fixed;
+  top: var(--navbar-height, 60px);
   left: 0;
   right: 0;
   bottom: 0;
