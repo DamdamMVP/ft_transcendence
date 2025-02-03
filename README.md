@@ -1,4 +1,4 @@
-# 🌐 ft_transcendance
+# 🌐 ft_transcendence
 
 <div align="center">
   <img src="https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vue.js&logoColor=4FC08D" alt="Vue.js Badge">
@@ -32,8 +32,8 @@ cd ft_transcendence
 
 | Commande        | Action                                   |
 | --------------- | ---------------------------------------- |
-| `npm run dev`   | 🚀 Démarrage du serveur de développement |
-| `npm run build` | 🏗 Construction pour la production       |
+| `make dev`      | 🚀 Démarrage du serveur de développement |
+| `make prod`     | 🏗 Construction pour la production       |
 
 ## 🌐 Le site
 
@@ -55,7 +55,7 @@ cd ft_transcendence
 ### 3. 🎯 Catch
 
 - 👥 Jouer en local 1vs1
-- 🤖 Jouer contre l'IA
+- Deux modes de jeu
 
 ![Affichage du catch](readme/catch.gif)
 
@@ -85,6 +85,6 @@ cd ft_transcendence
 
 ![Affichage des paramètres](readme/settings.gif)
 
-## 🤝 Contribution
+## 🤝 Remerciements
 
-- 👤 **Collaborateurs**: [@Polybiuss](https://github.com/Polybiuss) & [@BLQuatre](https://github.com/BLQuatre)
+- 👤 [@Polybiuss](https://github.com/Polybiuss) & [@BLQuatre](https://github.com/BLQuatre)
