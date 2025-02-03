@@ -34,7 +34,7 @@ ALLOWED_HOSTS = [ '{$HOSTNAME}' , '*']
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'djangoapp.Midleware.CookieJWTAuthentication',  # Use our authentication class
+        'djangoapp.Midleware.CookieJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -45,10 +45,10 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60 * 24),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,  # Renew refresh token on each use
-    'BLACKLIST_AFTER_ROTATION': True,  # Invalidate old refresh tokens after rotation
-    'ALGORITHM': 'HS256',  # Encryption algorithm
-    'SIGNING_KEY': SECRET_KEY,  # Replace with a secure secret key
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
 }
 
 # Application definition
@@ -84,14 +84,14 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [('redis', 6379)],  # Make sure Redis is installed and running
+            'hosts': [('redis', 6379)],
         },
     },
 }
 
 
 MIDDLEWARE = [
-    'djangoapp.Midleware.CookieMiddleware',  # Use our middleware                  
+    'djangoapp.Midleware.CookieMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -106,22 +106,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'djangotest.urls'
 
-def get_local_ip():
-    hostname = socket.gethostname()
-    try:
-        # Résolution de l'adresse IP depuis le nom d'hôte
-        local_ip = socket.gethostbyname(hostname)
-        if local_ip.startswith("127."):
-            # Méthode de secours si l'adresse est locale (127.x.x.x)
-            local_ip = [ip[4][0] for ip in socket.getaddrinfo(hostname, None, socket.AF_INET) if not ip[4][0].startswith("127.")][0]
-        return local_ip
-    except Exception as e:
-        print(f"Error retrieving local IP: {e}")
-        return "127.0.0.1"  # Retourne localhost par défaut en cas d'erreur
-
-local_ip = get_local_ip()
-print(local_ip)
-
 ALLOWED_HOSTS = [
     '*',
 ]
@@ -130,10 +114,6 @@ CORS_ALLOW_ALL_ORIGINS = False
 
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^http://10\.12\.\d{1,3}\.\d{1,3}(:\d+)?$",
-]
-
-CORS_ALLOWED_ORIGINS = [
-    f"http://{local_ip}:5173",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -172,7 +152,7 @@ DATABASES = {
         'PASSWORD':os.environ.get('PG_PASSWORD','postgres'),
         'NAME': os.environ.get('PG_DB','postgres'),
         'PORT': os.environ.get('PG_PORT','5432'),
-        'HOST': os.environ.get('PG_HOST','localhost'), # uses the container if set, otherwise it runs locally
+        'HOST': os.environ.get('PG_HOST','localhost'),
     }
 }
 
@@ -201,7 +181,6 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# Configuration of django-allauth
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
@@ -215,7 +194,6 @@ LOGOUT_REDIRECT_URL = '/'
 
 HOSTNAME = os.getenv("HOSTNAME", "localhost")
 
-# Configuration de l'API 42
 FORTYTWO_CLIENT_ID = os.environ.get('FORTYTWO_CLIENT_ID')
 FORTYTWO_CLIENT_SECRET = os.environ.get('FORTYTWO_CLIENT_SECRET')
 
@@ -246,7 +224,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-CSRF_COOKIE_SECURE = False  # Set to True in production if HTTPS is used
+CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = False  # Set to True in production if HTTPS is used
+SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
