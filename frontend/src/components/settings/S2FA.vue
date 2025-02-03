@@ -42,17 +42,17 @@ const showQRModal = ref(false)
 const qrCode = ref('')
 const verificationCode = ref('')
 
-// Vérifier le statut de la 2FA
+// Check 2FA status
 const check2FAStatus = async () => {
   try {
     const response = await axios.get('/users/2fa/status', { withCredentials: true })
     has2FAEnabled.value = response.data.enabled
   } catch (error) {
-    console.error('Erreur lors de la vérification du statut 2FA:', error)
+    console.error('Error when checking 2FA status:', error)
   }
 }
 
-// Activer la 2FA
+// Enable 2FA
 const setup2FA = async () => {
   try {
     const response = await axios.post('/users/2fa/setup', {}, { withCredentials: true })
@@ -62,38 +62,38 @@ const setup2FA = async () => {
     }
   } catch (error) {
     emit('showNotification', {
-      message: error.response?.data?.error || 'Erreur lors de la configuration 2FA',
+      message: error.response?.data?.error || 'Error when setting up 2FA',
       type: 'error'
     })
   }
 }
 
-// Désactiver la 2FA
+// Disable 2FA
 const disable2FA = async () => {
   try {
     await axios.post('/users/2fa/disable', {}, { withCredentials: true })
     has2FAEnabled.value = false
     emit('showNotification', {
-      message: 'La 2FA a été désactivée',
+      message: '2FA has been disabled',
       type: 'success'
     })
   } catch (error) {
     emit('showNotification', {
-      message: error.response?.data?.error || 'Erreur lors de la désactivation 2FA',
+      message: error.response?.data?.error || 'Error when disabling 2FA',
       type: 'error'
     })
   }
 }
 
-// Vérifier le code
+// Verify code
 const verifyCode = async () => {
   try {
     const response = await axios.post(
       '/users/2fa/verify',
-      { token: verificationCode.value }, // Changé de 'code' à 'token'
+      { token: verificationCode.value }, // Changed from 'code' to 'token'
       { withCredentials: true }
     )
-    if (response.data.success) { // Changé de 'verified' à 'success' pour matcher la réponse du backend
+    if (response.data.success) { // Changed from 'verified' to 'success' to match the backend response
       has2FAEnabled.value = true
       closeModal()
       emit('showNotification', {

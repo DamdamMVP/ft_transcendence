@@ -5,8 +5,6 @@ import axios from 'axios'
 
 const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
-
-// Référence vers l'input file caché
 const fileInput = ref(null)
 const selectedFile = ref(null)
 
@@ -35,7 +33,7 @@ const handleFileSelect = (event) => {
 const saveProfilePhoto = async () => {
   if (!selectedFile.value) return
 
-  // Vérifier la taille du fichier (2Mo max)
+  // Check the file size (2MB max)
   if (selectedFile.value.size > 2 * 1024 * 1024) {
     emit('showNotification', {
       message: "La taille de l'image ne doit pas dépasser 2 Mo",
@@ -270,7 +268,6 @@ h3 {
   text-shadow: 0 0 10px var(--primary-shadow-color);
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -282,7 +279,6 @@ h3 {
   }
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
   .profile-section {
     padding: 1.5rem;

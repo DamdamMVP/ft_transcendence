@@ -221,7 +221,6 @@ h2, h3 {
   box-shadow: 0 2px 10px var(--primary-shadow-color);
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -233,7 +232,6 @@ h2, h3 {
   }
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
   .settings-container {
     padding: 1rem;

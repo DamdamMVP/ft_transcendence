@@ -164,7 +164,6 @@ const authStore = useAuthStore()
   box-shadow: 0 4px 15px var(--primary-shadow-color);
 }
 
-/* Animation pour le hover des liens */
 @keyframes linkHover {
   0% {
     transform: translateY(0);
@@ -177,7 +176,6 @@ const authStore = useAuthStore()
   }
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
   .header {
     padding: 1rem 0;

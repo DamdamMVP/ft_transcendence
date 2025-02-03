@@ -80,7 +80,7 @@ const handleLogout = async () => {
     <S2FA />
   </div>
 
-  <!-- Popup de confirmation -->
+  <!-- Confirmation popups -->
   <div v-if="showDeleteConfirm" class="modal-overlay" @click="showDeleteConfirm = false">
     <div class="modal-content" @click.stop>
       <h3>{{ $t('settings.deleteAccount') }}</h3>
