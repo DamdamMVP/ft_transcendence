@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import eventBus from '../utils/eventBus'
-import { useAuthStore } from '../stores/authStore'
 
 export function useAuth() {
   const error = ref('')
@@ -10,7 +9,6 @@ export function useAuth() {
   const requires2FA = ref(false)
   const tempAuthToken = ref(null)
 
-  // Configuration d'axios pour inclure les cookies
   axios.defaults.withCredentials = true
 
   const signUp = async ({ username, email, password }) => {
@@ -26,7 +24,7 @@ export function useAuth() {
       }
     } catch (err) {
       const errorMessage =
-        err.response?.data?.error || 'Erreur lors de la création du compte'
+        err.response?.data?.error || 'Error while creating account'
       throw new Error(errorMessage)
     }
   }
@@ -39,30 +37,30 @@ export function useAuth() {
       })
 
       if (response.status === 200) {
-        // Vérifier le statut 2FA
+        // Check 2FA status
         try {
           const twoFAResponse = await axios.get('/users/2fa/status')
-          console.log('Statut 2FA:', twoFAResponse.data.enabled ? 'Activé' : 'Désactivé')
+          console.log('2FA status:', twoFAResponse.data.enabled ? 'Enabled' : 'Disabled')
           
           if (twoFAResponse.data.enabled) {
             requires2FA.value = true
-            tempAuthToken.value = response.data.token // Stocker temporairement le token
-            // Ouvrir le modal 2FA
+            tempAuthToken.value = response.data.token // Store token temporarily
+            // Open 2FA modal
             eventBus.emit('show-2fa-verification')
             return { success: true, requires2FA: true, data: response.data }
           }
         } catch (error) {
-          console.warn('Impossible de récupérer le statut 2FA:', error)
+          console.warn('Failed to retrieve 2FA status:', error)
         }
 
-        // Si pas de 2FA ou erreur de vérification du statut, procéder à la connexion normale
+        // If no 2FA or verification status error, proceed with normal login
         user.value = response.data.user
         isAuthenticated.value = true
         return { success: true, data: response.data }
       }
     } catch (err) {
       const errorMessage =
-        err.response?.data?.error || 'Erreur lors de la connexion'
+        err.response?.data?.error || 'Error while logging in'
       throw new Error(errorMessage)
     }
   }
@@ -78,7 +76,6 @@ export function useAuth() {
         isAuthenticated.value = true
         requires2FA.value = false
         tempAuthToken.value = null
-        // Émettre un événement pour SignIn.vue
         eventBus.emit('2fa-success', response.data)
         return { success: true, data: response.data }
       }
@@ -93,16 +90,16 @@ export function useAuth() {
 
   const signOut = async () => {
     try {
-      // Appeler le endpoint de déconnexion pour supprimer le cookie
+      // Call logout endpoint to delete cookie
       await axios.post('/users/logout')
     } catch (err) {
-      // Si l'erreur est 401, c'est normal (token expiré), on continue la déconnexion
+      // If error is 401, it's normal (token expired), continue with logout
       if (err.response?.status !== 401) {
-        console.error('Erreur lors de la déconnexion:', err)
+        console.error('Error while logging out:', err)
         throw err
       }
     } finally {
-      // Nettoyer les données locales de l'utilisateur
+      // Clean up local user data
       user.value = null
       isAuthenticated.value = false
     }

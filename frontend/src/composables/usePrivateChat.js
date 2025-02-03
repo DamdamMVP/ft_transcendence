@@ -4,7 +4,7 @@ export function usePrivateChat() {
   const chatConnections = ref(new Map())
   const reconnectAttempts = ref(new Map())
   const MAX_RECONNECT_ATTEMPTS = 5
-  const RECONNECT_DELAY = 3000 // 3 secondes
+  const RECONNECT_DELAY = 3000
 
   const getChatRoomName = (user1, user2) => {
     const sortedUsers = [user1, user2].sort()
@@ -15,13 +15,13 @@ export function usePrivateChat() {
     const attempts = reconnectAttempts.value.get(roomName) || 0
     
     if (attempts < MAX_RECONNECT_ATTEMPTS) {
-      console.log(`Tentative de reconnexion ${attempts + 1}/${MAX_RECONNECT_ATTEMPTS} pour ${roomName}`)
+      console.log(`Reconnection attempt ${attempts + 1}/${MAX_RECONNECT_ATTEMPTS} for ${roomName}`)
       reconnectAttempts.value.set(roomName, attempts + 1)
       
       await new Promise(resolve => setTimeout(resolve, RECONNECT_DELAY))
       return connectToChat(currentUser, otherUser)
     } else {
-      console.error(`Échec de reconnexion après ${MAX_RECONNECT_ATTEMPTS} tentatives pour ${roomName}`)
+      console.error(`Reconnection failed after ${MAX_RECONNECT_ATTEMPTS} attempts for ${roomName}`)
       reconnectAttempts.value.delete(roomName)
       return null
     }
@@ -31,39 +31,39 @@ export function usePrivateChat() {
     const isGeneral = currentUser === 'general' && otherUser === 'general'
     const roomName = isGeneral ? 'general' : getChatRoomName(currentUser, otherUser)
     
-    // Vérifier si une connexion existe et est active
+    // Check if a connection exists and is active
     const existingConnection = chatConnections.value.get(roomName)
     if (existingConnection?.readyState === WebSocket.OPEN) {
       return existingConnection
     }
 
-    // Fermer toute connexion existante qui ne serait pas en état OPEN
+    // Close any existing connection that is not in the OPEN state
     if (existingConnection) {
       existingConnection.close()
       chatConnections.value.delete(roomName)
     }
 
-    // Créer nouvelle connexion
+    // Create new connection
     const wsUrl = isGeneral ? '/ws/chat/general/' : `/ws/chat/${roomName}/`
     const ws = new WebSocket(wsUrl)
 
     ws.onopen = () => {
-      console.log(`Connecté à ${roomName}`)
-      reconnectAttempts.value.delete(roomName) // Réinitialiser les tentatives après succès
+      console.log(`Connected to ${roomName}`)
+      reconnectAttempts.value.delete(roomName) // Reset reconnection attempts after success
     }
 
     ws.onclose = async (event) => {
-      console.log(`Déconnecté de ${roomName}`, event.code, event.reason)
+      console.log(`Disconnected from ${roomName}`, event.code, event.reason)
       chatConnections.value.delete(roomName)
       
-      // Tenter une reconnexion automatique si la fermeture n'était pas volontaire
+      // Attempt to reconnect if the connection was not closed intentionally
       if (event.code !== 1000) {
         await handleReconnect(roomName, currentUser, otherUser)
       }
     }
 
     ws.onerror = (error) => {
-      console.error(`Erreur WebSocket pour ${roomName}:`, error)
+      console.error(`WebSocket error for ${roomName}:`, error)
     }
 
     chatConnections.value.set(roomName, ws)
@@ -76,13 +76,13 @@ export function usePrivateChat() {
     const connection = chatConnections.value.get(roomName)
 
     if (!connection) {
-      console.error(`Pas de connexion trouvée pour ${roomName}`)
+      console.error(`No connection found for ${roomName}`)
       return false
     }
 
     if (connection.readyState !== WebSocket.OPEN) {
-      console.error(`Connexion non ouverte pour ${roomName}. État: ${connection.readyState}`)
-      // Tenter de se reconnecter
+      console.error(`Connection not open for ${roomName}. State: ${connection.readyState}`)
+      // Attempt to reconnect
       connectToChat(currentUser, otherUser)
       return false
     }
@@ -94,12 +94,12 @@ export function usePrivateChat() {
       }))
       return true
     } catch (error) {
-      console.error(`Erreur lors de l'envoi du message:`, error)
+      console.error(`Error sending message:`, error)
       return false
     }
   }
   const disconnectFromChat = (currentUser, otherUser) => {
-    // Si c'est le canal général
+    // If it's the general channel
     if (currentUser === 'general' && otherUser === 'general') {
       const connection = chatConnections.value.get('general')
       if (connection) {
@@ -109,7 +109,7 @@ export function usePrivateChat() {
       return
     }
 
-    // Pour les chats privés
+    // For private chats
     const roomName = getChatRoomName(currentUser, otherUser)
     const connection = chatConnections.value.get(roomName)
     if (connection) {
@@ -118,38 +118,6 @@ export function usePrivateChat() {
     }
   }
 
-//   const sendMessage = (currentUser, otherUser, message) => {
-//     // Si c'est le canal général
-//     if (currentUser === 'general' && otherUser === 'general') {
-//       const connection = chatConnections.value.get('general')
-//       if (connection && connection.readyState === WebSocket.OPEN) {
-//         connection.send(
-//           JSON.stringify({
-//             message: message,
-//             timestamp: new Date().toISOString(),
-//           })
-//         )
-//         return true
-//       }
-//       return false
-//     }
-
-//     // Pour les chats privés
-//     const roomName = getChatRoomName(currentUser, otherUser)
-//     const connection = chatConnections.value.get(roomName)
-
-//     if (connection && connection.readyState === WebSocket.OPEN) {
-//       connection.send(
-//         JSON.stringify({
-//           message: message,
-//           timestamp: new Date().toISOString(),
-//         })
-//       )
-//       return true
-//     }
-//     return false
-//   }
-
   return {
     connectToChat,
     disconnectFromChat,
@@ -157,4 +125,3 @@ export function usePrivateChat() {
     chatConnections,
   }
 }
-
