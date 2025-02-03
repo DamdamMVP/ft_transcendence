@@ -244,7 +244,6 @@ onUnmounted(() => {
   min-height: 65vh;
   position: relative;
   overflow: hidden;
-  padding: 2rem;
   background: var(--background-color);
   isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
 }
