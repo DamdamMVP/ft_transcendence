@@ -21,7 +21,6 @@
 	animation: fadeIn 0.6s ease;
   }
   
-  /* Effet de fond subtil */
   .catch-view::before {
 	content: '';
 	position: absolute;
@@ -39,7 +38,6 @@
 	z-index: 0;
   }
   
-  /* Container pour le contenu routé */
   .catch-view > * {
 	position: relative;
 	z-index: 1;
@@ -47,7 +45,6 @@
 	height: 100%;
   }
   
-  /* Animations de transition */
   .fade-enter-active,
   .fade-leave-active {
 	transition: opacity 0.3s ease, transform 0.3s ease;
@@ -70,14 +67,12 @@
 	}
   }
   
-  /* Media Queries */
   @media (max-width: 768px) {
 	.catch-view {
-	  height: calc(85vh - 60px); /* Ajustement pour la barre de navigation mobile */
+	  height: calc(85vh - 60px);
 	}
   }
   
-  /* Support du thème sombre */
   @media (prefers-color-scheme: dark) {
 	.catch-view::before {
 	  opacity: 0.15;

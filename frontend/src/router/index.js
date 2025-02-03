@@ -119,13 +119,13 @@ router.beforeEach((to, from, next) => {
     : 'Golem'
   document.title = pageTitle
 
-  // Rediriger vers /pong si l'utilisateur est connecté et va sur la page d'accueil
+  // Redirect to /pong if the user is authenticated and goes to the homepage
   if (to.path === '/' && isAuthenticated) {
     next('/pong')
     return
   }
 
-  // Si la route nécessite une authentification et que l'utilisateur n'est pas connecté
+  // If the route requires authentication and the user is not authenticated
   if (requiresAuth && !isAuthenticated) {
     next('/')
   } else {

@@ -1,20 +1,20 @@
-# Image de base Node.js
+# Base Node.js image
 FROM node:20-alpine
 
-# Définition du répertoire de travail
+# Definition of the working directory
 WORKDIR /app
 
-# Copie des fichiers de dépendances
+# Copy package files
 COPY package*.json ./
 
-# Installation des dépendances
+# Install dependencies
 RUN npm install
 
-# Copie du code source
+# Copy source code
 COPY . .
 
-# Exposition du port pour Vite (5173 par défaut)
+# Expose port for Vite (default 5173)
 EXPOSE 5173
 
-# Commande pour lancer le serveur de développement
+# Command to launch development server
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

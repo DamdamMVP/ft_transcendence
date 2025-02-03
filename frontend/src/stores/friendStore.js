@@ -77,7 +77,7 @@ export const useFriendStore = defineStore('friend', () => {
 
       if (response.status === 200) {
         console.log('Friend removed successfully')
-        await loadFriends() // Reload friends list
+        await loadFriends()
         return true
       }
     } catch (error) {
@@ -144,7 +144,7 @@ export const useFriendStore = defineStore('friend', () => {
 
         if (blockedResponse.status === 200) {
           blockedUsers.value = blockedResponse.data
-          await loadFriends() // Reload friends list one last time to ensure it's up to date
+          await loadFriends()
           console.log('Updated blocked users list and friends list')
         }
         return true
@@ -164,7 +164,6 @@ export const useFriendStore = defineStore('friend', () => {
   }
 
   const unblockUser = async (userId) => {
-    // TODO: API call to unblock a user
     blockedUsers.value = blockedUsers.value.filter((id) => id !== userId)
   }
 
