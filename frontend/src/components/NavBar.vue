@@ -2,10 +2,8 @@
 import IconGolem from './icons/IconGolem.vue'
 import { useAuthStore } from '../stores/authStore'
 import IconSettings from './icons/IconSettings.vue'
-import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
-const router = useRouter()
 </script>
 
 <template>

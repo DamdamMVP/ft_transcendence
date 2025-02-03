@@ -26,12 +26,11 @@ const hideNotification = () => {
 }
 
 const showNotification = () => {
-  // Nettoyer le timeout existant si présent
   if (timeout) {
     clearTimeout(timeout)
   }
   
-  // Forcer la réinitialisation en cachant puis montrant
+  // Force reset by hiding then showing
   show.value = false
   setTimeout(() => {
     show.value = true
@@ -39,21 +38,21 @@ const showNotification = () => {
   }, 50)
 }
 
-// Regarder les changements de message
+// Watch for message changes
 watch(() => props.message, (newMessage, oldMessage) => {
   if (newMessage && (newMessage !== oldMessage || !show.value)) {
     showNotification()
   }
 })
 
-// Nettoyer le timeout lors de la destruction du composant
+// Clean up timeout when component is unmounted
 onUnmounted(() => {
   if (timeout) {
     clearTimeout(timeout)
   }
 })
 
-// Montrer la notification initialement si un message est présent
+// Show notification initially if a message is present
 if (props.message) {
   showNotification()
 }

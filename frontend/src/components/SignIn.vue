@@ -19,7 +19,7 @@ const { signIn } = useAuth()
 
 const handleSignIn = async () => {
   if (!email.value || !password.value) {
-    error.value = 'Veuillez remplir tous les champs'
+    error.value = 'Please fill in all fields'
     return
   }
 
@@ -32,30 +32,30 @@ const handleSignIn = async () => {
       password: password.value,
     })
     
-    console.log('Résultat complet:', result)
+    console.log('Complete result:', result)
     
     if (result.success) {
       if (result.requires2FA) {
-        console.log('2FA requise, attente de validation...')
-        // Le modal 2FA s'affichera via l'eventBus
-        // On stocke déjà les données partielles pour plus tard
+        console.log('2FA required, waiting for validation...')
+        // 2FA modal will be displayed via eventBus
+        // Store partial data for later use
         const userData = result.data
         
-        // Écouter l'événement de succès 2FA
+        // Listen for 2FA success event
         eventBus.on('2fa-success', (data) => {
-          console.log('2FA validée, connexion...')
+          console.log('2FA validated, logging in...')
           authStore.login(userData.user, userData.token)
           router.push('/pong')
-          // Ne pas oublier de retirer l'écouteur
+          // Don't forget to remove the listener
           eventBus.off('2fa-success')
         })
         return
       }
       
-      // Cas sans 2FA
+      // Case without 2FA
       authStore.login(result.data.user, result.data.token)
       
-      // Initialiser le WebSocket
+      // Initialize WebSocket
       initializeWebSocket()
       
       email.value = ''
@@ -63,7 +63,7 @@ const handleSignIn = async () => {
       error.value = ''
       emit('success', result.data)
       
-      // Redirection vers la page Pong
+      // Redirect to Pong page
       router.push('/pong')
     }
   } catch (err) {

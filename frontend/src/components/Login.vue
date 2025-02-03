@@ -12,11 +12,9 @@ const toggleMode = () => {
 }
 
 const handleAuthSuccess = () => {
-  // La connexion sera gérée par le composant SignIn
   console.log('Authentification en cours...')
 }
 
-// Écouteurs d'événements pour la 2FA
 const handle2FAVerified = () => {
   console.log('2FA vérifié avec succès')
 }

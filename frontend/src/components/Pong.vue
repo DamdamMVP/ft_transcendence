@@ -12,14 +12,14 @@
 		  @click="startGame"
 		  class="game-button start-button"
 		>
-		  Jouer
+		  Play
 		</button>
 		<button 
 		  v-if="gameWinner"
 		  @click="resetGame"
 		  class="game-button replay-button"
 		>
-		  Rejouer
+		  Replay
 		</button>
 	  </div>
 	</div>
@@ -30,15 +30,15 @@
 	name: 'Pong',
 	data() {
 	  return {
-		// Paramètres du jeu
+		// Game parameters
 		width: 800,
 		height: 400,
 		paddleWidth: 10,
 		paddleHeight: 100,
 		ballSize: 10,
 		winningScore: 3,
-  
-		// États du jeu
+
+		// Game states
 		playerY: 0,
 		computerY: 0,
 		ballX: 0,
@@ -49,30 +49,30 @@
 		computerScore: 0,
 		gameWinner: null,
 		gameStarted: false,
-  
-		// Touches pressées
+
+		// Keys pressed
 		keysPressed: {
 		  w: false,
 		  s: false,
 		  ArrowUp: false,
 		  ArrowDown: false
 		},
-  
+
 		gameInterval: null
 	  }
 	},
 	mounted() {
-	  // Initialisation des positions
+	  // Initialize positions
 	  this.playerY = this.height / 2 - this.paddleHeight / 2
 	  this.computerY = this.height / 2 - this.paddleHeight / 2
 	  this.ballX = this.width / 2
 	  this.ballY = this.height / 2
-  
-	  // Gestion des touches
+
+	  // Handle key presses
 	  window.addEventListener('keydown', this.handleKeyDown)
 	  window.addEventListener('keyup', this.handleKeyUp)
-  
-	  // On dessine le terrain initial sans démarrer le jeu
+
+	  // Draw initial state without starting the game
 	  this.drawInitialState()
 	},
 	beforeUnmount() {
@@ -82,7 +82,7 @@
 	},
 	methods: {
 	  handleKeyDown(e) {
-		// Empêcher le défilement de la page pour les touches de jeu
+		// Prevent page scrolling for game keys
 		if (['ArrowUp', 'ArrowDown', 'w', 's', 'W', 'S'].includes(e.key)) {
 		  e.preventDefault()
 		}
@@ -104,7 +104,7 @@
 		this.gameStarted = false
 		this.ballX = this.width / 2
 		this.ballY = this.height / 2
-		this.ballSpeedX = 5 * (Math.random() > 0.5 ? 1 : -1) // Direction aléatoire
+		this.ballSpeedX = 5 * (Math.random() > 0.5 ? 1 : -1) // Random direction
 		this.ballSpeedY = 5 * (Math.random() > 0.5 ? 1 : -1)
 		this.playerY = this.height / 2 - this.paddleHeight / 2
 		this.computerY = this.height / 2 - this.paddleHeight / 2
@@ -113,8 +113,8 @@
 	  },
 	  gameLoop() {
 		if (!this.gameStarted || this.gameWinner) return
-  
-		// Mouvement des raquettes
+
+		// Paddle movement
 		if (this.keysPressed.w) {
 		  this.playerY = Math.max(0, this.playerY - 5)
 		}
@@ -127,44 +127,44 @@
 		if (this.keysPressed.arrowdown) {
 		  this.computerY = Math.min(this.height - this.paddleHeight, this.computerY + 5)
 		}
-  
-		// Mouvement de la balle
+
+		// Ball movement
 		let newBallX = this.ballX + this.ballSpeedX
 		let newBallY = this.ballY + this.ballSpeedY
-  
-		// Rebond sur les murs du haut et du bas
+
+		// Top and bottom wall bounces
 		if (newBallY <= 0 || newBallY >= this.height - this.ballSize) {
 		  this.ballSpeedY = -this.ballSpeedY
 		  newBallY = newBallY <= 0 ? 0 : this.height - this.ballSize
 		}
-  
-		// Collision avec les raquettes
+
+		// Paddle collisions
 		const isCollidingWithPlayer = 
 		  newBallX <= this.paddleWidth &&
 		  newBallY + this.ballSize >= this.playerY &&
 		  newBallY <= this.playerY + this.paddleHeight
-  
+
 		const isCollidingWithComputer = 
 		  newBallX >= this.width - this.paddleWidth - this.ballSize &&
 		  newBallY + this.ballSize >= this.computerY &&
 		  newBallY <= this.computerY + this.paddleHeight
-  
+
 		if (isCollidingWithPlayer || isCollidingWithComputer) {
-		  this.ballSpeedX = -this.ballSpeedX * 1.1 // Augmente légèrement la vitesse
+		  this.ballSpeedX = -this.ballSpeedX * 1.1 // Slightly increase speed
 		  this.ballSpeedY = this.ballSpeedY * 1.1
 		  
-		  // Ajuste l'angle selon où la balle frappe la raquette
+		  // Adjust angle based on where the ball hits the paddle
 		  const paddleY = isCollidingWithPlayer ? this.playerY : this.computerY
 		  const relativeIntersectY = (paddleY + (this.paddleHeight / 2)) - newBallY
 		  const normalizedIntersectY = relativeIntersectY / (this.paddleHeight / 2)
 		  this.ballSpeedY = -normalizedIntersectY * Math.abs(this.ballSpeedX)
 		}
-  
-		// Gestion des points
+
+		// Score management
 		if (newBallX <= 0) {
 		  this.computerScore++
 		  if (this.computerScore >= this.winningScore) {
-			this.gameWinner = 'Joueur de droite'
+			this.gameWinner = 'Right Player'
 			clearInterval(this.gameInterval)
 		  } else {
 			this.resetBall()
@@ -172,7 +172,7 @@
 		} else if (newBallX >= this.width) {
 		  this.playerScore++
 		  if (this.playerScore >= this.winningScore) {
-			this.gameWinner = 'Joueur de gauche'
+			this.gameWinner = 'Left Player'
 			clearInterval(this.gameInterval)
 		  } else {
 			this.resetBall()
@@ -181,7 +181,7 @@
 		  this.ballX = newBallX
 		  this.ballY = newBallY
 		}
-  
+
 		this.draw()
 	  },
 	  resetBall() {
@@ -194,15 +194,15 @@
 		const ctx = this.$refs.canvas.getContext('2d')
 		ctx.clearRect(0, 0, this.width, this.height)
 		
-		// Dessin des raquettes
+		// Drawing paddles
 		ctx.fillStyle = 'white'
 		ctx.fillRect(0, this.playerY, this.paddleWidth, this.paddleHeight)
 		ctx.fillRect(this.width - this.paddleWidth, this.computerY, this.paddleWidth, this.paddleHeight)
 		
-		// Dessin de la balle
+		// Drawing the ball
 		ctx.fillRect(this.ballX, this.ballY, this.ballSize, this.ballSize)
-  
-		// Ligne centrale pointillée
+
+		// Dotted center line
 		ctx.setLineDash([5, 15])
 		ctx.beginPath()
 		ctx.moveTo(this.width / 2, 0)
@@ -210,28 +210,28 @@
 		ctx.strokeStyle = 'white'
 		ctx.stroke()
 		
-		// Affichage du score
+		// Score display
 		ctx.font = '48px Arial'
 		ctx.textAlign = 'center'
 		ctx.fillText(this.playerScore, this.width / 4, 60)
 		ctx.fillText(this.computerScore, (this.width / 4) * 3, 60)
   
-		// Affichage du gagnant
+		// Winner display
 		if (this.gameWinner) {
 		  ctx.font = '32px Arial'
-		  ctx.fillText(`${this.gameWinner} gagne !`, this.width / 2, this.height / 2)
+		  ctx.fillText(`${this.gameWinner} wins!`, this.width / 2, this.height / 2)
 		}
 	  },
 	  drawInitialState() {
 		const ctx = this.$refs.canvas.getContext('2d')
 		ctx.clearRect(0, 0, this.width, this.height)
 		
-		// Dessin des raquettes
+		// Drawing paddles
 		ctx.fillStyle = 'white'
 		ctx.fillRect(0, this.playerY, this.paddleWidth, this.paddleHeight)
 		ctx.fillRect(this.width - this.paddleWidth, this.computerY, this.paddleWidth, this.paddleHeight)
 		
-		// Ligne centrale pointillée
+		// Dotted center line
 		ctx.setLineDash([5, 15])
 		ctx.beginPath()
 		ctx.moveTo(this.width / 2, 0)
@@ -239,16 +239,16 @@
 		ctx.strokeStyle = 'white'
 		ctx.stroke()
 		
-		// Affichage du score initial
+		// Initial score display
 		ctx.font = '48px Arial'
 		ctx.textAlign = 'center'
 		ctx.fillText('0', this.width / 4, 60)
 		ctx.fillText('0', (this.width / 4) * 3, 60)
   
-		// Message de démarrage
+		// Start message
 		if (!this.gameStarted && !this.gameWinner) {
 		  ctx.font = '20px Arial'
-		  ctx.fillText('Appuyez sur "Jouer" pour commencer', this.width / 2, this.height / 2 + 50)
+		  ctx.fillText('Press "Play" to start', this.width / 2, this.height / 2 + 50)
 		}
 	  }
 	}

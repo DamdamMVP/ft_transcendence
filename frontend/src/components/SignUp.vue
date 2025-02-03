@@ -31,8 +31,7 @@ const handleSignUp = async () => {
       email: email.value,
       password: password.value,
     })
-    
-    // Réinitialiser les champs
+
     username.value = ''
     email.value = ''
     password.value = ''
