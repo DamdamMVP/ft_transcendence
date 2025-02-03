@@ -8,7 +8,7 @@ const route = useRoute()
 const router = useRouter()
 const userExists = ref(false)
 
-// Vérifier si l'utilisateur existe
+// Check if user exists
 const checkUserExists = async () => {
   try {
     await axios.get(`/users/read/${route.params.id_user}`, {
@@ -16,7 +16,7 @@ const checkUserExists = async () => {
     })
     userExists.value = true
   } catch (err) {
-    // Si l'utilisateur n'existe pas (404) ou autre erreur, rediriger vers la page 404
+    // If user doesn't exist (404) or other error, redirect to 404 page
     router.push('/404')
   }
 }
@@ -62,7 +62,7 @@ onMounted(async () => {
   z-index: 1;
 }
 
-/* Effets de fond améliorés */
+/* Improved background effects */
 .profil-view::before,
 .profil-view::after {
   content: '';
@@ -97,7 +97,7 @@ onMounted(async () => {
   backdrop-filter: blur(100px);
 }
 
-/* Style pour les composants enfants */
+/* Style for child components */
 :deep(.profil-card),
 :deep(.profil-stats),
 :deep(.profil-achievements) {
@@ -116,7 +116,7 @@ onMounted(async () => {
   box-shadow: 0 12px 30px var(--primary-shadow-color);
 }
 
-/* Animations améliorées */
+/* Improved animations */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -139,7 +139,7 @@ onMounted(async () => {
   }
 }
 
-/* Effet de brillance */
+/* Shine effect */
 :deep(.shine-effect) {
   position: relative;
   overflow: hidden;
@@ -171,7 +171,7 @@ onMounted(async () => {
   }
 }
 
-/* Media Queries améliorés */
+/* Improved media queries */
 @media (max-width: 1400px) {
   .profil-content {
     max-width: 95%;
@@ -214,7 +214,7 @@ onMounted(async () => {
   }
 }
 
-/* Support du mode sombre */
+/* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .profil-view::after {
     opacity: 0.07;

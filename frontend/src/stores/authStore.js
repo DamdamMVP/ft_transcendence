@@ -4,13 +4,13 @@ import { useAuth } from '../composables/useAuth'
 import { useUserStatus } from '../composables/useUserStatus'
 
 export const useAuthStore = defineStore('auth', () => {
-  // État de l'authentification
+  // Authentication state
   const isAuthenticated = ref(false)
   const user = ref(null)
   const { signOut } = useAuth()
   const { closeWebSocket } = useUserStatus()
 
-  // Initialiser l'état d'authentification au démarrage
+  // Initialize authentication state on startup
   const initAuth = () => {
     const userData = localStorage.getItem('user')
     if (userData) {
@@ -20,45 +20,45 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   const login = (userData) => {
-    // Mettre à jour l'état
+    // Update state
     user.value = userData
     isAuthenticated.value = true
 
-    // Sauvegarder les données utilisateur
+    // Save user data
     localStorage.setItem('user', JSON.stringify(userData))
   }
 
   const updateUser = (updatedData) => {
     if (user.value) {
-      // Mettre à jour uniquement les champs fournis
+      // Update only provided fields
       user.value = {
         ...user.value,
         ...updatedData
       }
-      // Sauvegarder les données mises à jour
+      // Save updated data
       localStorage.setItem('user', JSON.stringify(user.value))
     }
   }
 
   const logout = async () => {
     try {
-      // Fermer le WebSocket avant la déconnexion
+      // Close WebSocket before logout
       closeWebSocket()
       
       await signOut()
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error)
+      console.error('Error during logout:', error)
     } finally {
-      // Nettoyer l'état
+      // Clean up state
       user.value = null
       isAuthenticated.value = false
 
-      // Nettoyer le localStorage
+      // Clean up localStorage
       localStorage.removeItem('user')
     }
   }
 
-  // Initialiser l'état au démarrage
+  // Initialize state on startup
   initAuth()
 
   return { 

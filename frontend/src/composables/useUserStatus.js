@@ -2,7 +2,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../stores/authStore'
 import { useFriendStore } from '../stores/friendStore'
-// Singleton pattern pour le WebSocket
+// Singleton pattern for WebSocket
 let socket = null
 const onlineUsers = ref(new Set())
 
@@ -11,11 +11,11 @@ export function useUserStatus() {
   const fetchOnlineUsers = async () => {
     try {
         const response = await axios.get('/users/list_online')
-        // Extraire les IDs des utilisateurs de la réponse
+        // Extract user IDs from response
         const users = response.data.online_users.map(user => user.user__id)
         onlineUsers.value = new Set(users)
         
-        // Mettre à jour le statut des amis
+        // Update friends status
         const friendStore = useFriendStore()
         friendStore.friends.forEach(friend => {
             const isOnline = onlineUsers.value.has(friend.id)
@@ -47,7 +47,7 @@ export function useUserStatus() {
     socket.onopen = () => {
 		console.log('WebSocket connected')
 		fetchOnlineUsers()
-		// Envoyer un heartbeat régulier
+		// Send regular heartbeat
 		setInterval(() => {
 		  if (socket?.readyState === WebSocket.OPEN) {
 			socket.send(JSON.stringify({ type: 'heartbeat' }))
@@ -61,7 +61,7 @@ export function useUserStatus() {
 		  console.log('WebSocket message received:', data)
 	  
 		  if (data.type === 'user_status') {
-			// Créez un nouveau Set pour déclencher la réactivité
+			// Create a new Set to trigger reactivity
 			const updatedUsers = new Set(onlineUsers.value)
 			
 			if (data.is_online) {
@@ -70,14 +70,14 @@ export function useUserStatus() {
 			  updatedUsers.delete(data.user_id)
 			}
 	  
-			// Remplacement complet du Set
+			// Complete Set replacement
 			onlineUsers.value = updatedUsers
 	  
-			// Mise à jour reactive du store
+			// Reactive store update
 			const friendStore = useFriendStore()
 			friendStore.updateFriendStatus(data.user_id, data.is_online)
 	  
-			// Forcer une mise à jour de l'interface si nécessaire
+			// Force UI update if needed
 			friendStore.friends = [...friendStore.friends]
 		  }
 		} catch (error) {

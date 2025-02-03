@@ -6,15 +6,15 @@ import eventBus from '@/utils/eventBus'
 import axios from 'axios'
 import TwoFactorModal from '@/components/modals/TwoFactorModal.vue'
 
-// Configuration d'axios pour inclure les cookies
+// Configure axios to include cookies
 axios.defaults.withCredentials = true
 
 const router = useRouter()
 const authStore = useAuthStore()
 
-// Gestionnaire pour l'annulation de la 2FA
+// Handler for 2FA cancellation
 const handle2FACancelled = () => {
-  console.log('2FA annulée, redirection vers login')
+  console.log('2FA cancelled, redirecting to login')
   router.push('/login')
 }
 
@@ -26,38 +26,38 @@ onMounted(async () => {
   if (userDataStr && token) {
     const userData = JSON.parse(decodeURIComponent(userDataStr))
     
-    // Vérifier le statut 2FA exactement comme dans signIn
+    // Check 2FA status exactly as in signIn
     try {
       const twoFAResponse = await axios.get('/users/2fa/status')
-      console.log('Statut 2FA:', twoFAResponse.data.enabled ? 'Activé' : 'Désactivé')
+      console.log('2FA status:', twoFAResponse.data.enabled ? 'Enabled' : 'Disabled')
       
       if (twoFAResponse.data.enabled) {
-        // Écouter l'événement de succès 2FA
+        // Listen for 2FA success event
         eventBus.on('2fa-success', (data) => {
-          console.log('2FA validée, connexion...')
+          console.log('2FA validated, logging in...')
           authStore.login(userData, token)
           eventBus.off('2fa-success')
-          eventBus.off('2fa-cancelled')  // Ne pas oublier de retirer cet écouteur aussi
+          eventBus.off('2fa-cancelled')  // Don't forget to remove this listener too
           router.push('/pong')
         })
         
-        // Écouter l'événement d'annulation
+        // Listen for cancellation event
         eventBus.on('2fa-cancelled', () => {
-          console.log('2FA annulée, redirection vers login')
+          console.log('2FA cancelled, redirecting to login')
           eventBus.off('2fa-success')
           eventBus.off('2fa-cancelled')
           router.push('/')
         })
         
-        // Ouvrir le modal 2FA
+        // Open 2FA modal
         eventBus.emit('show-2fa-verification')
         return
       }
     } catch (error) {
-      console.warn('Impossible de récupérer le statut 2FA:', error)
+      console.warn('Failed to retrieve 2FA status:', error)
     }
 
-    // Si pas de 2FA ou erreur de vérification du statut, procéder à la connexion normale
+    // If no 2FA or verification status error, proceed with normal login
     authStore.login(userData, token)
     router.push('/pong')
   } else {
@@ -65,7 +65,7 @@ onMounted(async () => {
   }
 })
 
-// Nettoyage des écouteurs au démontage du composant
+// Clean up listeners when component is unmounted
 onBeforeUnmount(() => {
   eventBus.off('2fa-success')
   eventBus.off('2fa-cancelled')
@@ -74,7 +74,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="auth-callback">
-    <p>Authentification en cours...</p>
+    <p>Authenticating...</p>
     <TwoFactorModal />
   </div>
 </template>

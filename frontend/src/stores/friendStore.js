@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import axios from 'axios'
 
 export const useFriendStore = defineStore('friend', () => {
-  // État
+  // State
   const friends = ref([])
   const blockedUsers = ref([])
 
@@ -39,23 +39,23 @@ export const useFriendStore = defineStore('friend', () => {
       }
     } catch (error) {
       if (error.response?.status === 404) {
-        throw new Error('Utilisateur non trouvé')
+        throw new Error('User not found')
       } else if (error.response?.status === 400) {
         if (
           error.response?.data?.error === 'You cannot add yourself as a friend'
         ) {
-          throw new Error('Vous ne pouvez pas vous ajouter vous-même comme ami')
+          throw new Error('You cannot add yourself as a friend')
         } else if (
           error.response?.data?.error === 'This user is already your friend'
         ) {
-          throw new Error('Cet utilisateur est déjà votre ami')
+          throw new Error('This user is already your friend')
         } else {
           throw new Error(
-            error.response?.data?.error || "Erreur lors de l'ajout d'ami"
+            error.response?.data?.error || 'Error adding friend'
           )
         }
       } else {
-        throw new Error("Erreur lors de l'ajout d'ami")
+        throw new Error('Error adding friend')
       }
     }
   }
@@ -77,17 +77,17 @@ export const useFriendStore = defineStore('friend', () => {
 
       if (response.status === 200) {
         console.log('Friend removed successfully')
-        await loadFriends() // Recharger la liste des amis
+        await loadFriends() // Reload friends list
         return true
       }
     } catch (error) {
       console.error('Error removing friend:', error)
       if (error.response?.status === 404) {
-        throw new Error('Utilisateur non trouvé')
+        throw new Error('User not found')
       } else {
         throw new Error(
           error.response?.data?.error ||
-            "Erreur lors de la suppression de l'ami"
+            'Error removing friend'
         )
       }
     }
@@ -97,22 +97,22 @@ export const useFriendStore = defineStore('friend', () => {
     try {
       console.log('Blocking user:', username)
 
-      // D'abord trouver l'ID de l'utilisateur à bloquer dans la liste des amis
+      // First find the ID of the user to block in the friends list
       const userToBlock = friends.value.find(
         (friend) => friend.username === username
       )
       console.log('User to block:', userToBlock)
       if (!userToBlock) {
-        throw new Error('Utilisateur non trouvé dans la liste des amis')
+        throw new Error('User not found in friends list')
       }
 
-      // Garder l'ID pour plus tard
+      // Keep ID for later
       const userIdToBlock = userToBlock.id
 
-      // Supprimer de la liste d'amis
+      // Remove from friends list
       await removeFriend(username)
 
-      // Ensuite bloquer l'utilisateur avec l'ID sauvegardé
+      // Then block the user with the saved ID
       console.log('Sending block request with ID:', userIdToBlock)
       const response = await axios.post(
         '/users/block',
@@ -130,7 +130,7 @@ export const useFriendStore = defineStore('friend', () => {
 
       if (response.status === 200 || response.status === 201) {
         console.log('User blocked successfully')
-        // Mettre à jour la liste des utilisateurs bloqués
+        // Update blocked users list
         const blockedResponse = await axios.get(
           `${import.meta.env.VITE_BASE_URL}/users/list_blocked`,
           {
@@ -144,7 +144,7 @@ export const useFriendStore = defineStore('friend', () => {
 
         if (blockedResponse.status === 200) {
           blockedUsers.value = blockedResponse.data
-          await loadFriends() // Recharger la liste des amis une dernière fois pour s'assurer qu'elle est à jour
+          await loadFriends() // Reload friends list one last time to ensure it's up to date
           console.log('Updated blocked users list and friends list')
         }
         return true
@@ -154,17 +154,17 @@ export const useFriendStore = defineStore('friend', () => {
       console.error('Error response:', error.response?.data)
       console.error('Error status:', error.response?.status)
       if (error.response?.status === 404) {
-        throw new Error('Utilisateur non trouvé')
+        throw new Error('User not found')
       } else if (error.response?.data?.error) {
         throw new Error(error.response.data.error)
       } else {
-        throw new Error("Erreur lors du blocage de l'utilisateur")
+        throw new Error('Error blocking user')
       }
     }
   }
 
   const unblockUser = async (userId) => {
-    // TODO: Appel API pour débloquer un utilisateur
+    // TODO: API call to unblock a user
     blockedUsers.value = blockedUsers.value.filter((id) => id !== userId)
   }
 
@@ -200,14 +200,14 @@ export const useFriendStore = defineStore('friend', () => {
     }
   }
 
-  // Réinitialiser le store
+  // Reset store
   const reset = () => {
     friends.value = []
     blockedUsers.value = []
   }
 
   return {
-    // État
+    // State
     friends,
     blockedUsers,
 

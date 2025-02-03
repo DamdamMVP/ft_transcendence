@@ -122,7 +122,7 @@ export function useTheme() {
 
   const getCurrentTheme = () => currentTheme.value
 
-  // Appliquer le thème initial
+  // Apply initial theme
   setTheme(currentTheme.value)
 
   return {

@@ -11,7 +11,7 @@ const authStore = useAuthStore()
 const { locale } = useI18n()
 const { setTheme } = useTheme()
 
-// Initialiser le thème et la langue au chargement
+// Initialize theme and language on load
 onMounted(() => {
   if (authStore.user?.language) {
     locale.value = authStore.user.language
@@ -21,7 +21,7 @@ onMounted(() => {
   }
 })
 
-// Surveiller les changements dans authStore.user
+// Watch for changes in authStore.user
 watch(
   () => authStore.user,
   (newUser) => {
@@ -62,7 +62,6 @@ watch(
 }
 
 body {
-  /* color: var(--text-color); */
   background-color: var(--background-color);
 }
 
