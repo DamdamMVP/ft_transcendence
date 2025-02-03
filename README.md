@@ -55,7 +55,7 @@ cd ft_transcendence
 ### 3. 🎯 Catch
 
 - 👥 Jouer en local 1vs1
-- Deux modes de jeu
+- 🎮 Deux modes de jeu
 
 ![Affichage du catch](readme/catch.gif)
 
