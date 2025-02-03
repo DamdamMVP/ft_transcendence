@@ -199,7 +199,7 @@
   },
   "gdpr": {
     "title": "Aotreadur GDPR",
-    "message": "Pa grouit ur gont, e asantit da bolitikerezh GDPR hag e roit ho asant evit ma vo tremenet ho roadennoù personel. Ma na rit ket, ne vo ket krouet ho kont.",
+    "message": "Pa grouit ur gont, ec'h asantit d'hon politikerezh RGPT ha d'amprouiñ ho roadennoù personel. Ma ne rit ket, ne vo ket krouet ho kont. (N'it ket en nec'h, ne werzhomp ket ho roadennoù da dut all, ne viromp anezho nemet evit kinnig deoc'h un amprouadur personelaet war hon lec'hienn, ha ne stokomp nemet ar pezh a zo ret evit se. Ho roadennoù zo miret en un doare surentezet ha vo dilamet war hoc'h azgoulenn.)",
     "accept": "Asantiñ",
     "decline": "Na asantiñ"
   }

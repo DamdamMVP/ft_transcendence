@@ -211,7 +211,7 @@
   },
   "gdpr": {
     "title": "Consenso GDPR",
-    "message": "Creando un account, accetti la nostra politica GDPR e acconsenti al trattamento dei tuoi dati personali. In caso contrario, il tuo account non verrà creato.",
+    "message": "Creando un account, accetti la nostra politica GDPR e acconsenti al trattamento dei tuoi dati personali. Altrimenti, il tuo account non verrà creato. (Non preoccuparti, non vendiamo i tuoi dati a terzi, li conserviamo solo per offrirti un'esperienza personalizzata sul nostro sito, e memorizziamo solo ciò che è necessario per questo scopo. I tuoi dati sono archiviati in modo sicuro e verranno eliminati su semplice richiesta.)",
     "accept": "Accetta",
     "decline": "Rifiuta"
   }

@@ -211,7 +211,7 @@
   },
   "gdpr": {
     "title": "Consentement RGPD",
-    "message": "En créant un compte, vous acceptez notre politique RGPD et consentez au traitement de vos données personnelles. Sinon, votre compte ne sera pas créé.",
+    "message": "En créant un compte, vous acceptez notre politique RGPD et consentez au traitement de vos données personnelles. Sinon, votre compte ne sera pas créé. (vous inquiétez pas, on ne vend pas vos données à des tiers, on ne fait que les stocker pour vous offrir une expérience personnalisée sur notre site, et nous ne stockons que ce qui est nécessaire pour cela. Vos données sont stockées de manière sécurisée et serons supprimées sur simple demande.)",
     "accept": "Accepter",
     "decline": "Refuser"
   }

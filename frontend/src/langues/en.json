@@ -209,7 +209,7 @@
   },
   "gdpr": {
     "title": "GDPR Consent",
-    "message": "By creating an account, you agree to our GDPR policy and consent to the processing of your personal data. Else your account won't be created.",
+    "message": "By creating an account, you accept our GDPR policy and consent to the processing of your personal data. Otherwise, your account will not be created. (Don't worry, we don't sell your data to third parties, we only store it to provide you with a personalized experience on our site, and we only store what is necessary for this purpose. Your data is securely stored and will be deleted upon simple request.)",
     "accept": "Accept",
     "decline": "Decline"
   }
