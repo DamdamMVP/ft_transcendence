@@ -247,7 +247,6 @@ defineExpose({
   margin-bottom: 0.5rem;
 }
 
-/* Animations */
 @keyframes float {
   0%, 100% {
     transform: translateY(0);

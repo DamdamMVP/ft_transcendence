@@ -245,10 +245,9 @@ onUnmounted(() => {
   position: relative;
   overflow: hidden;
   background: var(--background-color);
-  isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
+  isolation: isolate;
 }
 
-/* Ajout des pseudo-éléments pour le fond */
 .local-mode::before {
   content: '';
   position: absolute;
@@ -286,7 +285,6 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
-/* Titre */
 h2 {
   font-size: 2.5rem;
   font-weight: 800;
@@ -296,7 +294,6 @@ h2 {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Container du jeu */
 .game-container {
   width: 100%;
   max-width: 800px;
@@ -310,7 +307,6 @@ h2 {
   backdrop-filter: blur(10px);
 }
 
-/* Overlay de configuration des joueurs */
 .player-setup-overlay {
   background: var(--background-secondary-color);
   padding: 3rem;
@@ -410,7 +406,6 @@ h2 {
   background: var(--text-secondary-color);
 }
 
-/* Animations */
 @keyframes float {
   0%, 100% {
     transform: translateY(0);
@@ -440,7 +435,6 @@ h2 {
   }
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
   h2 {
     font-size: 2.5rem;

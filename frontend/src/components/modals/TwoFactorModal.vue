@@ -14,18 +14,18 @@
         }}
       </h2>
 
-      <!-- Alert pour les messages d'erreur/succès -->
+      <!-- Alert for error/success messages -->
       <div v-if="alertMessage" :class="['alert', `alert-${alertType}`]">
         {{ alertMessage }}
       </div>
 
-      <!-- Mode QR Code -->
+      <!-- QR Code Mode -->
       <div v-if="qrCode && !isVerificationMode" class="qr-container">
         <img :src="`data:image/svg+xml;base64,${qrCode}`" alt="QR Code" />
         <p class="instructions">{{ t('security.scanQRCode') }}</p>
       </div>
 
-      <!-- Mode Vérification -->
+      <!-- Verification Mode -->
       <template v-else-if="isVerificationMode">
         <p class="instructions">{{ t('security.enter2FACode') }}</p>
         <div class="input-group">
@@ -85,23 +85,20 @@ const isLoading = ref(false)
 const alertMessage = ref('')
 const alertType = ref('info')
 const isVerificationMode = ref(false)
-const codeInput = ref(null) // Référence pour l'input
+const codeInput = ref(null)
 
-// Computed
 const isValidCode = computed(() => {
   return /^\d{6}$/.test(verificationCode.value)
 })
 
-// Input validation
 const validateInput = (event) => {
   const value = event.target.value
   verificationCode.value = value.replace(/\D/g, '').slice(0, 6)
 }
 
-// Gestion des erreurs API
 const handleApiError = async (error) => {
   isLoading.value = false
-  verificationCode.value = '' // Vider le champ
+  verificationCode.value = ''
   if (error.message === 'invalidCode') {
     alertMessage.value = t('security.invalidCode')
   } else {
@@ -110,9 +107,8 @@ const handleApiError = async (error) => {
   }
   alertType.value = 'error'
 
-  // Attendre que le DOM soit mis à jour avec le message d'erreur
+
   await nextTick()
-  // Remettre le focus sur l'input
   if (codeInput.value) {
     codeInput.value.focus()
   }
@@ -122,14 +118,12 @@ const handleApiError = async (error) => {
   }, 5000)
 }
 
-// Gestionnaire d'événement pour la touche Échap
 const handleEscape = (e) => {
   if (e.key === 'Escape' && show.value && !isLoading.value) {
     closeModal()
   }
 }
 
-// Ajouter/retirer l'écouteur quand le modal s'ouvre/se ferme
 const setupEscapeListener = () => {
   document.addEventListener('keyup', handleEscape)
 }
@@ -138,7 +132,6 @@ const removeEscapeListener = () => {
   document.removeEventListener('keyup', handleEscape)
 }
 
-// Ouvrir le modal avec le QR code
 const openModal = (qrCodeData) => {
   qrCode.value = qrCodeData
   show.value = true
@@ -147,7 +140,6 @@ const openModal = (qrCodeData) => {
   alertType.value = 'info'
 }
 
-// Ouvrir le modal pour la vérification
 const openVerificationModal = async () => {
   show.value = true
   isVerificationMode.value = true
@@ -156,11 +148,9 @@ const openVerificationModal = async () => {
   alertMessage.value = ''
   alertType.value = 'info'
 
-  setupEscapeListener() // Ajouter l'écouteur
+  setupEscapeListener()
 
-  // Attendre que le DOM soit mis à jour
   await nextTick()
-  // Mettre le focus sur l'input
   if (codeInput.value) {
     codeInput.value.focus()
   }
@@ -174,7 +164,7 @@ const closeModal = () => {
     if (isVerificationMode.value) {
       eventBus.emit('2fa-cancelled')
     }
-    removeEscapeListener() // Retirer l'écouteur
+    removeEscapeListener()
   }
 }
 

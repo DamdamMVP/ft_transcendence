@@ -352,7 +352,7 @@ export class GameEngine {
 	  ctx.fill()
 	  ctx.closePath()
   
-	  // Si on est en phase de score, afficher le score au centre
+	  // If we are in score phase, display the score in the center
 	  if (gamePhase === 'score') {
 		ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
 		ctx.font = 'bold 48px Arial'

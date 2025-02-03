@@ -49,10 +49,9 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
+  isolation: isolate;
 }
 
-/* Ajout des pseudo-éléments pour le fond */
 .pong-home::before {
   content: '';
   position: absolute;
@@ -185,7 +184,6 @@
 	}
   }
   
-  /* Animation pour l'apparition des boutons */
   .mode-button {
 	animation: fadeInUp 0.6s ease backwards;
   }

@@ -247,10 +247,9 @@ onUnmounted(() => {
   position: relative;
   overflow: hidden;
   background: var(--background-color);
-  isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
+  isolation: isolate;
 }
 
-/* Ajout des pseudo-éléments pour le fond */
 .ai-mode::before {
   content: '';
   position: absolute;

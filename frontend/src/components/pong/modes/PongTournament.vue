@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <!-- Zone de jeu -->
+    <!-- Game zone -->
     <div v-else class="game-container">
       <GameCanvas
         ref="gameCanvasRef"
@@ -77,11 +77,11 @@ import { GameEngine } from '../common/GameEngine'
 const { t } = useI18n()
 const authStore = useAuthStore()
 
-// État du tournoi
+// Tournament state
 const gamePhase = ref('menu')
 const canvasPhase = ref('ready')
 const players = ref([
-  authStore.user?.username || '', // Utiliser le pseudo de l'utilisateur connecté
+  authStore.user?.username || '',
   '',
   '',
   '',
@@ -92,7 +92,7 @@ const currentMatchIndex = ref(0)
 const currentMatch = ref({ player1: '', player2: '', round: 'semi' })
 const bonusModeEnabled = ref(false)
 
-// État du jeu
+// Game state
 const gameCanvasRef = ref(null)
 const gameEngine = ref(null)
 const countdownValue = ref(3)
@@ -103,7 +103,7 @@ let scoreTimeout = null
 
 let animationId = null
 
-// Vérifier uniquement les joueurs 2 à 4
+// Check only players 2 to 4
 const canStart = computed(() => {
   return players.value.slice(1).every((player) => player.trim() !== '')
 })
@@ -120,7 +120,7 @@ function startTournament() {
 
 function setupNextMatch() {
   if (currentMatchIndex.value < 2) {
-    // Demi-finales
+    // Semifinals
     const matchIndex = currentMatchIndex.value
     currentMatch.value = {
       player1: getPlayerName(matchIndex * 2),
@@ -128,7 +128,7 @@ function setupNextMatch() {
       round: 'semi',
     }
   } else if (currentMatchIndex.value === 2) {
-    // Finale
+    // Final
     currentMatch.value = {
       player1: winners.value[0],
       player2: winners.value[1],
@@ -148,10 +148,10 @@ function startNextMatch() {
     const canvas = gameCanvasRef.value?.canvas
     if (canvas) {
       gameEngine.value = new GameEngine(canvas.width, canvas.height, bonusModeEnabled.value)
-      // Forcer une première frame pour s'assurer que tout est initialisé
+      // Force a first frame to ensure everything is initialized
       const ctx = canvas.getContext('2d')
       gameEngine.value.drawGame(ctx)
-      // Lancer automatiquement le jeu
+      // Launch the game automatically
       launchGame()
     }
   })
@@ -194,7 +194,7 @@ function gameLoop() {
       if (player === 'player1') player1Score.value++
       else player2Score.value++
 
-      // Pause pendant 1 seconde pour montrer le score
+      // Pause for 1 second to show the score
       canvasPhase.value = 'score'
       if (scoreTimeout) clearTimeout(scoreTimeout)
 
@@ -202,7 +202,7 @@ function gameLoop() {
         if (!isGameOver && gameEngine.value) {
           canvasPhase.value = 'playing'
           gameEngine.value.launchBall()
-          gameLoop() // Relancer la boucle de jeu
+          gameLoop()
         }
       }, 1000)
     }
@@ -243,7 +243,7 @@ function endMatch() {
       : currentMatch.value.player2
   matchWinner.value = winner
 
-  // Mettre à jour le tournoi
+  // Update the tournament
   if (currentMatchIndex.value < 2) {
     winners.value[currentMatchIndex.value] = winner
   } else {
@@ -254,7 +254,7 @@ function endMatch() {
 function handleMatchEnd() {
   currentMatchIndex.value++
 
-  // Réinitialiser les scores
+  // Reset scores
   player1Score.value = 0
   player2Score.value = 0
   matchWinner.value = ''
@@ -268,7 +268,6 @@ function handleMatchEnd() {
   }
 }
 
-// Gestion des événements clavier
 function handleKeyDown(e) {
   if (gameEngine.value && canvasPhase.value === 'playing') {
     gameEngine.value.handleKeyDown(e)
@@ -306,10 +305,9 @@ onUnmounted(() => {
   min-height: 80vh;
   background: var(--background-color);
   animation: fadeIn 0.6s ease;
-  isolation: isolate; /* Ajout pour créer un nouveau contexte d'empilement */
+  isolation: isolate;
 }
 
-/* Ajout des pseudo-éléments pour le fond */
 .tournament-mode::before {
   content: '';
   position: absolute;
@@ -404,7 +402,6 @@ onUnmounted(() => {
   animation: fadeInUp 0.6s ease;
 }
 
-/* Positionnement des boîtes dans la grille */
 .match-box:nth-child(1) {
   grid-area: 1 / 1 / 2 / 2;
 }
@@ -429,7 +426,6 @@ onUnmounted(() => {
   grid-area: 4 / 5 / 5 / 6;
 }
 
-/* Connecteurs horizontaux */
 .match-box:nth-child(1)::after,
 .match-box:nth-child(2)::after,
 .match-box:nth-child(3)::after,
@@ -514,7 +510,6 @@ onUnmounted(() => {
   margin: 0 auto;
 }
 
-/* Animations */
 @keyframes float {
   0%, 100% {
     transform: translateY(0);
