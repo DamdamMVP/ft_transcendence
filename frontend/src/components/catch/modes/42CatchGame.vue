@@ -38,7 +38,6 @@
 		</div>
 	  </div>
   
-	  <!-- Moved outside of game-board -->
 	  <div v-if="!gameStarted || gameOver" class="overlay"></div>
 	  <div v-if="!gameStarted || gameOver" class="start-message">
 		<div v-if="gameOver">
@@ -301,7 +300,6 @@ export default {
           y: margin + Math.random() * (this.boardHeight - 2 * margin),
         };
 
-        // Calculate distance to cat
         const dx = newPos.x - this.catPos.x;
         const dy = newPos.y - this.catPos.y;
         const distanceToCat = Math.sqrt(dx * dx + dy * dy);
@@ -672,13 +670,11 @@ export default {
   }
 }
 
-/* Adjust button style to align with message */
 .start-message .start-btn {
   margin-top: 20px;
   min-width: 200px;
 }
 
-/* Style for game over text container */
 .game-over-text + .game-over-text {
   margin-top: 10px;
   font-size: 28px;

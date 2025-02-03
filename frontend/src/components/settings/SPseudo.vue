@@ -8,7 +8,6 @@ const authStore = useAuthStore()
 
 const username = ref(authStore.user?.username || '')
 
-// Surveiller les changements dans authStore.user
 watch(
   () => authStore.user,
   (newUser) => {

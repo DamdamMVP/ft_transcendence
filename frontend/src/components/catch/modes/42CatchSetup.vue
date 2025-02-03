@@ -268,7 +268,6 @@
 	}
   }
   
-  /* Media Queries */
   @media (max-width: 768px) {
 	.guest-form {
 	  padding: 2rem;
