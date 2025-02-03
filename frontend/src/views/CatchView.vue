@@ -8,27 +8,6 @@
 	</div>
   </template>
   
-  <script setup>
-  import CatchGame from '@/components/catch/modes/CatchGame.vue'
-  import { useAuthStore } from '@/stores/authStore'
-  import { useTheme } from '@/composables/useTheme'
-  import { useI18n } from 'vue-i18n'
-  import { ref } from 'vue'
-  
-  const authStore = useAuthStore()
-  const { currentTheme } = useTheme()
-  const { t } = useI18n()
-  
-  const guestUsername = ref(null)
-  const guestInput = ref('')
-  
-  const setGuestUsername = () => {
-	if (guestInput.value.trim()) {
-	  guestUsername.value = guestInput.value.trim()
-	}
-  }
-  </script>
-  
   <style scoped>
   .catch-view {
 	width: 100%;

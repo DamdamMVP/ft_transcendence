@@ -12,12 +12,6 @@ axios.defaults.withCredentials = true
 const router = useRouter()
 const authStore = useAuthStore()
 
-// Handler for 2FA cancellation
-const handle2FACancelled = () => {
-  console.log('2FA cancelled, redirecting to login')
-  router.push('/login')
-}
-
 onMounted(async () => {
   const params = new URLSearchParams(window.location.search)
   const userDataStr = params.get('user')
