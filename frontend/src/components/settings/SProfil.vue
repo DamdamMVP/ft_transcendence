@@ -38,7 +38,7 @@ const saveProfilePhoto = async () => {
   // Check the file size (2MB max)
   if (selectedFile.value.size > 2 * 1024 * 1024) {
     emit('showNotification', {
-      message: t('settings.notifications.profileError'),
+      message: t('settings.notifications.profileSizeError'),
       type: 'error',
     })
     return
@@ -52,25 +52,27 @@ const saveProfilePhoto = async () => {
       `/users/update_profile_picture/${authStore.user.id}`,
       formData,
       {
-        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        withCredentials: true,
       }
     )
 
-    if (response.data) {
+    if (response.data.message === 'Profile picture updated successfully') {
       emit('showNotification', {
         message: t('settings.notifications.profileUpdated'),
         type: 'success',
       })
-      authStore.updateUser(response.data)
+
+      const userResponse = await axios.get(
+        `/users/read/${authStore.user.id}`,
+        { withCredentials: true }
+      )
+      if (userResponse.data) {
+        authStore.updateUser(userResponse.data)
+      }
       selectedFile.value = null
-    } else {
-      emit('showNotification', {
-        message: t('settings.notifications.profileError'),
-        type: 'error',
-      })
     }
   } catch (error) {
     emit('showNotification', {
@@ -83,15 +85,15 @@ const saveProfilePhoto = async () => {
 
 <template>
   <div class="profile-section">
-    <h3>{{ $t('settings.profilePhoto') }}</h3>
+    <h3>{{ t('settings.profilePhoto') }}</h3>
     <div class="profile-photo-container">
       <img
         :src="profilePhotoUrl"
-        :alt="$t('settings.profilePhoto')"
+        :alt="t('settings.profilePhoto')"
         class="profile-photo"
       />
       <div class="photo-overlay" @click="triggerFileInput">
-        <span>{{ $t('settings.clickToChange') }}</span>
+        <span>{{ t('settings.clickToChange') }}</span>
       </div>
     </div>
     <input
@@ -106,7 +108,7 @@ const saveProfilePhoto = async () => {
       @click="saveProfilePhoto"
       :disabled="!selectedFile"
     >
-      <i class="icon-save"></i> {{ $t('settings.save') }}
+      <i class="icon-save"></i> {{ t('settings.save') }}
     </button>
   </div>
 </template>

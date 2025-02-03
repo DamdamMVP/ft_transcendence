@@ -94,11 +94,11 @@ export default {
   props: {
     playerUsername: {
       type: String,
-      default: 'Player',
+      default: 'Joueur',
     },
     guestUsername: {
       type: String,
-      default: 'Guest',
+      default: 'Invité',
     },
   },
   data() {
@@ -188,7 +188,6 @@ export default {
             playerBox.left < wallBox.right && 
             playerBox.bottom > wallBox.top && 
             playerBox.top < wallBox.bottom) {
-
           const fromLeft = Math.abs(playerBox.right - wallBox.left) < Math.abs(playerBox.left - wallBox.right)
           return { type: 'wall', fromLeft }
         }
@@ -222,85 +221,91 @@ export default {
       const spriteSize = 15
       let mouseMove = { x: 0, y: 0 }
 
+      let mouseVerticalPos = { x: this.mousePos.x, y: newMouseY }
       if (this.pressedKeys.has('w')) {
-        newMouseY = Math.max(spriteSize, this.mousePos.y - this.mouseSpeed)
+        mouseVerticalPos.y = Math.max(spriteSize, this.mousePos.y - this.mouseSpeed)
         mouseMove.y = -this.mouseSpeed
       }
       if (this.pressedKeys.has('s')) {
-        newMouseY = Math.min(this.boardHeight - spriteSize, this.mousePos.y + this.mouseSpeed)
+        mouseVerticalPos.y = Math.min(this.boardHeight - spriteSize, this.mousePos.y + this.mouseSpeed)
         mouseMove.y = this.mouseSpeed
       }
+      const mouseVerticalCollision = this.checkWallCollision(mouseVerticalPos)
+      if (!mouseVerticalCollision) {
+        newMouseY = mouseVerticalPos.y
+      }
+
+      let mouseHorizontalPos = { x: newMouseX, y: this.mousePos.y }
       if (this.pressedKeys.has('a')) {
-        newMouseX = Math.max(spriteSize, this.mousePos.x - this.mouseSpeed)
+        mouseHorizontalPos.x = Math.max(spriteSize, this.mousePos.x - this.mouseSpeed)
         mouseMove.x = -this.mouseSpeed
       }
       if (this.pressedKeys.has('d')) {
-        newMouseX = Math.min(this.boardWidth - spriteSize, this.mousePos.x + this.mouseSpeed)
+        mouseHorizontalPos.x = Math.min(this.boardWidth - spriteSize, this.mousePos.x + this.mouseSpeed)
         mouseMove.x = this.mouseSpeed
+      }
+      const mouseHorizontalCollision = this.checkWallCollision(mouseHorizontalPos)
+      if (!mouseHorizontalCollision) {
+        newMouseX = mouseHorizontalPos.x
       }
 
       let newCatX = this.catPos.x
       let newCatY = this.catPos.y
       let catMove = { x: 0, y: 0 }
 
+      let catVerticalPos = { x: this.catPos.x, y: newCatY }
       if (this.pressedKeys.has('8')) {
-        newCatY = Math.max(spriteSize, this.catPos.y - this.catSpeed)
+        catVerticalPos.y = Math.max(spriteSize, this.catPos.y - this.catSpeed)
         catMove.y = -this.catSpeed
       }
       if (this.pressedKeys.has('5')) {
-        newCatY = Math.min(this.boardHeight - spriteSize, this.catPos.y + this.catSpeed)
+        catVerticalPos.y = Math.min(this.boardHeight - spriteSize, this.catPos.y + this.catSpeed)
         catMove.y = this.catSpeed
       }
+      const catVerticalCollision = this.checkWallCollision(catVerticalPos)
+      if (!catVerticalCollision) {
+        newCatY = catVerticalPos.y
+      }
+
+      let catHorizontalPos = { x: newCatX, y: this.catPos.y }
       if (this.pressedKeys.has('4')) {
-        newCatX = Math.max(spriteSize, this.catPos.x - this.catSpeed)
+        catHorizontalPos.x = Math.max(spriteSize, this.catPos.x - this.catSpeed)
         catMove.x = -this.catSpeed
       }
       if (this.pressedKeys.has('6')) {
-        newCatX = Math.min(this.boardWidth - spriteSize, this.catPos.x + this.catSpeed)
+        catHorizontalPos.x = Math.min(this.boardWidth - spriteSize, this.catPos.x + this.catSpeed)
         catMove.x = this.catSpeed
       }
-
-      const mouseCollision = this.checkWallCollision({ x: newMouseX, y: newMouseY })
-      if (!mouseCollision) {
-        if (this.mousePos.x !== newMouseX || this.mousePos.y !== newMouseY) {
-          this.lastMouseMove = now
-          this.mouseTrail.unshift({
-            x: this.mousePos.x + 12,
-            y: this.mousePos.y + 12,
-            speed: Math.sqrt(Math.pow(mouseMove.x, 2) + Math.pow(mouseMove.y, 2))
-          })
-          if (this.mouseTrail.length > this.trailLength) {
-            this.mouseTrail.pop()
-          }
-        }
-        this.mousePos = { x: newMouseX, y: newMouseY }
-      } else if (mouseCollision.type === 'wall') {
-        this.mousePos = {
-          x: mouseCollision.fromLeft ? newMouseX - 30 : newMouseX + 30,
-          y: newMouseY
-        }
+      const catHorizontalCollision = this.checkWallCollision(catHorizontalPos)
+      if (!catHorizontalCollision) {
+        newCatX = catHorizontalPos.x
       }
 
-      const catCollision = this.checkWallCollision({ x: newCatX, y: newCatY })
-      if (!catCollision) {
-        if (this.catPos.x !== newCatX || this.catPos.y !== newCatY) {
-          this.lastCatMove = now
-          this.catTrail.unshift({
-            x: this.catPos.x + 12,
-            y: this.catPos.y + 12,
-            speed: Math.sqrt(Math.pow(catMove.x, 2) + Math.pow(catMove.y, 2))
-          })
-          if (this.catTrail.length > this.trailLength) {
-            this.catTrail.pop()
-          }
-        }
-        this.catPos = { x: newCatX, y: newCatY }
-      } else if (catCollision.type === 'wall') {
-        this.catPos = {
-          x: catCollision.fromLeft ? newCatX - 30 : newCatX + 30,
-          y: newCatY
+      if (this.mousePos.x !== newMouseX || this.mousePos.y !== newMouseY) {
+        this.lastMouseMove = now
+        this.mouseTrail.unshift({
+          x: this.mousePos.x + 12,
+          y: this.mousePos.y + 12,
+          speed: Math.sqrt(Math.pow(mouseMove.x, 2) + Math.pow(mouseMove.y, 2))
+        })
+        if (this.mouseTrail.length > this.trailLength) {
+          this.mouseTrail.pop()
         }
       }
+      this.mousePos = { x: newMouseX, y: newMouseY }
+
+      if (this.catPos.x !== newCatX || this.catPos.y !== newCatY) {
+        this.lastCatMove = now
+        this.catTrail.unshift({
+          x: this.catPos.x + 12,
+          y: this.catPos.y + 12,
+          speed: Math.sqrt(Math.pow(catMove.x, 2) + Math.pow(catMove.y, 2))
+        })
+        if (this.catTrail.length > this.trailLength) {
+          this.catTrail.pop()
+        }
+      }
+      this.catPos = { x: newCatX, y: newCatY }
 
       this.checkCheeseCollection()
 
@@ -420,16 +425,13 @@ export default {
         this.timeLeft--
       } else if (this.timeLeft <= 0 && !this.isPaused && this.gameStarted) {
         if (this.mouseScore === this.catScore) {
-          if (!this.isOvertime) {  
-            this.isOvertime = true
-            this.showOvertimeMessage = true
-            this.mouseTrail = []
-            this.catTrail = []
-            setTimeout(() => {
-              this.showOvertimeMessage = false
-            }, 3000) 
-          }
-          return
+          this.isOvertime = true
+          this.showOvertimeMessage = true
+          this.mouseTrail = []
+          this.catTrail = []
+          setTimeout(() => {
+            this.showOvertimeMessage = false
+          }, 3000)
         } else {
           this.endGame(this.mouseScore > this.catScore ? 'mouse' : 'cat')
         }
