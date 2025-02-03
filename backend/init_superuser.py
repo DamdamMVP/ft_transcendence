@@ -6,7 +6,7 @@ from djangoapp.models import User
 
 
 def init_superuser():
-    load_dotenv()  # Charger les variables d'environnement
+    load_dotenv()
     
     DJANGO_SUPERUSER_USERNAME = os.getenv('DJANGO_SUPERUSER_USERNAME')
     DJANGO_SUPERUSER_EMAIL = os.getenv('DJANGO_SUPERUSER_EMAIL')
