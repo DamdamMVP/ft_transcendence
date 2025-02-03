@@ -1,19 +1,16 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import { ref, computed, onMounted, watch } from 'vue'
-import { useAuthStore } from '../../stores/authStore'
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 import eventBus from '../../utils/eventBus'
 
 const route = useRoute()
-const authStore = useAuthStore()
 const userHistory = ref([])
 const loading = ref(true)
 const error = ref(null)
 const { t } = useI18n()
 
-// Filtre l'historique par jeu et trie par date
 const filteredAndSortedHistory = computed(() => {
   return [...userHistory.value]
     .filter(
@@ -33,7 +30,6 @@ const fetchHistory = async () => {
       { withCredentials: true }
     )
     userHistory.value = response.data
-    // Émettre l'événement de mise à jour
     eventBus.emit('history-updated', response.data)
   } catch (err) {
     error.value = "Erreur lors de la récupération de l'historique"
@@ -42,7 +38,7 @@ const fetchHistory = async () => {
   }
 }
 
-// Recharger l'historique quand le jeu change
+// Reload history when the game changes
 watch(
   () => route.params.game,
   () => {
@@ -182,7 +178,6 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 2fr 1fr;
   align-items: center;
-  /* padding: 1rem; */
   padding-left: 0.7rem;
   padding-right: 0.7rem;
   border-radius: 12px;

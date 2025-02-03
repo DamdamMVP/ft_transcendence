@@ -46,7 +46,6 @@ const route = useRoute()
   animation: fadeIn 0.6s ease;
 }
 
-/* Effet de fond subtil */
 .navbar-profil::before {
   content: '';
   position: absolute;
@@ -128,7 +127,6 @@ const route = useRoute()
   box-shadow: 0 6px 20px var(--primary-shadow-color);
 }
 
-/* Animation d'entrée */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -140,7 +138,6 @@ const route = useRoute()
   }
 }
 
-/* Effet de brillance */
 .navbar-link::after {
   content: '';
   position: absolute;
@@ -177,7 +174,6 @@ const route = useRoute()
   }
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
   .navbar-profil {
     padding: 0.8rem 1rem;

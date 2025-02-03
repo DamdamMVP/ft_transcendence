@@ -8,12 +8,11 @@ import NavBarProfil from '../../components/profil/NavBarProfil.vue'
 
 const { t } = useI18n()
 const route = useRoute()
-const userHistory = ref([]) // Initialiser comme un tableau vide
+const userHistory = ref([])
 const loading = ref(true)
 const profileUser = ref(null)
 const error = ref(null)
 
-// Récupérer les informations de l'utilisateur
 const fetchUserProfile = async () => {
   try {
     loading.value = true
@@ -29,7 +28,6 @@ const fetchUserProfile = async () => {
   }
 }
 
-// Récupérer l'historique pour les stats
 const fetchHistory = async () => {
   try {
     const response = await axios.get(
@@ -38,22 +36,19 @@ const fetchHistory = async () => {
         withCredentials: true,
       }
     )
-    // S'assurer que la réponse est un tableau
     userHistory.value = Array.isArray(response.data) ? response.data : []
   } catch (err) {
     console.error('Erreur lors de la récupération des stats:', err)
     error.value = err.message
-    userHistory.value = [] // Réinitialiser à un tableau vide en cas d'erreur
+    userHistory.value = []
   }
 }
 
-// Recharger les données quand l'ID change
 const reloadData = async () => {
   error.value = null
   await Promise.all([fetchUserProfile(), fetchHistory()])
 }
 
-// Observer les changements de route
 watch(
   () => route.params.id_user,
   (newId, oldId) => {
@@ -64,9 +59,7 @@ watch(
   { immediate: true }
 )
 
-// Statistiques globales
 const stats = computed(() => {
-  // Vérifier que userHistory.value est un tableau
   if (!Array.isArray(userHistory.value)) {
     return {
       victories: 0,
@@ -96,19 +89,17 @@ const stats = computed(() => {
   }
 })
 
-// URL de la photo de profil
 const profilePhotoUrl = computed(() => {
   if (!profileUser.value?.profile_picture) {
     return '/default-avatar.png'
   }
-  // S'assurer que l'URL est complète et à jour
+  // Make sure the URL is complete and up-to-date
   const baseUrl = import.meta.env.VITE_BASE_URL.endsWith('/')
     ? import.meta.env.VITE_BASE_URL.slice(0, -1)
     : import.meta.env.VITE_BASE_URL
   return `${baseUrl}${profileUser.value.profile_picture}`
 })
 
-// Mettre à jour l'historique quand un événement est reçu
 const updateHistory = (newHistory) => {
   userHistory.value = Array.isArray(newHistory) ? newHistory : []
 }
@@ -116,7 +107,6 @@ const updateHistory = (newHistory) => {
 onMounted(async () => {
   try {
     await reloadData()
-    // S'abonner à l'événement de mise à jour
     eventBus.on('history-updated', updateHistory)
   } catch (err) {
     console.error('Erreur lors du chargement initial:', err)
@@ -125,7 +115,6 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  // Se désabonner de l'événement
   eventBus.off('history-updated', updateHistory)
 })
 </script>
@@ -211,7 +200,6 @@ onUnmounted(() => {
   box-shadow: 0 12px 30px var(--primary-shadow-color);
 }
 
-/* Effet de fond subtil */
 .profile-card::before {
   content: '';
   position: absolute;
@@ -324,7 +312,6 @@ onUnmounted(() => {
   color: var(--error-color);
 }
 
-/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -336,7 +323,6 @@ onUnmounted(() => {
   }
 }
 
-/* Media Queries */
 @media (max-width: 768px) {
   .profile-card {
     width: 90%;
