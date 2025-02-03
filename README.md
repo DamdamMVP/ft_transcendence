@@ -30,10 +30,31 @@ cd ft_transcendence
 
 ## 2. 🛠️ Commandes Principales
 
-| Commande        | Action                                   |
-| --------------- | ---------------------------------------- |
-| `make dev`      | 🚀 Démarrage du serveur de développement |
-| `make prod`     | 🏗 Construction pour la production       |
+| Commande    | Action                                   |
+| ----------- | ---------------------------------------- |
+| `make dev`  | 🚀 Démarrage du serveur de développement |
+| `make prod` | 🏗 Construction pour la production        |
+
+## 3. 🌟 Modules
+
+### Majeurs Modules
+
+- Use a Framework to build the backend.
+- Implement Two-Factor Authentication (2FA) and JWT.
+- Designing the Backend as Microservices.
+- Standard user management, authentication, users across tournaments.
+- Implementing a remote authentication.
+- Add Another Game with User History and Matchmaking
+- Live Chat.
+- Introduce an AI Opponent.
+
+### Minor Modules
+
+- GDPR Compliance Options with User Anonymization, Local Data Management, and Account Deletion.
+- Game Customization Options.
+- Expanding Browser Compatibility
+- Multiple language supports
+- Use a database for the backend -and more.
 
 ## 🌐 Le site
 
