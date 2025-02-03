@@ -70,7 +70,7 @@ export default {
 
 .guest-form-container {
   position: fixed;
-  top: var(--navbar-height, 60px);
+  top: var(--navbar-height, 100px);
   left: 0;
   right: 0;
   bottom: 0;
