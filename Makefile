@@ -1,8 +1,6 @@
 NAME = ft_transcendence
-# Par défaut, l'environnement est "dev" (développement). Pour la production, utilisez ENV=prod.
 ENV ?= dev
 
-# Si l'environnement est prod, on charge le fichier d'override production.
 ifeq ($(ENV),prod)
   DC = docker-compose -f docker-compose.yml -f docker-compose.prod.yml
 else
@@ -49,7 +47,6 @@ db:
 	@echo "Connecting to database..."
 	$(DC) exec db psql -U postgres
 
-# Cibles pour lancer en production ou en développement
 prod:
 	$(MAKE) ENV=prod all
 
