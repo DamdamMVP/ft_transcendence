@@ -2,9 +2,11 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import axios from 'axios'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
+const { t } = useI18n()
 const fileInput = ref(null)
 const selectedFile = ref(null)
 
@@ -36,7 +38,7 @@ const saveProfilePhoto = async () => {
   // Check the file size (2MB max)
   if (selectedFile.value.size > 2 * 1024 * 1024) {
     emit('showNotification', {
-      message: "La taille de l'image ne doit pas dépasser 2 Mo",
+      message: t('settings.notifications.profileError'),
       type: 'error',
     })
     return
@@ -50,33 +52,29 @@ const saveProfilePhoto = async () => {
       `/users/update_profile_picture/${authStore.user.id}`,
       formData,
       {
+        withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        withCredentials: true,
       }
     )
 
-    if (response.data.message === 'Profile picture updated successfully') {
+    if (response.data) {
       emit('showNotification', {
-        message: 'Photo de profil mise à jour avec succès',
+        message: t('settings.notifications.profileUpdated'),
         type: 'success',
       })
-
-      const userResponse = await axios.get(
-        `/users/read/${authStore.user.id}`,
-        { withCredentials: true }
-      )
-      if (userResponse.data) {
-        authStore.updateUser(userResponse.data)
-      }
+      authStore.updateUser(response.data)
       selectedFile.value = null
+    } else {
+      emit('showNotification', {
+        message: t('settings.notifications.profileError'),
+        type: 'error',
+      })
     }
   } catch (error) {
     emit('showNotification', {
-      message:
-        error.response?.data?.error ||
-        'Erreur lors de la mise à jour de la photo de profil',
+      message: error.response?.data?.error || t('settings.notifications.profileError'),
       type: 'error',
     })
   }

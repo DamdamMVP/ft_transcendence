@@ -2,9 +2,11 @@
 import { ref, watch } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import axios from 'axios'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const username = ref(authStore.user?.username || '')
 
@@ -28,16 +30,14 @@ const saveUsername = async () => {
 
     if (response.data && response.data.username === username.value) {
       emit('showNotification', {
-        message: "Nom d'utilisateur mis à jour avec succès",
+        message: t('settings.notifications.usernameChanged'),
         type: 'success',
       })
       authStore.updateUser(response.data)
     }
   } catch (error) {
     emit('showNotification', {
-      message:
-        error.response?.data?.error ||
-        "Erreur lors de la mise à jour du nom d'utilisateur",
+      message: error.response?.data?.error || t('settings.notifications.usernameError'),
       type: 'error',
     })
   }

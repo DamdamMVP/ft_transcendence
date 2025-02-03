@@ -2,9 +2,11 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import axios from 'axios'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
+const { t } = useI18n()
 
 const currentPassword = ref('')
 const newPassword = ref('')
@@ -14,7 +16,7 @@ const savePassword = async () => {
   try {
     if (!currentPassword.value) {
       emit('showNotification', {
-        message: 'Le mot de passe actuel est requis',
+        message: t('settings.notifications.passwordError'),
         type: 'error'
       })
       return
@@ -22,7 +24,7 @@ const savePassword = async () => {
 
     if (!newPassword.value || !confirmPassword.value) {
       emit('showNotification', {
-        message: 'Le nouveau mot de passe et sa confirmation sont requis',
+        message: t('settings.notifications.passwordError'),
         type: 'error'
       })
       return
@@ -30,7 +32,7 @@ const savePassword = async () => {
 
     if (newPassword.value !== confirmPassword.value) {
       emit('showNotification', {
-        message: 'Les mots de passe ne correspondent pas',
+        message: t('settings.notifications.passwordError'),
         type: 'error'
       })
       return
@@ -52,7 +54,7 @@ const savePassword = async () => {
       response.data.message === 'Password updated successfully'
     ) {
       emit('showNotification', {
-        message: 'Mot de passe mis à jour avec succès',
+        message: t('settings.notifications.passwordChanged'),
         type: 'success'
       })
       currentPassword.value = ''
@@ -62,12 +64,12 @@ const savePassword = async () => {
   } catch (error) {
     if (error.response?.data?.error === 'Invalid old password') {
       emit('showNotification', {
-        message: 'Le mot de passe actuel est incorrect',
+        message: t('settings.notifications.invalidOldPassword'),
         type: 'error'
       })
     } else {
       emit('showNotification', {
-        message: error.response?.data?.error || 'Erreur lors de la mise à jour du mot de passe',
+        message: error.response?.data?.error || t('settings.notifications.passwordError'),
         type: 'error'
       })
     }

@@ -82,7 +82,28 @@
     "disable2FA": "Diweredekaat 2FA",
     "enterVerificationCode": "Ebarzhit ar c'hod 6 sifr",
     "verify": "Gwiriañ",
-    "scanQRCode": "Skanit ar c'hod QR-mañ gant ho meziant dilesa (Google Authenticator, Authy, h.a.)"
+    "scanQRCode": "Skanit ar c'hod QR-mañ gant ho meziant dilesa (Google Authenticator, Authy, h.a.)",
+    "notifications": {
+      "2faEnabled": "2FA ativado com sucesso",
+      "2faDisabled": "2FA desativado",
+      "2faError": "Código de verificação inválido",
+      "2faSetupError": "Erro ao configurar 2FA",
+      "2faDisableError": "Erro ao desativar 2FA",
+      "accountDeleted": "Conta excluída com sucesso",
+      "accountDeleteError": "Erro ao excluir conta",
+      "accountAnonymized": "Conta anonimizada com sucesso",
+      "accountAnonymizeError": "Erro ao anonimizar conta",
+      "passwordChanged": "Senha alterada com sucesso",
+      "passwordError": "Erro ao alterar senha",
+      "usernameChanged": "Nome de usuário alterado com sucesso",
+      "usernameError": "Erro ao alterar nome de usuário",
+      "profileUpdated": "Perfil atualizado com sucesso",
+      "profileError": "Erro ao atualizar perfil",
+      "languageUpdated": "Idioma atualizado com sucesso",
+      "languageError": "Erro ao atualizar o idioma",
+      "themeUpdated": "Tema atualizado com sucesso",
+      "themeError": "Erro ao atualizar o tema"
+    }
   },
   "friendList": {
     "title": "Ma mignoned",
@@ -202,5 +223,12 @@
     "message": "Pa grouit ur gont, ec'h asantit d'hon politikerezh RGPT ha d'amprouiñ ho roadennoù personel. Ma ne rit ket, ne vo ket krouet ho kont. (N'it ket en nec'h, ne werzhomp ket ho roadennoù da dut all, ne viromp anezho nemet evit kinnig deoc'h un amprouadur personelaet war hon lec'hienn, ha ne stokomp nemet ar pezh a zo ret evit se. Ho roadennoù zo miret en un doare surentezet ha vo dilamet war hoc'h azgoulenn.)",
     "accept": "Asantiñ",
     "decline": "Na asantiñ"
+  },
+  "friends": {
+    "notifications": {
+      "userBlocked": "Usuário bloqueado com sucesso",
+      "friendRemoved": "Amigo removido com sucesso",
+      "friendAdded": "Amigo adicionado com sucesso"
+    }
   }
 }

@@ -7,7 +7,7 @@
       @close="notification.show = false"
     />
 
-    <!-- Icône de message flottante -->
+    <!-- Floating message icon -->
     <div class="message-icon" @click="toggleExpand">
       <span class="material-icons">🗪</span>
       <div v-if="onlineFriendsCount" class="online-badge">
@@ -15,7 +15,7 @@
       </div>
     </div>
 
-    <!-- Panel de la friend list -->
+    <!-- Friend list panel -->
     <div
       v-if="isExpanded && !activeChatFriend"
       class="friend-list"
@@ -70,7 +70,7 @@
       </div>
     </div>
 
-    <!-- Fenêtres de chat -->
+    <!-- Chat windows -->
     <ChatWindow
       v-if="activeChatFriend && isExpanded"
       :friend="activeChatFriend"
@@ -105,7 +105,6 @@ const notification = ref({
   message: '',
   type: 'error',
 })
-const isAddingFriend = ref(false)
 
 const onlineFriendsCount = computed(() => {
   return friendStore.friends.filter((friend) =>
@@ -119,14 +118,12 @@ const filteredFriends = computed(() => {
   )
 })
 
-// Le watch s'occupe déjà de charger la liste quand l'authentification change
 onMounted(async () => {
   if (authStore.isAuthenticated) {
     await friendStore.loadFriends()
   }
 })
 
-// Surveiller les changements d'authentification
 watch(
   () => authStore.isAuthenticated,
   async (newValue) => {
@@ -143,11 +140,9 @@ const toggleExpand = () => {
 }
 
 const startChat = (friend) => {
-  // Si c'est le canal général
   if (friend.isChannel) {
     activeChatFriend.value = friend
   } else {
-    // Si c'est un ami normal
     activeChatFriend.value = friend
   }
 }
@@ -157,13 +152,13 @@ const closeChat = () => {
 }
 
 const handleSendMessage = (message) => {
-  console.log('Message envoyé:', message)
+  console.log('Message sent:', message)
 }
 
 const blockUser = async (friend) => {
   try {
     await friendStore.blockUser(friend.username)
-    showNotification('Utilisateur bloqué avec succès', 'success')
+    showNotification($t('friends.notifications.userBlocked'), 'success')
   } catch (error) {
     showNotification(error.message, 'error')
   }
@@ -172,7 +167,7 @@ const blockUser = async (friend) => {
 const deleteFriend = async (friend) => {
   try {
     await friendStore.removeFriend(friend.username)
-    showNotification('Ami supprimé avec succès', 'success')
+    showNotification($t('friends.notifications.friendRemoved'), 'success')
   } catch (error) {
     showNotification(error.message, 'error')
   }
@@ -183,7 +178,7 @@ const addFriend = async () => {
     try {
       await friendStore.addFriend(newFriendUsername.value.trim())
       newFriendUsername.value = ''
-      showNotification('Ami ajouté avec succès', 'success')
+      showNotification($t('friends.notifications.friendAdded'), 'success')
     } catch (error) {
       showNotification(error.message, 'error')
     }

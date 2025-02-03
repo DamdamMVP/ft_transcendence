@@ -6,7 +6,7 @@ import axios from 'axios'
 
 const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const tempLanguage = ref(authStore.user.language)
 
@@ -33,7 +33,7 @@ const saveLanguage = async () => {
 
       if (response.data?.user) {
         emit('showNotification', {
-          message: 'Langue mise à jour avec succès',
+          message: t('settings.notifications.languageUpdated'),
           type: 'success',
         })
         locale.value = tempLanguage.value
@@ -41,9 +41,7 @@ const saveLanguage = async () => {
       }
     } catch (error) {
       emit('showNotification', {
-        message:
-          error.response?.data?.error ||
-          'Erreur lors de la mise à jour de la langue',
+        message: error.response?.data?.error || t('settings.notifications.languageError'),
         type: 'error',
       })
       tempLanguage.value = authStore.user.language

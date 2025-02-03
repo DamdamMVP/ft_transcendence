@@ -87,7 +87,28 @@
     "disable2FA": "Désactiver la 2FA",
     "enterVerificationCode": "Entrez le code à 6 chiffres",
     "verify": "Vérifier",
-    "scanQRCode": "Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy, etc.)"
+    "scanQRCode": "Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy, etc.)",
+    "notifications": {
+      "2faEnabled": "La 2FA a été activée avec succès",
+      "2faDisabled": "La 2FA a été désactivée",
+      "2faError": "Code de vérification invalide",
+      "2faSetupError": "Erreur lors de la configuration de la 2FA",
+      "2faDisableError": "Erreur lors de la désactivation de la 2FA",
+      "accountDeleted": "Compte supprimé avec succès",
+      "accountDeleteError": "Erreur lors de la suppression du compte",
+      "accountAnonymized": "Compte anonymisé avec succès",
+      "accountAnonymizeError": "Erreur lors de l'anonymisation du compte",
+      "passwordChanged": "Mot de passe modifié avec succès",
+      "passwordError": "Erreur lors de la modification du mot de passe",
+      "usernameChanged": "Nom d'utilisateur modifié avec succès",
+      "usernameError": "Erreur lors de la modification du nom d'utilisateur",
+      "profileUpdated": "Profil mis à jour avec succès",
+      "profileError": "Erreur lors de la mise à jour du profil",
+      "languageUpdated": "Langue mise à jour avec succès",
+      "languageError": "Erreur lors de la mise à jour de la langue",
+      "themeUpdated": "Thème mis à jour avec succès",
+      "themeError": "Erreur lors de la mise à jour du thème"
+    }
   },
   "friendList": {
     "title": "Mes amis",
@@ -104,6 +125,13 @@
       "block": "🚫",
       "delete": "🗑",
       "profile": "👤"
+    }
+  },
+  "friends": {
+    "notifications": {
+      "userBlocked": "Utilisateur bloqué avec succès",
+      "friendRemoved": "Ami supprimé avec succès",
+      "friendAdded": "Ami ajouté avec succès"
     }
   },
   "chat": {

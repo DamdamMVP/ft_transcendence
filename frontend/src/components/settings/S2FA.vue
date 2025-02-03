@@ -74,12 +74,12 @@ const disable2FA = async () => {
     await axios.post('/users/2fa/disable', {}, { withCredentials: true })
     has2FAEnabled.value = false
     emit('showNotification', {
-      message: '2FA has been disabled',
+      message: $t('settings.notifications.2faDisabled'),
       type: 'success'
     })
   } catch (error) {
     emit('showNotification', {
-      message: error.response?.data?.error || 'Error when disabling 2FA',
+      message: error.response?.data?.error || $t('settings.notifications.2faDisableError'),
       type: 'error'
     })
   }
@@ -90,20 +90,20 @@ const verifyCode = async () => {
   try {
     const response = await axios.post(
       '/users/2fa/verify',
-      { token: verificationCode.value }, // Changed from 'code' to 'token'
+      { token: verificationCode.value }, 
       { withCredentials: true }
     )
-    if (response.data.success) { // Changed from 'verified' to 'success' to match the backend response
+    if (response.data.success) { 
       has2FAEnabled.value = true
       closeModal()
       emit('showNotification', {
-        message: 'La 2FA a été activée avec succès',
+        message: $t('settings.notifications.2faEnabled'),
         type: 'success'
       })
     }
   } catch (error) {
     emit('showNotification', {
-      message: error.response?.data?.error || 'Code de vérification invalide',
+      message: error.response?.data?.error || $t('settings.notifications.2faError'),
       type: 'error'
     })
   }

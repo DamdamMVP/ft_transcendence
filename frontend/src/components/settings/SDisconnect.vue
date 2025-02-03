@@ -4,10 +4,12 @@ import { useAuthStore } from '../../stores/authStore'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import S2FA from './S2FA.vue'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
 const router = useRouter()
+const { t } = useI18n()
 const showDeleteConfirm = ref(false)
 const showAnonymizeConfirm = ref(false)
 
@@ -20,7 +22,7 @@ const deleteAccount = async () => {
 
     if (response.data?.message === 'User successfully deleted!') {
       emit('showNotification', {
-        message: 'Compte supprimé avec succès',
+        message: t('settings.notifications.accountDeleted'),
         type: 'success'
       })
       authStore.logout()
@@ -29,7 +31,7 @@ const deleteAccount = async () => {
     }
   } catch (error) {
     emit('showNotification', {
-      message: error.response?.data?.error || 'Erreur lors de la suppression du compte',
+      message: error.response?.data?.error || t('settings.notifications.accountDeleteError'),
       type: 'error'
     })
     showDeleteConfirm.value = false
@@ -44,7 +46,7 @@ const anonymizeAccount = async () => {
     )
     if (response.data?.message === 'User anonymized successfully') {
       emit('showNotification', {
-        message: 'Compte anonymisé avec succès',
+        message: t('settings.notifications.accountAnonymized'),
         type: 'success'
       })
       await authStore.logout()
@@ -53,7 +55,7 @@ const anonymizeAccount = async () => {
     }
   } catch (error) {
     emit('showNotification', {
-      message: error.response?.data?.error || 'Erreur lors de l\'anonymisation du compte',
+      message: error.response?.data?.error || t('settings.notifications.accountAnonymizeError'),
       type: 'error'
     })
     showAnonymizeConfirm.value = false

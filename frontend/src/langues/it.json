@@ -87,7 +87,28 @@
     "disable2FA": "Disattiva 2FA",
     "enterVerificationCode": "Inserisci il codice a 6 cifre",
     "verify": "Verifica",
-    "scanQRCode": "Scansiona questo codice QR con la tua app di autenticazione (Google Authenticator, Authy, ecc.)"
+    "scanQRCode": "Scansiona questo codice QR con la tua app di autenticazione (Google Authenticator, Authy, ecc.)",
+    "notifications": {
+      "2faEnabled": "2FA attivata con successo",
+      "2faDisabled": "2FA disattivata",
+      "2faError": "Codice di verifica non valido",
+      "2faSetupError": "Errore durante la configurazione della 2FA",
+      "2faDisableError": "Errore durante la disattivazione della 2FA",
+      "accountDeleted": "Account eliminato con successo",
+      "accountDeleteError": "Errore durante l'eliminazione dell'account",
+      "accountAnonymized": "Account anonimizzato con successo",
+      "accountAnonymizeError": "Errore durante l'anonimizzazione dell'account",
+      "passwordChanged": "Password modificata con successo",
+      "passwordError": "Errore durante la modifica della password",
+      "usernameChanged": "Nome utente modificato con successo",
+      "usernameError": "Errore durante la modifica del nome utente",
+      "profileUpdated": "Profilo aggiornato con successo",
+      "profileError": "Errore durante l'aggiornamento del profilo",
+      "languageUpdated": "Lingua aggiornata con successo",
+      "languageError": "Errore durante l'aggiornamento della lingua",
+      "themeUpdated": "Tema aggiornato con successo",
+      "themeError": "Errore durante l'aggiornamento del tema"
+    }
   },
   "friendList": {
     "title": "I miei amici",
@@ -104,6 +125,13 @@
       "block": "🚫",
       "delete": "🗑",
       "profile": "👤"
+    }
+  },
+  "friends": {
+    "notifications": {
+      "userBlocked": "Utente bloccato con successo",
+      "friendRemoved": "Amico rimosso con successo",
+      "friendAdded": "Amico aggiunto con successo"
     }
   },
   "chat": {

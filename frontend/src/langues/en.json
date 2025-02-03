@@ -79,15 +79,36 @@
     "deleteAccountConfirm": "Yes, delete my account",
     "cancel": "Cancel",
     "accountDeleted": "Account successfully deleted",
-	"anonymizeAccount": "Anonymize account",
-	"anonymizeAccountConfirm": "Yes, anonymize my account",
-	"anonymizeConfirm": "Are you sure you want to anonymize your account? This action is irreversible.",
+    "anonymizeAccount": "Anonymize account",
+    "anonymizeAccountConfirm": "Yes, anonymize my account",
+    "anonymizeConfirm": "Are you sure you want to anonymize your account? This action is irreversible.",
     "logout": "Logout",
     "enable2FA": "Enable 2FA",
     "disable2FA": "Disable 2FA",
     "enterVerificationCode": "Enter 6-digit code",
     "verify": "Verify",
-    "scanQRCode": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)"
+    "scanQRCode": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
+    "notifications": {
+      "2faEnabled": "2FA has been enabled successfully",
+      "2faDisabled": "2FA has been disabled",
+      "2faError": "Invalid verification code",
+      "2faSetupError": "Error when setting up 2FA",
+      "2faDisableError": "Error when disabling 2FA",
+      "accountDeleted": "Account deleted successfully",
+      "accountDeleteError": "Error while deleting account",
+      "accountAnonymized": "Account anonymized successfully",
+      "accountAnonymizeError": "Error while anonymizing account",
+      "passwordChanged": "Password changed successfully",
+      "passwordError": "Error while changing password",
+      "usernameChanged": "Username changed successfully",
+      "usernameError": "Error while changing username",
+      "profileUpdated": "Profile updated successfully",
+      "profileError": "Error while updating profile",
+      "languageUpdated": "Language updated successfully",
+      "languageError": "Error while updating language",
+      "themeUpdated": "Theme updated successfully",
+      "themeError": "Error while updating theme"
+    }
   },
   "friendList": {
     "title": "My friends",
@@ -104,6 +125,13 @@
         "block": "🚫",
         "delete": "🗑",
         "profile": "👤"
+    }
+  },
+  "friends": {
+    "notifications": {
+      "userBlocked": "User blocked successfully",
+      "friendRemoved": "Friend removed successfully",
+      "friendAdded": "Friend added successfully"
     }
   },
   "chat": {

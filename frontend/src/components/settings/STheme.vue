@@ -3,10 +3,12 @@ import { ref } from 'vue'
 import { useAuthStore } from '../../stores/authStore'
 import { useTheme } from '../../composables/useTheme'
 import axios from 'axios'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits(['showNotification'])
 const authStore = useAuthStore()
 const { setTheme } = useTheme()
+const { t } = useI18n()
 
 const tempTheme = ref(authStore.user.theme)
 
@@ -27,7 +29,7 @@ const saveTheme = async () => {
 
       if (response.data?.user) {
         emit('showNotification', {
-          message: 'Thème mis à jour avec succès',
+          message: t('settings.notifications.themeUpdated'),
           type: 'success',
         })
         setTheme(tempTheme.value)
@@ -35,9 +37,7 @@ const saveTheme = async () => {
       }
     } catch (error) {
       emit('showNotification', {
-        message:
-          error.response?.data?.error ||
-          'Erreur lors de la mise à jour du thème',
+        message: error.response?.data?.error || t('settings.notifications.themeError'),
         type: 'error',
       })
       tempTheme.value = authStore.user.theme
