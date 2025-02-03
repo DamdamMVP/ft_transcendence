@@ -28,26 +28,21 @@ def setup_2fa(request):
     device = get_user_totp_device(user)
     
     if not device:
-        # Generate a random base32 key
         key = pyotp.random_base32()
         device = user.totpdevice_set.create(key=key, confirmed=False)
     
-    # Create TOTP object
     totp = pyotp.TOTP(device.key)
     
-    # Create provisioning URI
     provisioning_uri = totp.provisioning_uri(
         name=user.username,
         issuer_name='ft_transcendence'
     )
     
-    # Generate QR code
     img = qrcode.make(provisioning_uri, image_factory=qrcode.image.svg.SvgImage)
     stream = BytesIO()
     img.save(stream)
     qr_code = base64.b64encode(stream.getvalue()).decode()
     
-    # Create otpauth URL manually to ensure correct format
     otpauth_url = f"otpauth://totp/ft_transcendence:{user.username}?secret={device.key}&issuer=ft_transcendence"
     
     return Response({
@@ -73,22 +68,20 @@ def verify_2fa(request):
             logger.warning(f"No 2FA device found for user {user.username}")
             return Response({'error': '2FA is not set up'}, status=400)
         
-        # Ensure token is a string of 6 digits
+        # Token must be a string of 6 digits
         token = str(token).zfill(6)
         if not token.isdigit() or len(token) != 6:
             return Response({'error': 'Token must be 6 digits'}, status=400)
         
-        # Create TOTP object with the same parameters
+        # Create a TOTP object (same parameters))
         totp = pyotp.TOTP(device.key)
         
-        # Verify with both current and previous windows to account for time drift
         is_valid = totp.verify(token, valid_window=1)
         
         if is_valid:
             if not device.confirmed:
                 device.confirmed = True
                 device.save()
-                # Mettre à jour le champ has_2fa
                 user.has_2fa = True
                 user.save()
                 logger.info(f"2FA confirmed for user {user.username}")
@@ -113,13 +106,10 @@ def disable_2fa(request):
     for device in devices:
         device.delete()
     
-    # Mettre à jour le champ has_2fa
     user.has_2fa = False
     user.save()
     
     return Response({'success': True, 'message': '2FA has been disabled'})
-    
-    return Response({'error': '2FA is not enabled'}, status=400)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

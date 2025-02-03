@@ -1,10 +1,5 @@
 from django.urls import path
 from . import views
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,  # Generates access and refresh tokens
-    TokenRefreshView,     # Renews an access token
-    TokenVerifyView,      # Verifies if a token is valid
-)
 from . import two_factor
 from . import history
 

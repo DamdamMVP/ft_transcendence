@@ -1,13 +1,12 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from django.http import JsonResponse
 from django.contrib.auth.hashers import check_password, make_password
-from .models import User, History, Block
+from .models import User, Block
 from django.contrib.auth import authenticate, login
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from rest_framework import status
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -51,7 +50,6 @@ def login(request):
     user = authenticate(request, username=email, password=password)
 
     if user:
-        # Mettre à jour le statut en ligne
         status, _ = UserStatus.objects.get_or_create(user=user)
         status.is_online = True
         status.save()
@@ -70,7 +68,7 @@ def login(request):
             httponly=True,
             secure=True,
             samesite='None',
-            max_age=3600 * 24  # 24 heures 
+            max_age=3600 * 24
         )
         response.set_cookie(
             key='refresh_token',
@@ -121,7 +119,6 @@ def refresh_token(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout(request):
-    # Mettre à jour le statut en ligne
     user = request.user
     status, _ = UserStatus.objects.get_or_create(user=user)
     status.is_online = False
@@ -129,7 +126,6 @@ def logout(request):
 
     response = Response({'message': 'Logged out successfully'}, status=200)
 
-    # Delete cookies
     response.delete_cookie('access_token')
     response.delete_cookie('refresh_token')
 
@@ -155,13 +151,12 @@ def getUser(request, pk):
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=404)
 
-# Add a new user (with password hashing)
+# Add a new user
 @api_view(['POST'])
-@permission_classes([AllowAny])  # Allows access without authentication
+@permission_classes([AllowAny])
 def addUser(request):
     data = request.data
 
-    # Hash password
     password = data.get('password')
 
     try:
@@ -169,6 +164,7 @@ def addUser(request):
     except ValidationError as e:
         return Response({'error': e.messages}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Hash password
     data['password'] = make_password(data['password'])
     serializer = UserSerializer(data=data)
 
@@ -182,22 +178,20 @@ def addUser(request):
 @permission_classes([IsAuthenticated])
 def updateUser(request, pk):
     try:
-        # Check that the user making the request corresponds to the user to be updated
-        if int(request.user.id) != int(pk):  # Ensure both are integers
+        # Check if request user = user to be updated
+        if int(request.user.id) != int(pk):
             return Response({'error': 'You can only update your own account.'}, status=403)
         
         user = request.user
         data = request.data
 
-        # Only allow `username` and `email` fields to be updated
         allowed_fields = ['username', 'email']
         update_data = {field: data[field] for field in allowed_fields if field in data}
 
-        # Check that allowed fields are present and valid
         if not update_data:
             return Response({'error': 'Only username and email can be updated.'}, status=400)
 
-        serializer = UserSerializer(instance=user, data=update_data, partial=True)  # Use `partial=True` to only require provided fields
+        serializer = UserSerializer(instance=user, data=update_data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=200)
@@ -206,8 +200,6 @@ def updateUser(request, pk):
         return Response({'error': 'User not found'}, status=404)
 
 
-
-# Delete a user
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def deleteUser(request, pk):
@@ -223,7 +215,6 @@ def updateProfilePicture(request, pk):
         if 'profile_picture' not in request.FILES:
             return Response({'error': 'No profile picture provided'}, status=400)
 
-        # Update profile picture
         user.profile_picture = request.FILES['profile_picture']
         user.save()
 
@@ -326,7 +317,6 @@ def block_user(request):
     blocker = request.user
     blocked_id = request.data.get("blocked_id")
 
-    # Check if blocked user ID is provided
     if not blocked_id:
         return Response({"error": "Blocked user ID is required."}, status=400)
 
@@ -334,11 +324,9 @@ def block_user(request):
         # Check if user exists
         blocked = User.objects.get(id=blocked_id)
 
-        # Prevent user from blocking themselves
         if blocker.id == blocked.id:
             return Response({"error": "You cannot block yourself."}, status=400)
 
-        # Check if user is already blocked
         if Block.objects.filter(blocker=blocker, blocked=blocked).exists():
             return Response({"message": f"{blocked.username} is already blocked."}, status=200)
 
@@ -356,7 +344,6 @@ def unblock_user(request):
     blocker = request.user
     blocked_id = request.data.get("blocked_id")
 
-    # Check if unblock user ID is provided
     if not blocked_id:
         return Response({"error": "Blocked user ID is required."}, status=400)
 
@@ -364,12 +351,10 @@ def unblock_user(request):
         # Check if user exists
         blocked = User.objects.get(id=blocked_id)
 
-        # Check if user is actually blocked
         block = Block.objects.filter(blocker=blocker, blocked=blocked).first()
         if not block:
             return Response({"error": f"{blocked.username} is not blocked."}, status=400)
 
-        # Delete block
         block.delete()
         return Response({"message": f"{blocked.username} has been unblocked."}, status=200)
     except User.DoesNotExist:
@@ -501,8 +486,8 @@ def fortytwo_login(request):
     Initiate the 42 OAuth flow
     """
     client_id = settings.FORTYTWO_CLIENT_ID
-    hostname = settings.HOSTNAME  # Récupère le hostname défini dans l'environnement
-    redirect_uri = f'https://{hostname}:8443/users/fortytwo/callback/'  # Remplace localhost
+    hostname = settings.HOSTNAME
+    redirect_uri = f'https://{hostname}:8443/users/fortytwo/callback/'
     auth_url = f'https://api.intra.42.fr/oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code'
     
     return redirect(auth_url)
@@ -542,50 +527,42 @@ def fortytwo_callback(request):
         return Response({'error': 'Failed to get user info'}, status=400)
 
     user_data = response.json()
-    print("42 API user data:", user_data)  # Debug log
-    
+   
     try:
         user = User.objects.get(email=user_data['email'])
     except User.DoesNotExist:
-        # Générer un mot de passe aléatoire sécurisé
         random_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
         user = User.objects.create_user(
-            email=user_data['email'],
-            username=user_data['login'],
-            first_name=user_data.get('first_name', ''),
-            last_name=user_data.get('last_name', ''),
-            password=random_password  # Utiliser le mot de passe aléatoire
+            email = user_data['email'],
+            username = user_data['login'],
+            first_name = user_data.get('first_name', ''),
+            last_name = user_data.get('last_name', ''),
+            password = random_password 
         )
 
-    # Récupérer et sauvegarder l'image de profil 42
+    # Get 42 profile picture
     if 'image' in user_data and 'link' in user_data['image']:
         image_url = user_data['image']['link']
-        print("Image URL from 42:", image_url)  # Debug log
         
         image_response = requests.get(image_url)
-        print("Image response status:", image_response.status_code)  # Debug log
         
         if image_response.ok:
             from django.core.files.base import ContentFile
             import os
             
-            # Créer un nom de fichier unique basé sur l'username
             image_name = f"42_profile_{user.username}{os.path.splitext(image_url)[1]}"
-            print("Saving image as:", image_name)  # Debug log
             
-            # Sauvegarder l'image
             user.profile_picture.save(
                 image_name,
                 ContentFile(image_response.content),
                 save=True
             )
-            print("Image saved successfully")  # Debug log
         else:
-            print("Failed to download image:", image_response.text)  # Debug log
+            print("Failed to download image:", image_response.text)
     else:
-        print("No image URL found in user data")  # Debug log
+        print("No image URL found in user data")
 
-    # Authentifier et connecter l'utilisateur directement
+    # Auth and connect the user
     user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request._request, user)
 
@@ -596,7 +573,6 @@ def fortytwo_callback(request):
     print(f"User authentication status: {user.is_authenticated}")
     print(f"Current user: {user.username}")
 
-    # Créer l'URL avec les paramètres utilisateur
     user_data = {
         'id': user.id,
         'username': user.username,

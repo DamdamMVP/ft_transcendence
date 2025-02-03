@@ -2,7 +2,7 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
-from .models import Block, UserStatus  # Modèle pour les statuts
+from .models import Block, UserStatus
 from django.contrib.auth.models import AnonymousUser
 from datetime import datetime
 
@@ -79,7 +79,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        user = self.scope["user"]  # Connected user
+        user = self.scope["user"]
 
         # Decode message data
         try:
@@ -99,7 +99,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'chat_message',
                 'message': message,
                 'sender': user.username,
-                'sender_id': user.id,  # Adding ID for block management
+                'sender_id': user.id,
                 'timestamp': timestamp,
             }
         )
@@ -114,7 +114,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Check if user has blocked the sender
         blocked_senders = await self.get_blocked_users(user)
 
-        # If current user (`user`) has blocked the sender (`sender_id`), ignore message
         if sender_id in blocked_senders:
             print(f"User {user} has blocked sender {sender_id}")
             return
@@ -194,7 +193,6 @@ class StatusConsumer(AsyncWebsocketConsumer):
         }
 
     async def user_status(self, event):
-        # Envoyer la mise à jour du statut à tous les clients connectés
         await self.send(text_data=json.dumps({
             "type": "user_status",
             "user_id": event["user_id"],
