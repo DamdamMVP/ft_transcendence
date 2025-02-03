@@ -16,7 +16,7 @@ const { signUp } = useAuth()
 
 const handleSignUp = async () => {
   if (password.value !== confirmPassword.value) {
-    error.value = 'Les mots de passe ne correspondent pas'
+    error.value = 'Passwords do not match'
     return
   }
 

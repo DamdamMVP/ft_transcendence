@@ -12,15 +12,15 @@ const toggleMode = () => {
 }
 
 const handleAuthSuccess = () => {
-  console.log('Authentification en cours...')
+  console.log('Authentication in progress...')
 }
 
 const handle2FAVerified = () => {
-  console.log('2FA vérifié avec succès')
+  console.log('2FA successfully verified')
 }
 
 const handle2FACancelled = () => {
-  console.log('Vérification 2FA annulée')
+  console.log('2FA verification cancelled')
 }
 
 onMounted(() => {
